@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MauiSample.MainPage">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="30,0"
+            Spacing="25">
+
+            <Label
+                Text="RevenueCat Public API Key"
+                Style="{StaticResource SubHeadline}"
+                SemanticProperties.HeadingLevel="Level2" />
+
+            <Entry x:Name="rcApiKey" Placeholder="Public API Key" Text="goog_kPxQRsYSTBgsBRMlucULuPZIYkW"></Entry>
+
+            <Label
+                Text="RevenueCat User ID"
+                Style="{StaticResource SubHeadline}"
+                SemanticProperties.HeadingLevel="Level2" />
+
+            <Entry x:Name="rcUserId" Placeholder="User ID" Text="tfp-120465"></Entry>
+
+            <Button
+                Text="Identify"
+                SemanticProperties.Hint="Navigates to getting started documentation"
+                Clicked="Identify_Clicked"
+                HorizontalOptions="Fill" />
+
+            <Button
+                Text="Update Entitlements"
+                SemanticProperties.Hint="Navigates to getting started documentation"
+                Clicked="Update_Clicked"
+                HorizontalOptions="Fill" />
+            <Label Text="Entitlements: ?" x:Name="txtEntitlements"></Label>
+
+            <Label
+                Text="RevenueCat Offering Identifier"
+                Style="{StaticResource SubHeadline}"
+                SemanticProperties.HeadingLevel="Level2" />
+
+            <Entry x:Name="rcOfferingId" Placeholder="Offering Identifier" Text="pro1year"></Entry>
+
+            <Button
+                Text="Purchase"
+                SemanticProperties.Hint="Navigates to getting started documentation"
+                Clicked="Purchase_Clicked"
+                HorizontalOptions="Fill" />
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
