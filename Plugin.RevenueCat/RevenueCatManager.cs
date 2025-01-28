@@ -27,8 +27,14 @@ public class RevenueCatManager(IRevenueCatImpl revenueCatImpl) : IRevenueCatMana
 	{
 		var s = await revenueCatImpl.Login(userId);
 
-		var cir = CustomerInfoRequest.FromJson(s);
+	CustomerInfoRequest cir = null;
 
+try {
+		 cir = CustomerInfoRequest.FromJson(s);
+} catch (Exception ex)
+{
+	Console.WriteLine(ex);
+}
 		Console.WriteLine(s);
 
 		return cir;

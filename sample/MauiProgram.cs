@@ -21,9 +21,10 @@ public static class MauiProgram
 #if ANDROID
 		builder.Services.AddSingleton<IRevenueCatImpl, RevenueCatAndroid>();
 		builder.Services.AddSingleton<IRevenueCatManager, RevenueCatManager>();
-        #elif IOS || MACCATALYST
-        builder.Services.AddSingleton<IRevenueCatManager, RevenueCatManagerApple>();
-        #endif
+#elif IOS || MACCATALYST
+        builder.Services.AddSingleton<IRevenueCatImpl, RevenueCatApple>();
+		builder.Services.AddSingleton<IRevenueCatManager, RevenueCatManager>();
+#endif
 
 #if DEBUG
 		builder.Logging.AddDebug();

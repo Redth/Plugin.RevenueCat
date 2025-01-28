@@ -8,108 +8,125 @@
 import Foundation
 import UIKit
 import RevenueCat
-import RevenueCatUI
 
 @objc(RevenueCatManager)
 public class RevenueCatManager : NSObject
 {
 
     @objc(initialize:apiKey:userId:)
-    public func initialize(debugLog: Bool, apiKey: String, userId: String?) {
+    public func initialize(debugLog: Bool, apiKey: NSString, userId: String?) {
         if (debugLog){
             Purchases.logLevel = .debug
         }
-        Purchases.configure(withAPIKey: apiKey, appUserID: userId)
+        Purchases.configure(withAPIKey: apiKey as String, appUserID: userId)
     }
     
     
-    @objc(login:err:)
-    public func login(userId: String) async throws -> String {
-        
-        return try await withCheckedThrowingContinuation { continuation in
-            Purchases.shared.logIn(userId) { (customerInfo, created, error) in
-                do {
-                    let jsonString = try self.processCustomerInfo(customerInfo: customerInfo, error: error)
-                    continuation.resume(returning: jsonString)
-                } catch {
-                    continuation.resume(throwing: error)
-                }
+    @objc(login:callback:)
+    public func login(userId: NSString, callback: @escaping (NSData?, NSError?) -> Void) {
+        Purchases.shared.logIn(userId as String) { customerInfo, created, error in
+            if (error != nil)
+            {
+                callback(nil, error)
+                return
+            }
+            
+            do {
+                let jsonData = try JSONSerialization.data(withJSONObject: customerInfo!.rawData, options: [])
+                
+                callback(NSData(data: jsonData), nil)
+                
+                //let jsonString = try self.processCustomerInfo(customerInfo: customerInfo)
+                //callback(jsonString, nil)
+            } catch let error as NSError {
+                callback(nil, error)
             }
         }
     }
     
     
-    @objc(getCustomerInfo:err:)
-    public func getCustomerInfo(force: Bool) async throws -> String {
-        
+    @objc(getCustomerInfo:callback:)
+    public func getCustomerInfo(force: Bool, callback: @escaping (NSString?, NSError?) -> Void) {
         let fetchPolicy = force ? CacheFetchPolicy.fetchCurrent : CacheFetchPolicy.notStaleCachedOrFetched
 
-        return try await withCheckedThrowingContinuation { continuation in
-            Purchases.shared.getCustomerInfo(fetchPolicy: fetchPolicy) { (customerInfo, error) in
-                do {
-                    let jsonString = try self.processCustomerInfo(customerInfo: customerInfo, error: error)
-                    continuation.resume(returning: jsonString)
-                } catch {
-                    continuation.resume(throwing: error)
-                }
+        Purchases.shared.getCustomerInfo(fetchPolicy: fetchPolicy) { customerInfo, error in
+            if (error != nil)
+            {
+                callback(nil, error)
+                return
+            }
+            
+            do {
+                let jsonString = try self.processCustomerInfo(customerInfo: customerInfo)
+                callback(jsonString, nil)
+            } catch let error as NSError {
+                callback(nil, error)
             }
         }
     }
     
     
-    var customerInfoChangedHandler: ((String) -> Void)?
+    var customerInfoChangedHandler: ((NSString) -> Void)?
 
     @objc(setCustomerInfoChangedHandler:)
-    public func setCustomerInfoChangedHandler(callback: @escaping (String) -> Void) -> Void {
+    public func setCustomerInfoChangedHandler(callback: @escaping (NSString) -> Void) -> Void {
         customerInfoChangedHandler = callback
     }
     
-    @objc(restore:)
-    public func restore() async throws -> String {
-        return try await withCheckedThrowingContinuation { continuation in
-            Purchases.shared.restorePurchases() { (customerInfo, error) in
-                do {
-                    let jsonString = try self.processCustomerInfo(customerInfo: customerInfo, error: error)
-                    continuation.resume(returning: jsonString)
-                } catch {
-                    continuation.resume(throwing: error)
-                }
-            }
-        }
-    }
+//    @objc(restore:)
+//    public func restore(callback: @escaping (String?, NSError?) -> Void) {
+//        Purchases.shared.restorePurchases() { (customerInfo, error) in
+//                do {
+//                    let jsonString = try self.processCustomerInfo(customerInfo: customerInfo, error: error)
+//                    continuation.resume(returning: jsonString)
+//                } catch {
+//                    continuation.resume(throwing: error)
+//                }
+//            }
+//        }
+//    }
+//    
+//    @objc(purchase:err:)
+//    public func restore(storeProduct: Any) async throws -> String {
+//        return try await withCheckedThrowingContinuation { continuation in
+//            Purchases.shared.purchase(product: storeProduct as! StoreProduct) { (transaction, customerInfo, error, ok) in
+//                do {
+//                    let jsonString = try self.processCustomerInfo(customerInfo: customerInfo, error: error)
+//                    let transactionJsonString = try self.processTransaction(transaction: transaction, error: error)
+//                    continuation.resume(returning: transactionJsonString)
+//                } catch {
+//                    continuation.resume(throwing: error)
+//                }
+//            }
+//        }
+//    }
     
-    @objc(purchase:err:)
-    public func restore(storeProduct: Any) async throws -> String {
-        return try await withCheckedThrowingContinuation { continuation in
-            Purchases.shared.purchase(product: storeProduct as! StoreProduct) { (transaction, customerInfo, error, ok) in
-                do {
-                    let jsonString = try self.processCustomerInfo(customerInfo: customerInfo, error: error)
-                    let transactionJsonString = try self.processTransaction(transaction: transaction, error: error)
-                    continuation.resume(returning: transactionJsonString)
-                } catch {
-                    continuation.resume(throwing: error)
-                }
-            }
-        }
-    }
-    
-    private func processCustomerInfo(customerInfo: CustomerInfo?, error: Error?) throws -> String {
-        if let error = error {
-            throw error
-        }
-        
+    private func processCustomerInfo(customerInfo: CustomerInfo?) throws -> NSString? {
+       
         guard let rawData = customerInfo?.rawData else {
             throw NSError(domain: "InvalidDataError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Customer info is nil or invalid"])
         }
+        var jsonString: NSString?
         
-        guard let jsonString = anyToJson(rawData: rawData) else {
-            throw NSError(domain: "SerializationError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to convert raw data to JSON"])
+        do {
+            // Convert dictionary to JSON data
+            let jsonData = try JSONSerialization.data(withJSONObject: rawData, options: [])
+            
+            // Convert JSON data to a JSON string
+            let jsonDataString = NSString(data: jsonData, encoding: NSUTF8StringEncoding)
+            
+            let cleanJsonString = NSString(string: jsonDataString!)
+            
+            if (self.customerInfoChangedHandler != nil) {
+                self.customerInfoChangedHandler!(cleanJsonString)
+            }
+            
+            return cleanJsonString
+        } catch {
+            return nil
         }
         
-        if (customerInfoChangedHandler != nil) {
-            customerInfoChangedHandler!(jsonString)
-        }
-        return jsonString
+        return nil
     }
     
     private func processTransaction(transaction: StoreTransaction?, error: Error?) throws -> String {

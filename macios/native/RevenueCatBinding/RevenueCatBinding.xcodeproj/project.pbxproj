@@ -9,8 +9,6 @@
 /* Begin PBXBuildFile section */
 		646070992D42CC940036C905 /* RevenueCat.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 646070982D42CC940036C905 /* RevenueCat.xcframework */; };
 		6460709A2D42CC940036C905 /* RevenueCat.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 646070982D42CC940036C905 /* RevenueCat.xcframework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		6460709D2D42CCA30036C905 /* RevenueCatUI.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6460709C2D42CCA30036C905 /* RevenueCatUI.xcframework */; };
-		6460709E2D42CCA30036C905 /* RevenueCatUI.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6460709C2D42CCA30036C905 /* RevenueCatUI.xcframework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		83E34F572C21CB2B008AA950 /* RevenueCat.h in Headers */ = {isa = PBXBuildFile; fileRef = 83E34F562C21CB2B008AA950 /* RevenueCat.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		83E34F5E2C21CC53008AA950 /* RevenueCatBinding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E34F5D2C21CC53008AA950 /* RevenueCatBinding.swift */; };
 /* End PBXBuildFile section */
@@ -23,7 +21,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				6460709A2D42CC940036C905 /* RevenueCat.xcframework in Embed Frameworks */,
-				6460709E2D42CCA30036C905 /* RevenueCatUI.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -32,7 +29,6 @@
 
 /* Begin PBXFileReference section */
 		646070982D42CC940036C905 /* RevenueCat.xcframework */ = {isa = PBXFileReference; expectedSignature = "AppleDeveloperProgram:8SXR2327BM:RevenueCat, Inc."; lastKnownFileType = wrapper.xcframework; name = RevenueCat.xcframework; path = ../bin/deps/RevenueCat/RevenueCat.xcframework; sourceTree = "<group>"; };
-		6460709C2D42CCA30036C905 /* RevenueCatUI.xcframework */ = {isa = PBXFileReference; expectedSignature = "AppleDeveloperProgram:8SXR2327BM:RevenueCat, Inc."; lastKnownFileType = wrapper.xcframework; name = RevenueCatUI.xcframework; path = ../bin/deps/RevenueCatUI/RevenueCatUI.xcframework; sourceTree = "<group>"; };
 		83E34F532C21CB2B008AA950 /* RevenueCatBinding.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RevenueCatBinding.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		83E34F562C21CB2B008AA950 /* RevenueCat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RevenueCat.h; sourceTree = "<group>"; };
 		83E34F5D2C21CC53008AA950 /* RevenueCatBinding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevenueCatBinding.swift; sourceTree = "<group>"; };
@@ -44,7 +40,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				646070992D42CC940036C905 /* RevenueCat.xcframework in Frameworks */,
-				6460709D2D42CCA30036C905 /* RevenueCatUI.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -54,7 +49,6 @@
 		646070972D42CC940036C905 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				6460709C2D42CCA30036C905 /* RevenueCatUI.xcframework */,
 				646070982D42CC940036C905 /* RevenueCat.xcframework */,
 			);
 			name = Frameworks;
