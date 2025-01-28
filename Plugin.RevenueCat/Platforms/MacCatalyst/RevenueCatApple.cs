@@ -23,7 +23,6 @@ public class RevenueCatApple : IRevenueCatImpl
     {
         var s = await revenueCatManager.LoginAsync(userId);
 
-        var d = s as NSData;
 
         
         return s;
