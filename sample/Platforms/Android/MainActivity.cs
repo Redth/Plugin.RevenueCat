@@ -11,6 +11,6 @@ public class MainActivity : MauiAppCompatActivity
     {
         base.OnCreate(savedInstanceState);
 
-        Com.Revenuecat.Revenuecatbinding.RevenueCatManager.OnCreate(this);
+        //Com.Revenuecat.Revenuecatbinding.RevenueCatManager.OnCreate(this);
     }
 }

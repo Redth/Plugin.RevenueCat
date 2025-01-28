@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Plugin.RevenueCat;
 
 namespace MauiSample;
 
@@ -17,8 +18,9 @@ public static class MauiProgram
 
         builder.Services.AddTransient<MainPage>();
 
-        #if ANDROID
-        builder.Services.AddSingleton<IRevenueCatManager, RevenueCatManagerAndroid>();
+#if ANDROID
+		builder.Services.AddSingleton<IRevenueCatImpl, RevenueCatAndroid>();
+		builder.Services.AddSingleton<IRevenueCatManager, RevenueCatManager>();
         #elif IOS || MACCATALYST
         builder.Services.AddSingleton<IRevenueCatManager, RevenueCatManagerApple>();
         #endif

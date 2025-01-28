@@ -1,4 +1,6 @@
-﻿namespace MauiSample;
+﻿using Plugin.RevenueCat;
+
+namespace MauiSample;
 
 
 public partial class MainPage : ContentPage
@@ -11,22 +13,33 @@ public partial class MainPage : ContentPage
 
         this.revenueCatManager = revenueCatManager;
 
-        this.revenueCatManager.SetEntitlementsUpdatedHandler(entitlements =>
+		this.revenueCatManager.CustomerInfoUpdated += RevenueCatManager_CustomerInfoUpdated;
+        //this.revenueCatManager.SetEntitlementsUpdatedHandler(entitlements =>
+        //{
+        //    Dispatcher.Dispatch(() =>
+        //    {
+        //        txtEntitlements.Text = "Entitlements: "
+        //                                + string.Join(", ", entitlements)
+        //                                + Environment.NewLine
+        //                                + "Refreshed at: " + DateTime.Now.ToLongDateString() + ", " + DateTime.Now.ToLongTimeString();
+        //    });
+        //});
+    }
+
+	private void RevenueCatManager_CustomerInfoUpdated(object? sender, CustomerInfoUpdatedEventArgs e)
+	{
+		Dispatcher.Dispatch(() =>
         {
-            Dispatcher.Dispatch(() =>
-            {
-                txtEntitlements.Text = "Entitlements: "
-                                        + string.Join(", ", entitlements)
-                                        + Environment.NewLine
-                                        + "Refreshed at: " + DateTime.Now.ToLongDateString() + ", " + DateTime.Now.ToLongTimeString();
-            });
+            txtEntitlements.Text = "Entitlements: "
+                                    + string.Join(", ", e.CustomerInfoRequest.Subscriber.Entitlements.Keys)
+                                    + Environment.NewLine
+                                    + "Refreshed at: " + DateTime.Now.ToLongDateString() + ", " + DateTime.Now.ToLongTimeString();
         });
     }
 
+	private bool isInitialized = false;
 
-    private bool isInitialized = false;
-
-    private void Identify_Clicked(object? sender, EventArgs e)
+    private async void Identify_Clicked(object? sender, EventArgs e)
     {
         if (!isInitialized)
         {
@@ -53,7 +66,7 @@ public partial class MainPage : ContentPage
             return;
         }
 
-        revenueCatManager.Identify(rcUserId.Text);
+        await revenueCatManager.LoginAsync(rcUserId.Text);
     }
 
 
@@ -65,27 +78,27 @@ public partial class MainPage : ContentPage
             return;
         }
 
-        try
-        {
+        //try
+        //{
 
-            object platformView = null;
-            #if ANDROID
-            platformView = (this.Window.Handler.PlatformView as AndroidX.Activity.ComponentActivity);
-            #elif MACCATALYST || IOS
-            platformView = (this.Window.Handler.PlatformView as UIKit.UIWindow).RootViewController;
-            #endif
+        //    object platformView = null;
+        //    #if ANDROID
+        //    platformView = (this.Window.Handler.PlatformView as AndroidX.Activity.ComponentActivity);
+        //    #elif MACCATALYST || IOS
+        //    platformView = (this.Window.Handler.PlatformView as UIKit.UIWindow).RootViewController;
+        //    #endif
 
-            revenueCatManager.ShowPaywall(platformView, rcOfferingId.Text, true);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex);
-        }
+        //    revenueCatManager.ShowPaywall(platformView, rcOfferingId.Text, true);
+        //}
+        //catch (Exception ex)
+        //{
+        //    Console.WriteLine(ex);
+        //}
     }
 
-    private void Update_Clicked(object? sender, EventArgs e)
+    private async void Update_Clicked(object? sender, EventArgs e)
     {
-        revenueCatManager.Update(true);
+        var ci = await revenueCatManager.GetCustomerInfoAsync(true);
     }
 }
 
