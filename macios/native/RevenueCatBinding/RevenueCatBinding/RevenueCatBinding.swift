@@ -23,24 +23,9 @@ public class RevenueCatManager : NSObject
     
     
     @objc(login:callback:)
-    public func login(userId: NSString, callback: @escaping (NSData?, NSError?) -> Void) {
+    public func login(userId: NSString, callback: @escaping (NSString?, NSError?) -> Void) {
         Purchases.shared.logIn(userId as String) { customerInfo, created, error in
-            if (error != nil)
-            {
-                callback(nil, error)
-                return
-            }
-            
-            do {
-                let jsonData = try JSONSerialization.data(withJSONObject: customerInfo!.rawData, options: [])
-                
-                callback(NSData(data: jsonData), nil)
-                
-                //let jsonString = try self.processCustomerInfo(customerInfo: customerInfo)
-                //callback(jsonString, nil)
-            } catch let error as NSError {
-                callback(nil, error)
-            }
+            self.processCustomerInfo(customerInfo: customerInfo, originalError: error, callback: callback)
         }
     }
     
@@ -50,18 +35,7 @@ public class RevenueCatManager : NSObject
         let fetchPolicy = force ? CacheFetchPolicy.fetchCurrent : CacheFetchPolicy.notStaleCachedOrFetched
 
         Purchases.shared.getCustomerInfo(fetchPolicy: fetchPolicy) { customerInfo, error in
-            if (error != nil)
-            {
-                callback(nil, error)
-                return
-            }
-            
-            do {
-                let jsonString = try self.processCustomerInfo(customerInfo: customerInfo)
-                callback(jsonString, nil)
-            } catch let error as NSError {
-                callback(nil, error)
-            }
+            self.processCustomerInfo(customerInfo: customerInfo, originalError: error, callback: callback)
         }
     }
     
@@ -73,112 +47,175 @@ public class RevenueCatManager : NSObject
         customerInfoChangedHandler = callback
     }
     
-//    @objc(restore:)
-//    public func restore(callback: @escaping (String?, NSError?) -> Void) {
-//        Purchases.shared.restorePurchases() { (customerInfo, error) in
-//                do {
-//                    let jsonString = try self.processCustomerInfo(customerInfo: customerInfo, error: error)
-//                    continuation.resume(returning: jsonString)
-//                } catch {
-//                    continuation.resume(throwing: error)
-//                }
-//            }
-//        }
-//    }
-//    
-//    @objc(purchase:err:)
-//    public func restore(storeProduct: Any) async throws -> String {
-//        return try await withCheckedThrowingContinuation { continuation in
-//            Purchases.shared.purchase(product: storeProduct as! StoreProduct) { (transaction, customerInfo, error, ok) in
-//                do {
-//                    let jsonString = try self.processCustomerInfo(customerInfo: customerInfo, error: error)
-//                    let transactionJsonString = try self.processTransaction(transaction: transaction, error: error)
-//                    continuation.resume(returning: transactionJsonString)
-//                } catch {
-//                    continuation.resume(throwing: error)
-//                }
-//            }
-//        }
-//    }
-    
-    private func processCustomerInfo(customerInfo: CustomerInfo?) throws -> NSString? {
-       
-        guard let rawData = customerInfo?.rawData else {
-            throw NSError(domain: "InvalidDataError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Customer info is nil or invalid"])
+    @objc(restore:)
+    public func restore(callback: @escaping (NSString?, NSError?) -> Void) {
+        Purchases.shared.restorePurchases() { (customerInfo, error) in
+            self.processCustomerInfo(customerInfo: customerInfo, originalError: error, callback: callback)
         }
-        var jsonString: NSString?
+    }
+
+    @objc(getOffering:callback:)
+    public func getOffering(offeringId: String, callback: @escaping (NSString?, NSError?) -> Void) {
+        
+        Purchases.shared.getOfferings { (offerings, error) in
+            
+            if let currentOffering = offerings?.offering(identifier: offeringId) {
+                
+                var offeringInfo = [String: Any]()
+                offeringInfo["id"] = currentOffering.id
+                offeringInfo["identifier"] = currentOffering.identifier
+                
+                for md in currentOffering.metadata {
+                    offeringInfo[md.key] = md.value
+                }
+                
+                var packageInfos = [Any]()
+                
+                let apkgs = currentOffering.availablePackages
+                
+                for pkg in apkgs {
+                    var packageInfo: [String: Any] = [:]
+                    
+                    packageInfo["id"] = pkg.id
+                    packageInfo["identifier"] = pkg.identifier
+                    packageInfo["localized_introductory_price_string"] = pkg.localizedIntroductoryPriceString
+                    packageInfo["localized_price_string"] = pkg.localizedPriceString
+                    packageInfo["offering_identifier"] = pkg.offeringIdentifier
+                    
+                    let packageTypeMapping: [RevenueCat.PackageType: String] = [
+                        .annual: "annual",
+                        .monthly: "monthly",
+                        .weekly: "weekly",
+                        .custom: "custom",
+                        .lifetime: "lifetime",
+                        .sixMonth: "six_month",
+                        .threeMonth: "three_month",
+                        .twoMonth: "two_month",
+                        .unknown: "unknown"
+                    ]
+                    packageInfo["package_type"] = packageTypeMapping[pkg.packageType] ?? "unknown"
+
+                    let storeProduct = pkg.storeProduct
+                    var productInfo: [String: Any] = [:]
+                    productInfo["identifier"] = storeProduct.productIdentifier
+                    productInfo["localized_title"] = storeProduct.localizedTitle
+                    productInfo["localized_description"] = storeProduct.localizedDescription
+                    productInfo["localized_price_string"] = storeProduct.localizedPriceString
+                    productInfo["localized_price_per_day"] = storeProduct.localizedPricePerDay
+                    productInfo["localized_price_per_week"] = storeProduct.localizedPricePerWeek
+                    productInfo["localized_price_per_month"] = storeProduct.localizedPricePerMonth
+                    productInfo["localized_price_per_year"] = storeProduct.localizedPricePerYear
+                    productInfo["currency_code"] = storeProduct.currencyCode
+                    productInfo["is_family_shareable"] = storeProduct.isFamilyShareable
+                    
+                    if let subscriptionPeriod = storeProduct.subscriptionPeriod {
+                        var subscriptionPeriodInfo: [String: Any] = [:]
+                        subscriptionPeriodInfo["value"] = subscriptionPeriod.value
+                        
+                        let subPeriodUnitMapping: [RevenueCat.SubscriptionPeriod.Unit: String] = [
+                            .day: "day",
+                            .year: "year",
+                            .month: "month",
+                            .week: "week"
+                        ]
+                        subscriptionPeriodInfo["unit"] = subPeriodUnitMapping[subscriptionPeriod.unit] ?? "unknown"
+                        
+                        productInfo["subscription_period"] = subscriptionPeriodInfo
+                    }
+                    
+                    packageInfo["store_product"] = productInfo
+                    
+                    packageInfos.append(packageInfo)
+                }
+                
+
+                    
+                offeringInfo["packages"] = packageInfos
+                
+                do {
+                    let jsonData = try JSONSerialization.data(withJSONObject: offeringInfo, options: [])
+                    let jsonStr = NSString(data: jsonData, encoding: String.Encoding.utf8.rawValue)
+
+                    callback(jsonStr, nil)
+                } catch let error as NSError {
+                    callback(nil, error)
+                }
+                
+                //callback(currentOffering.description as NSString, nil)
+            } else {
+                callback(nil, nil)
+            }
+        }
+    }
+    
+    @objc(purchase:packageIdentifier:callback:)
+    public func purchase(offeringIdentifier: NSString, packageIdentifier: NSString, callback: @escaping (NSString?, NSError?) -> Void) {
+        Purchases.shared.getOfferings { (offerings, error) in
+            
+            if let offering = offerings?.offering(identifier: offeringIdentifier as String) {
+                if let pkg = offering.package(identifier: packageIdentifier as String) {
+                    Purchases.shared.purchase(package: pkg) { storeTransaction, customerInfo, error, ok in
+                        self.processStoreTransaction(storeTransaction: storeTransaction, originalError: error, callback: callback)
+                        return
+                    }
+                } else {
+                    callback(nil, nil)
+                }
+            } else {
+                callback(nil, nil)
+            }
+        }
+    }
+    
+    private func processCustomerInfo(customerInfo: CustomerInfo?, originalError: Error?, callback: @escaping (NSString?, NSError?) -> Void) {
+       
+        if (originalError != nil) {
+            callback(nil, (originalError as NSError?) ?? NSError(domain: "UnknownError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unknown error"]))
+            return
+        }
+        
+        guard let rawData = customerInfo?.rawData else {
+            callback(nil, NSError(domain: "InvalidDataError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Customer info is nil or invalid"]))
+            return
+        }
         
         do {
-            // Convert dictionary to JSON data
-            let jsonData = try JSONSerialization.data(withJSONObject: rawData, options: [])
+            let jsonData = try JSONSerialization.data(withJSONObject: customerInfo!.rawData, options: [])
+            let jsonStr = NSString(data: jsonData, encoding: String.Encoding.utf8.rawValue)
             
-            // Convert JSON data to a JSON string
-            let jsonDataString = NSString(data: jsonData, encoding: NSUTF8StringEncoding)
-            
-            let cleanJsonString = NSString(string: jsonDataString!)
-            
-            if (self.customerInfoChangedHandler != nil) {
-                self.customerInfoChangedHandler!(cleanJsonString)
+            if (customerInfoChangedHandler != nil) {
+                customerInfoChangedHandler!(jsonStr!)
             }
             
-            return cleanJsonString
-        } catch {
-            return nil
+            callback(jsonStr, nil)
+            return
+        } catch let error as NSError {
+            callback(nil, error)
+            return
         }
-        
-        return nil
     }
     
-    private func processTransaction(transaction: StoreTransaction?, error: Error?) throws -> String {
-        if let error = error {
-            throw error
+    private func processStoreTransaction(storeTransaction: StoreTransaction?, originalError: Error?, callback: @escaping (NSString?, NSError?) -> Void) {
+       
+        if (originalError != nil) {
+            callback(nil, (originalError as NSError?) ?? NSError(domain: "UnknownError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unknown error"]))
+            return
         }
         
-        guard let rawData = transaction else {
-            throw NSError(domain: "InvalidDataError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Customer info is nil or invalid"])
+        guard let rawData = storeTransaction else {
+            callback(nil, NSError(domain: "InvalidDataError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Customer info is nil or invalid"]))
+            return
         }
         
-        guard let jsonString = anyToJson(rawData: rawData) else {
-            throw NSError(domain: "SerializationError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to convert raw data to JSON"])
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: storeTransaction!, options: [])
+            let jsonStr = NSString(data: jsonData, encoding: String.Encoding.utf8.rawValue)
+            
+            callback(jsonStr, nil)
+            return
+        } catch let error as NSError {
+            callback(nil, error)
+            return
         }
-        
-        return jsonString
-    }
-    
-    func anyToJson(rawData: Any) -> String? {
-        if let data = rawData as? String {
-            // If it's already a string
-            return data
-        } else if let data = rawData as? Data {
-            // If it's raw Data
-            if let jsonString = String(data: data, encoding: .utf8) {
-                return jsonString
-            } else {
-                return nil
-            }
-        } else if let jsonObject = rawData as? [String: Any] {
-            // If it's a Dictionary
-            do {
-                let jsonData = try JSONSerialization.data(withJSONObject: jsonObject, options: .prettyPrinted)
-                if let jsonString = String(data: jsonData, encoding: .utf8) {
-                    return jsonString
-                }
-            } catch {
-                return nil
-            }
-        } else if let jsonArray = rawData as? [Any] {
-            // If it's an Array
-            do {
-                let jsonData = try JSONSerialization.data(withJSONObject: jsonArray, options: .prettyPrinted)
-                if let jsonString = String(data: jsonData, encoding: .utf8) {
-                    return jsonString
-                }
-            } catch {
-                return nil
-            }
-        } else {
-            return nil
-        }
-        return nil
     }
 }

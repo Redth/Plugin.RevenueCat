@@ -15,25 +15,29 @@ namespace RevenueCat
 		// Login method
 		[Export("login:callback:")]
 		[Async]
-		void Login(string userId, System.Action<NSData?, NSError?> callback);
+		void Login(string userId, System.Action<NSString?, NSError?> callback);
 
 		// GetCustomerInfo method
 		[Export("getCustomerInfo:callback:")]
 		[Async]
 		void GetCustomerInfo(bool force, System.Action<NSString?, NSError?> callback);
 
-		// // SetCustomerInfoChangedHandler method
-		// [Export("setCustomerInfoChangedHandler:")]
-		// void SetCustomerInfoChangedHandler(Action<string> callback);
-		//
-		// // Restore method
-		// [Export("restore:")]
-		// [Async]
-		// Task<string> RestoreAsync();
-		//
-		// // Purchase method
-		// [Export("purchase:err:")]
-		// [Async]
-		// Task<string> PurchaseAsync(NSObject storeProduct);
+		// SetCustomerInfoChangedHandler method
+		[Export("setCustomerInfoChangedHandler:")]
+		void SetCustomerInfoChangedHandler(Action<NSString?> callback);
+		
+		// Restore method
+		[Export("restore:")]
+		[Async]
+		void Restore(System.Action<NSString?, NSError?> callback);
+		
+		// Purchase method
+		[Export("purchase:packageIdentifier:callback:")]
+		[Async]
+		void Purchase(NSString offeringIdentifier, NSString packageIdentifier, System.Action<NSString?, NSError?> callback);
+
+		[Export("getOffering:callback:")]
+		[Async]
+		void GetOffering(NSString offeringIdentifier, System.Action<NSString?, NSError?> callback);
 	}
 }

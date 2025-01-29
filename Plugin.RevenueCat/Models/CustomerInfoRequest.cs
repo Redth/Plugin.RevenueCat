@@ -12,25 +12,64 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Globalization;
 
+public partial class Offering
+{
+	[JsonPropertyName("id")]
+	public string Id { get; set; }
+
+	[JsonPropertyName("identifier")]
+	public string Identifier { get; set; }
+
+	[JsonPropertyName("description")]
+	public string Description { get; set; }
+
+	[JsonPropertyName("packages")]
+	public List<Package> Packages { get; set; } = new();
+}
+
+public partial class Package
+{
+	[JsonPropertyName("id")]
+	public string Id { get; set; }
+
+	[JsonPropertyName("identifier")]
+	public string Identifier { get; set; }
+
+	[JsonPropertyName("description")]
+	public string Description { get; set; }
+
+	[JsonPropertyName("localized_introductory_price_string")]
+	public string LocalizedIntroductoryPriceString { get; set; }
+
+	[JsonPropertyName("localized_price_string")]
+	public string LocalizedPriceString { get; set; }
+
+	[JsonPropertyName("offering_identifier")]
+	public string OfferingIdentifier { get; set; }
+
+	[JsonPropertyName("package_type")]
+	public string PackageType { get; set; }
+}
+
 public partial class CustomerInfoRequest
 {
 	[JsonPropertyName("request_date")]
 	public DateTimeOffset RequestDate { get; set; }
 
 	[JsonPropertyName("request_date_ms")]
-	public long RequestDateMs { get; set; }
+	public long? RequestDateMs { get; set; }
 
 	[JsonPropertyName("subscriber")]
 	public Subscriber Subscriber { get; set; }
 
 	[JsonPropertyName("schema_version")]
-	public long SchemaVersion { get; set; }
+	public string SchemaVersion { get; set; }
 
 	[JsonPropertyName("verification_result")]
 	public string VerificationResult { get; set; }
 
 	[JsonPropertyName("customer_info_request_date")]
-	public long CustomerInfoRequestDate { get; set; }
+	public DateTimeOffset? CustomerInfoRequestDate { get; set; }
 }
 
 public partial class Subscriber
@@ -150,12 +189,19 @@ public partial class Price
 
 public partial class CustomerInfoRequest
 {
-	public static CustomerInfoRequest FromJson(string json) => JsonSerializer.Deserialize<CustomerInfoRequest>(json, CustomerInfoRequestExtensions.Settings);
+	public static CustomerInfoRequest FromJson(string json) => JsonSerializer.Deserialize<CustomerInfoRequest>(json, ModelExtensions.Settings);
 }
 
-public static class CustomerInfoRequestExtensions
+public partial class Offering
+{
+	public static Offering FromJson(string json) => JsonSerializer.Deserialize<Offering>(json, ModelExtensions.Settings);
+}
+
+public static class ModelExtensions
 {
 	public static string ToJson(this CustomerInfoRequest self) => JsonSerializer.Serialize(self, Settings);
+
+	public static string ToJson(this Offering self) => JsonSerializer.Serialize(self, Settings);
 
 	public static readonly JsonSerializerOptions Settings = new(JsonSerializerDefaults.General)
 	{

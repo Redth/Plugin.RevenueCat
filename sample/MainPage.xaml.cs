@@ -1,4 +1,5 @@
-﻿using Plugin.RevenueCat;
+﻿using System.Threading.Tasks;
+using Plugin.RevenueCat;
 
 namespace MauiSample;
 
@@ -70,7 +71,7 @@ public partial class MainPage : ContentPage
     }
 
 
-    private void Purchase_Clicked(object? sender, EventArgs e)
+    private async void Purchase_Clicked(object? sender, EventArgs e)
     {
         if (string.IsNullOrEmpty(rcOfferingId.Text))
         {
@@ -78,22 +79,9 @@ public partial class MainPage : ContentPage
             return;
         }
 
-        //try
-        //{
+        var offering = await revenueCatManager.GetOfferingAsync("pro1year");
 
-        //    object platformView = null;
-        //    #if ANDROID
-        //    platformView = (this.Window.Handler.PlatformView as AndroidX.Activity.ComponentActivity);
-        //    #elif MACCATALYST || IOS
-        //    platformView = (this.Window.Handler.PlatformView as UIKit.UIWindow).RootViewController;
-        //    #endif
-
-        //    revenueCatManager.ShowPaywall(platformView, rcOfferingId.Text, true);
-        //}
-        //catch (Exception ex)
-        //{
-        //    Console.WriteLine(ex);
-        //}
+        Console.WriteLine(offering.Identifier);
     }
 
     private async void Update_Clicked(object? sender, EventArgs e)

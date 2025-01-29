@@ -23,25 +23,28 @@ public class RevenueCatManager(IRevenueCatImpl revenueCatImpl) : IRevenueCatMana
 		});
 		revenueCatImpl.Initialize(platformContext, debugLog, appStore, apiKey, userId);
 	}
+
 	public async Task<CustomerInfoRequest?> LoginAsync(string userId)
 	{
-		var s = await revenueCatImpl.Login(userId);
+		var s = await revenueCatImpl.LoginAsync(userId);
 
-	CustomerInfoRequest cir = null;
+		CustomerInfoRequest cir = null;
 
-try {
-		 cir = CustomerInfoRequest.FromJson(s);
-} catch (Exception ex)
-{
-	Console.WriteLine(ex);
-}
+		try {
+			cir = CustomerInfoRequest.FromJson(s);
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine(ex);
+		}
 		Console.WriteLine(s);
 
 		return cir;
 	}
+
 	public async Task<CustomerInfoRequest?> GetCustomerInfoAsync(bool force)
 	{
-		var s = await revenueCatImpl.GetCustomerInfo(force);
+		var s = await revenueCatImpl.GetCustomerInfoAsync(force);
 
 		var cir = CustomerInfoRequest.FromJson(s);
 
@@ -49,6 +52,24 @@ try {
 
 
 		return cir;
+	}
+
+	public async Task<Offering?> GetOfferingAsync(string offeringIdentifier)
+	{
+		Offering? o = null;
+
+		try {
+			var s = await revenueCatImpl.GetOfferingAsync(offeringIdentifier);
+
+			o = Offering.FromJson(s);
+
+			Console.WriteLine(s);
+		} catch (Exception ex) {
+
+			Console.WriteLine(ex);
+		}
+
+		return o;
 	}
 }
 

@@ -8,6 +8,9 @@ import androidx.annotation.NonNull;
 import com.revenuecat.purchases.CacheFetchPolicy;
 import com.revenuecat.purchases.CustomerInfo;
 import com.revenuecat.purchases.LogLevel;
+import com.revenuecat.purchases.Offering;
+import com.revenuecat.purchases.Offerings;
+import com.revenuecat.purchases.Package;
 import com.revenuecat.purchases.PurchaseParams;
 import com.revenuecat.purchases.Purchases;
 import com.revenuecat.purchases.PurchasesConfiguration;
@@ -16,9 +19,14 @@ import com.revenuecat.purchases.Store;
 import com.revenuecat.purchases.interfaces.LogInCallback;
 import com.revenuecat.purchases.interfaces.PurchaseCallback;
 import com.revenuecat.purchases.interfaces.ReceiveCustomerInfoCallback;
+import com.revenuecat.purchases.interfaces.ReceiveOfferingsCallback;
 import com.revenuecat.purchases.models.StoreProduct;
 import com.revenuecat.purchases.models.StoreTransaction;
 
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -64,7 +72,7 @@ public class RevenueCatManager
         return future;
     }
 
-    public void setAttributes(Map<String, String> attr)  {
+    public static void setAttributes(Map<String, String> attr)  {
         Purchases.getSharedInstance().setAttributes(attr);
     }
 
@@ -89,30 +97,67 @@ public class RevenueCatManager
         return future;
     }
 
-    public CompletableFuture<String> purchase(ProductInfo productInfo, Object platformObject)
-    {
-        Activity activity = ((Activity) platformObject);
+    public static CompletableFuture<String> getOffering(String offeringIdentifier) {
         CompletableFuture<String> future = new CompletableFuture<>();
 
-        Purchases.getSharedInstance().purchase(
-                new PurchaseParams.Builder(activity, (StoreProduct) productInfo.getRevenueCatProduct()).build(), new PurchaseCallback() {
-                    @Override
-                    public void onCompleted(@NonNull StoreTransaction storeTransaction, @NonNull CustomerInfo customerInfo) {
-                        handleCustomerInfoUpdated(customerInfo);
-                        future.complete(storeTransaction.getOriginalJson().toString());
-                    }
+        Purchases.getSharedInstance().getOfferings(new ReceiveOfferingsCallback() {
+            @Override
+            public void onReceived(@NonNull Offerings offerings) {
+                Offering offering = offerings.get(offeringIdentifier);
 
-                    @Override
-                    public void onError(@NonNull PurchasesError purchasesError, boolean b) {
-                        future.completeExceptionally(new Exception(purchasesError.getMessage()));
-                    }
+                Dictionary<String, Object> d = new Hashtable<>();
+
+                d.put("id", offering.getIdentifier());
+                d.put("identifier", offering.getIdentifier());
+                d.put("description", offering.getServerDescription());
+
+                List<Object> packages = new ArrayList<>();
+
+                for (Package pkg: offering.getAvailablePackages()) {
+                    Dictionary<String, Object> p = new Hashtable<>();
+                    p.put("id", pkg.getIdentifier());
+                    p.put("identifier", pkg.getIdentifier());
+
+                    packages.add(p);
                 }
-        );
+
+                d.put("packages", packages);
+
+                future.complete("");
+            }
+
+            @Override
+            public void onError(@NonNull PurchasesError purchasesError) {
+                future.completeExceptionally(new Exception(purchasesError.getMessage()));
+            }
+        });
 
         return future;
     }
 
-    public CompletableFuture<String> restore()
+    public static CompletableFuture<String> purchase(String offeringIdentifier, String packageIdentifier)
+    {
+        CompletableFuture<String> future = new CompletableFuture<>();
+
+//        Purchases.getSharedInstance().purchase(
+//                new PurchaseParams.Builder(activity, (StoreProduct) productInfo.getRevenueCatProduct()).build(), new PurchaseCallback() {
+//                    @Override
+//                    public void onCompleted(@NonNull StoreTransaction storeTransaction, @NonNull CustomerInfo customerInfo) {
+//                        handleCustomerInfoUpdated(customerInfo);
+//                        future.complete(storeTransaction.getOriginalJson().toString());
+//                    }
+//
+//                    @Override
+//                    public void onError(@NonNull PurchasesError purchasesError, boolean b) {
+//                        future.completeExceptionally(new Exception(purchasesError.getMessage()));
+//                    }
+//                }
+//        );
+
+        return future;
+    }
+
+    public static CompletableFuture<String> restore()
     {
         CompletableFuture<String> future = new CompletableFuture<>();
 
