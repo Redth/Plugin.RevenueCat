@@ -33,5 +33,7 @@ dependencies {
 
     implementation("com.revenuecat.purchases:purchases:8.11.0")
     implementation("com.revenuecat.purchases:purchases-store-amazon:8.11.0")
+    implementation("com.google.code.gson:gson:2.12.0")
+
 }
 

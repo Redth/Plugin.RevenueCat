@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
+import com.google.gson.Gson;
 import com.revenuecat.purchases.CacheFetchPolicy;
 import com.revenuecat.purchases.CustomerInfo;
 import com.revenuecat.purchases.LogLevel;
@@ -22,6 +24,7 @@ import com.revenuecat.purchases.interfaces.ReceiveCustomerInfoCallback;
 import com.revenuecat.purchases.interfaces.ReceiveOfferingsCallback;
 import com.revenuecat.purchases.models.StoreProduct;
 import com.revenuecat.purchases.models.StoreTransaction;
+import com.revenuecat.purchases.models.Period;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
@@ -29,6 +32,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.HashMap;
 
 public class RevenueCatManager
 {
@@ -97,33 +101,78 @@ public class RevenueCatManager
         return future;
     }
 
-    public static CompletableFuture<String> getOffering(String offeringIdentifier) {
+    public static CompletableFuture<String> getOffering(@Nullable String offeringIdentifier) {
         CompletableFuture<String> future = new CompletableFuture<>();
 
         Purchases.getSharedInstance().getOfferings(new ReceiveOfferingsCallback() {
             @Override
             public void onReceived(@NonNull Offerings offerings) {
-                Offering offering = offerings.get(offeringIdentifier);
+                Offering offering;
 
-                Dictionary<String, Object> d = new Hashtable<>();
+                if (offeringIdentifier != null)
+                    offering = offerings.get(offeringIdentifier);
+                else
+                    offering = offerings.getCurrent();
 
-                d.put("id", offering.getIdentifier());
-                d.put("identifier", offering.getIdentifier());
-                d.put("description", offering.getServerDescription());
+                Map<String, Object> offeringInfo = new HashMap<>();
+                offeringInfo.put("id", offering.getIdentifier());
+                offeringInfo.put("identifier", offering.getIdentifier());
+                offeringInfo.put("description", offering.getServerDescription());
 
-                List<Object> packages = new ArrayList<>();
+                offeringInfo.put("metadata", offering.getMetadata());
 
-                for (Package pkg: offering.getAvailablePackages()) {
-                    Dictionary<String, Object> p = new Hashtable<>();
-                    p.put("id", pkg.getIdentifier());
-                    p.put("identifier", pkg.getIdentifier());
+                List<Map<String, Object>> packageInfos = new ArrayList<>();
 
-                    packages.add(p);
+                for (Package pkg : offering.getAvailablePackages()) {
+                    Map<String, Object> packageInfo = new HashMap<>();
+                    packageInfo.put("id", pkg.getIdentifier());
+                    packageInfo.put("identifier", pkg.getIdentifier());
+
+                    StoreProduct storeProduct = pkg.getProduct();
+                    Map<String, Object> productInfo = new HashMap<>();
+                    productInfo.put("identifier", storeProduct.getId());
+                    productInfo.put("title", storeProduct.getTitle());
+                    productInfo.put("description", storeProduct.getDescription());
+                    productInfo.put("price_string", storeProduct.getPrice().getFormatted());
+                    productInfo.put("currency_code", storeProduct.getPrice().getCurrencyCode());
+                    productInfo.put("is_family_shareable", false);
+
+                    if (storeProduct.getPeriod() != null) {
+                        Map<String, Object> subscriptionPeriodInfo = new HashMap<>();
+                        subscriptionPeriodInfo.put("value", storeProduct.getPeriod().getValue());
+
+                        String unit;
+                        switch (storeProduct.getPeriod().getUnit()) {
+                            case DAY:
+                                unit = "day";
+                                break;
+                            case YEAR:
+                                unit = "year";
+                                break;
+                            case MONTH:
+                                unit = "month";
+                                break;
+                            case WEEK:
+                                unit = "week";
+                                break;
+                            default:
+                                unit = "unknown";
+                                break;
+                        }
+                        subscriptionPeriodInfo.put("unit", unit);
+
+                        productInfo.put("subscription_period", subscriptionPeriodInfo);
+                    }
+
+                    packageInfo.put("store_product", productInfo);
+                    packageInfos.add(packageInfo);
                 }
 
-                d.put("packages", packages);
+                offeringInfo.put("packages", packageInfos);
 
-                future.complete("");
+                Gson gson = new Gson();
+                String json = gson.toJson(offeringInfo);
+                future.complete(json);
             }
 
             @Override
