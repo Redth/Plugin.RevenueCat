@@ -2,9 +2,12 @@ package com.revenuecat.revenuecatbinding;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultCaller;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.OptIn;
 
 import com.google.gson.Gson;
 import com.revenuecat.purchases.CacheFetchPolicy;
@@ -25,6 +28,10 @@ import com.revenuecat.purchases.interfaces.ReceiveOfferingsCallback;
 import com.revenuecat.purchases.models.StoreProduct;
 import com.revenuecat.purchases.models.StoreTransaction;
 import com.revenuecat.purchases.models.Period;
+import com.revenuecat.purchases.ui.revenuecatui.ExperimentalPreviewRevenueCatUIPurchasesAPI;
+import com.revenuecat.purchases.ui.revenuecatui.activity.PaywallActivityLauncher;
+import com.revenuecat.purchases.ui.revenuecatui.activity.PaywallResult;
+import com.revenuecat.purchases.ui.revenuecatui.activity.PaywallResultHandler;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
@@ -239,5 +246,8 @@ public class RevenueCatManager
             customerInfoUpdatedListener.onCustomerInfoUpdated(customerInfo.getRawData().toString());
         }
     }
+
+
 }
+
 

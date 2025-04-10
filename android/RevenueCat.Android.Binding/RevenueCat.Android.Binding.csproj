@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <RevenueCatSdkVersion>8.11.0</RevenueCatSdkVersion>
+    <RevenueCatSdkVersion>8.16.0</RevenueCatSdkVersion>
     <RevenueCatSdkUrl>https://repo1.maven.org/maven2/com/revenuecat/purchases/purchases/$(RevenueCatSdkVersion)/purchases-$(RevenueCatSdkVersion).aar</RevenueCatSdkUrl>
     <RevenueCatUISdkUrl>https://repo1.maven.org/maven2/com/revenuecat/purchases/purchases-ui/$(RevenueCatSdkVersion)/purchases-ui-$(RevenueCatSdkVersion).aar</RevenueCatUISdkUrl>
   </PropertyGroup>
