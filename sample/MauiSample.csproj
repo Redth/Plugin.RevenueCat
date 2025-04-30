@@ -55,17 +55,7 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
 	</ItemGroup>
 
-	<!-- Reference to MaciOS Binding project -->
-	<ItemGroup Condition="$(TargetFramework.Contains('ios')) Or $(TargetFramework.Contains('maccatalyst'))">
-        <ProjectReference Include="..\macios\RevenueCat.MaciOS.Binding\RevenueCat.MaciOS.Binding.csproj" />
-    </ItemGroup>
-
-	<!-- Reference to Android Binding project -->
-	<ItemGroup Condition="$(TargetFramework.Contains('android'))">
-    <ProjectReference Include="..\android\RevenueCat.Android.Binding\RevenueCat.Android.Binding.csproj" />
-    </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Plugin.RevenueCat\Plugin.RevenueCat.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Plugin.RevenueCat\Plugin.RevenueCat.csproj" />
+	</ItemGroup>
 </Project>

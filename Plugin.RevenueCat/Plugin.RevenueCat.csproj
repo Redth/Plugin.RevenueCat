@@ -13,8 +13,6 @@
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.0</SupportedOSPlatformVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
-<!--        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>-->
-<!--        <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>-->
     </PropertyGroup>
 
     <ItemGroup>
@@ -29,25 +27,8 @@
         <ProjectReference Include="..\android\RevenueCat.Android.Binding\RevenueCat.Android.Binding.csproj" />
     </ItemGroup>
 
-    <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
-
-		<!-- <PackageReference Include="Xamarin.GooglePlayServices.Ads.Identifier" Version="117.0.1.5" />
-		<PackageReference Include="Org.Jetbrains.Kotlinx.KotlinxSerializationJson" Version="1.7.3" />
-		<PackageReference Include="Xamarin.Android.Google.BillingClient" Version="7.1.1.2" />
-		<PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" Version="2.8.7.3" />
-		<PackageReference Include="Xamarin.Kotlin.Parcelize.Runtime" Version="2.0.21.3" /> -->
-		<!-- <PackageReference Include="Xamarin.KotlinX.Serialization.Json.Jvm" Version="1.7.3.4" /> -->
-        <!--<PackageReference Include="Dev.Drewhamilton.Poko.PokoAnnotations" Version="0.15.2" />
-        <PackageReference Include="Org.Jetbrains.Kotlinx.KotlinxSerializationJson" Version="1.7.3" />
-        <PackageReference Include="Xamarin.Android.Google.BillingClient" Version="7.1.1.2" />
-        <PackageReference Include="Xamarin.GooglePlayServices.Ads.Identifier" Version="117.0.1.5" />
-        <PackageReference Include="Xamarin.Kotlin.Parcelize.Runtime" Version="1.9.23.3" />-->
-
-
-    </ItemGroup>
-
-    <ItemGroup>
+    <!-- <ItemGroup>
         <None Include="Plugin.RevenueCat.targets" Pack="True" PackagePath="buildTransitive/Plugin.RevenueCat.targets" />
-    </ItemGroup>
+    </ItemGroup> -->
 
 </Project>
