@@ -58,16 +58,20 @@ public class RevenueCatManager : NSObject
     public func getOffering(offeringId: String, callback: @escaping (NSString?, NSError?) -> Void) {
         
         Purchases.shared.getOfferings { (offerings, error) in
-            
-            if let currentOffering = offerings?.offering(identifier: offeringId) {
+            //Get by id or current if no id/offering
+            if let currentOffering = offerings?.offering(identifier: offeringId) ?? offerings?.current {
                 
                 var offeringInfo = [String: Any]()
                 offeringInfo["id"] = currentOffering.id
                 offeringInfo["identifier"] = currentOffering.identifier
+                offeringInfo["description"] = currentOffering.serverDescription
                 
+                var metadataInfo = [String: Any]()
                 for md in currentOffering.metadata {
-                    offeringInfo[md.key] = md.value
+                    metadataInfo[md.key] = md.value
                 }
+                
+                offeringInfo["metadata"] = metadataInfo
                 
                 var packageInfos = [Any]()
                 
@@ -78,9 +82,9 @@ public class RevenueCatManager : NSObject
                     
                     packageInfo["id"] = pkg.id
                     packageInfo["identifier"] = pkg.identifier
-                    packageInfo["localized_introductory_price_string"] = pkg.localizedIntroductoryPriceString
-                    packageInfo["localized_price_string"] = pkg.localizedPriceString
-                    packageInfo["offering_identifier"] = pkg.offeringIdentifier
+                    //packageInfo["introductory_price_string"] = pkg.localizedIntroductoryPriceString
+                    //packageInfo["price_string"] = pkg.localizedPriceString
+                    //packageInfo["offering_identifier"] = pkg.offeringIdentifier
                     
                     let packageTypeMapping: [RevenueCat.PackageType: String] = [
                         .annual: "annual",
@@ -93,20 +97,23 @@ public class RevenueCatManager : NSObject
                         .twoMonth: "two_month",
                         .unknown: "unknown"
                     ]
-                    packageInfo["package_type"] = packageTypeMapping[pkg.packageType] ?? "unknown"
+
+                    packageInfo["type"] = packageTypeMapping[pkg.packageType] ?? "unknown"
 
                     let storeProduct = pkg.storeProduct
                     var productInfo: [String: Any] = [:]
                     productInfo["identifier"] = storeProduct.productIdentifier
-                    productInfo["localized_title"] = storeProduct.localizedTitle
-                    productInfo["localized_description"] = storeProduct.localizedDescription
-                    productInfo["localized_price_string"] = storeProduct.localizedPriceString
-                    productInfo["localized_price_per_day"] = storeProduct.localizedPricePerDay
-                    productInfo["localized_price_per_week"] = storeProduct.localizedPricePerWeek
-                    productInfo["localized_price_per_month"] = storeProduct.localizedPricePerMonth
-                    productInfo["localized_price_per_year"] = storeProduct.localizedPricePerYear
+                    productInfo["title"] = storeProduct.localizedTitle
+                    productInfo["description"] = storeProduct.localizedDescription
+                    productInfo["price_string"] = storeProduct.localizedPriceString
                     productInfo["currency_code"] = storeProduct.currencyCode
                     productInfo["is_family_shareable"] = storeProduct.isFamilyShareable
+                    
+                    
+//                    productInfo["localized_price_per_day"] = storeProduct.localizedPricePerDay
+//                    productInfo["localized_price_per_week"] = storeProduct.localizedPricePerWeek
+//                    productInfo["localized_price_per_month"] = storeProduct.localizedPricePerMonth
+//                    productInfo["localized_price_per_year"] = storeProduct.localizedPricePerYear
                     
                     if let subscriptionPeriod = storeProduct.subscriptionPeriod {
                         var subscriptionPeriodInfo: [String: Any] = [:]
