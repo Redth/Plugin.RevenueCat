@@ -1,4 +1,5 @@
-﻿using Java.Interop;
+﻿using Android.App;
+using Java.Interop;
 using Java.Util.Concurrent;
 using Java.Util.Functions;
 using RevenueCat;
@@ -15,21 +16,36 @@ public class RevenueCatAndroid : Java.Lang.Object, IRevenueCatImpl, ICustomerInf
 	}
 
 	public async Task<string?> LoginAsync(string userId)
-		=> global::RevenueCat.RevenueCatManager.Login(userId)!.AsTask<Java.Lang.String>();
+	{
+		var s = await global::RevenueCat.RevenueCatManager.Login(userId)!.AsTask<Java.Lang.String>();
+		return s?.ToString();
+	}
 
-	public Task<string?> GetCustomerInfoAsync(bool force)
-		=> global::RevenueCat.RevenueCatManager.GetCustomerInfo(force)!.AsTask<Java.Lang.String>();
+	public async Task<string?> GetCustomerInfoAsync(bool force)
+	{
+		var s = await global::RevenueCat.RevenueCatManager.GetCustomerInfo(force)!.AsTask<Java.Lang.String>();
+		return s?.ToString();
+	}
 
 	Action<string>? customerInfoUpdateHandler;
 
-	public Task<string?> RestoreAsync()
-		=> global::RevenueCat.RevenueCatManager.Restore()!.AsTask<Java.Lang.String>();
+	public async Task<string?> RestoreAsync()
+	{
+		var s = await global::RevenueCat.RevenueCatManager.Restore()!.AsTask<Java.Lang.String>();
+		return s?.ToString();
+	}
 
-	public Task<string?> PurchaseAsync(string offeringIdentifier, string packageIdentifier)
-		=> global::RevenueCat.RevenueCatManager.Purchase(offeringIdentifier, packageIdentifier)!.AsTask<Java.Lang.String>();
-		
-	public Task<string?> GetOfferingAsync(string offeringIdentifier)
-		=> global::RevenueCat.RevenueCatManager.GetOffering(offeringIdentifier)!.AsTask<Java.Lang.String>();
+	public async Task<string?> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier)
+	{
+		var s = await global::RevenueCat.RevenueCatManager.Purchase(platformContext as Activity, offeringIdentifier, packageIdentifier)!.AsTask<Java.Lang.String>();
+		return s?.ToString();
+	}
+
+	public async Task<string?> GetOfferingAsync(string offeringIdentifier)
+	{
+		var s = await global::RevenueCat.RevenueCatManager.GetOffering(offeringIdentifier)!.AsTask<Java.Lang.String>();
+		return s?.ToString();
+	}
 
 	public void SetCustomerInfoUpdatedHandler(Action<string> handler)
 		=> customerInfoUpdateHandler = handler;
