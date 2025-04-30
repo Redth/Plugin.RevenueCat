@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <RevenueCatSdkVersion>8.11.0</RevenueCatSdkVersion>
+    <RevenueCatSdkVersion>8.16.0</RevenueCatSdkVersion>
     <RevenueCatSdkUrl>https://repo1.maven.org/maven2/com/revenuecat/purchases/purchases/$(RevenueCatSdkVersion)/purchases-$(RevenueCatSdkVersion).aar</RevenueCatSdkUrl>
     <RevenueCatUISdkUrl>https://repo1.maven.org/maven2/com/revenuecat/purchases/purchases-ui/$(RevenueCatSdkVersion)/purchases-ui-$(RevenueCatSdkVersion).aar</RevenueCatUISdkUrl>
   </PropertyGroup>
@@ -33,24 +33,33 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dev.Drewhamilton.Poko.PokoAnnotations" Version="0.15.2" />
     <PackageReference Include="Xamarin.GooglePlayServices.Ads.Identifier" Version="117.0.1.5" />
-    <PackageReference Include="Xamarin.Google.Crypto.Tink.Android" Version="1.8.0.1" />
     <PackageReference Include="Org.Jetbrains.Kotlinx.KotlinxSerializationJson" Version="1.7.3" />
     <PackageReference Include="Xamarin.Android.Google.BillingClient" Version="7.1.1.2" />
-
-<!--    <PackageReference Include="Xamarin.AndroidX.Activity" Version="1.9.2.1" />-->
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" Version="2.8.7.3" />
+    <PackageReference Include="Xamarin.Kotlin.Parcelize.Runtime" Version="2.0.21.3" />
   </ItemGroup>
 
   <ItemGroup>
-<!--    <AndroidMavenLibrary Include="io.coil-kt:coil" Version="2.4.0" Bind="false" />-->
-<!--    <AndroidMavenLibrary Include="io.coil-kt:coil-base" Version="2.4.0" Bind="false" />-->
-<!--    <AndroidMavenLibrary Include="io.coil-kt:coil-compose" Version="2.4.0" Bind="false" />-->
-<!--    <AndroidMavenLibrary Include="io.coil-kt:coil-compose-base" Version="2.4.0" Bind="false" />-->
-<!--    <AndroidMavenLibrary Include="io.coil-kt:coil-svg" Version="2.4.0" Bind="false" />-->
-<!--    <AndroidMavenLibrary Include="org.commonmark:commonmark-ext-gfm-strikethrough" Version="0.21.0" Bind="false" />-->
-<!--    <AndroidMavenLibrary Include="org.commonmark:commonmark" Version="0.21.0" Bind="false" />-->
-<!--    <AndroidMavenLibrary Include="com.caverock:androidsvg-aar" Version="1.4" Bind="false" />-->
+    <!-- RevenueCat SDK libraries -->
+    <AndroidMavenLibrary Include="com.revenuecat.purchases:purchases" Version="8.16.0" Bind="false"  VerifyDependencies="False" />
+    <AndroidMavenLibrary Include="com.revenuecat.purchases:purchases-store-amazon" Version="8.16.0" Bind="false"  VerifyDependencies="False" />
+    
+    <!-- Amazon AppStore SDK -->
+    <AndroidMavenLibrary Include="com.amazon.device:amazon-appstore-sdk" Version="3.0.5" Bind="false"  VerifyDependencies="False" />
+    
+    <!-- Kotlin data class annotations -->
+    <AndroidMavenLibrary Include="dev.drewhamilton.poko:poko-annotations" Version="0.13.1" Bind="false" VerifyDependencies="False" />
+  </ItemGroup>
+
+  <ItemGroup>
+	  <AndroidIgnoredJavaDependency Include="androidx.lifecycle:lifecycle-common:2.5.0" />
+	  <AndroidIgnoredJavaDependency Include="androidx.lifecycle:lifecycle-runtime:2.5.0" />
+	  <AndroidIgnoredJavaDependency Include="androidx.annotation:annotation:1.6.0" />
+	  <AndroidIgnoredJavaDependency Include="org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1" />
+	  <AndroidIgnoredJavaDependency Include="org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22" />
+	  <AndroidIgnoredJavaDependency Include="androidx.core:core-ktx:1.8.0" />
+    <AndroidIgnoredJavaDependency Include="com.google.crypto.tink:tink-android:1.8.0" />
   </ItemGroup>
 
 </Project>

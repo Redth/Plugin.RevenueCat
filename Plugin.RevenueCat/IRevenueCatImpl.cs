@@ -10,7 +10,7 @@ public interface IRevenueCatImpl
 	Task<string?> LoginAsync(string userId);
 	Task<string?> GetCustomerInfoAsync(bool force);
 
-	Task<string?> PurchaseAsync(string offeringIdentifier, string packageIdentifier);
+	Task<string?> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier);
 
 	Task<string?> GetOfferingAsync(string offeringIdentifier);
 

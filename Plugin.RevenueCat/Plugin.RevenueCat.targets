@@ -1,6 +1,0 @@
-﻿<Project>
-    <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
-        <AndroidMavenLibrary Include="com.revenuecat.purchases:purchases" Version="8.11.0" Bind="false" VerifyDependencies="False" />
-        <AndroidMavenLibrary Include="com.revenuecat.purchases:purchases-store-amazon" Version="8.11.0" Bind="false" VerifyDependencies="False" />
-    </ItemGroup>
-</Project>
