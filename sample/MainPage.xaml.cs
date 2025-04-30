@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.Maui.Platform;
 using Plugin.RevenueCat;
 
 namespace MauiSample;
@@ -81,8 +82,27 @@ public partial class MainPage : ContentPage
 
         var offering = await revenueCatManager.GetOfferingAsync("pro1year");
 
-        Console.WriteLine(offering.Identifier);
+        var package = offering.Packages.FirstOrDefault();
+        
+        Console.WriteLine($"Offering: {offering.Identifier}");
+        Console.WriteLine($"Package: {package.Identifier}");
+        
+        object? platformContext = null;
+        
+        #if ANDROID
+        var activity = this.Window.Handler.MauiContext.Context.GetActivity();
+        platformContext = activity;
+        #endif
+        var sk  = await revenueCatManager.PurchaseAsync(platformContext, offering.Identifier, package.Identifier);
     }
+
+    private async void Restore_Clicked(object? sender, EventArgs e)
+    {
+        var s= await revenueCatManager.RestoreAsync();
+        
+        Console.WriteLine(s);
+    }
+    
 
     private async void Update_Clicked(object? sender, EventArgs e)
     {

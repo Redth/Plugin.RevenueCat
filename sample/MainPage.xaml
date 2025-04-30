@@ -47,6 +47,12 @@
                 SemanticProperties.Hint="Navigates to getting started documentation"
                 Clicked="Purchase_Clicked"
                 HorizontalOptions="Fill" />
+            
+            
+            <Button
+                Text="Restore"
+                Clicked="Restore_Clicked"
+                HorizontalOptions="Fill" />
         </VerticalStackLayout>
     </ScrollView>
 

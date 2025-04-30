@@ -27,7 +27,7 @@ public class RevenueCatApple : IRevenueCatImpl
 
     public async Task<string?> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier)
     {
-        var s = revenueCatManager.PurchaseAsync(new NSString(offeringIdentifier), new NSString(packageIdentifier));
+        var s = await revenueCatManager.PurchaseAsync(new NSString(offeringIdentifier), new NSString(packageIdentifier));
         return s.ToString();
     }
 
