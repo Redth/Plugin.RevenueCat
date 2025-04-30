@@ -72,11 +72,11 @@ public class RevenueCatManager(IRevenueCatImpl revenueCatImpl) : IRevenueCatMana
 		return o;
 	}
 
-	public async Task<string?> RestoreAsync()
+	public async Task<CustomerInfoRequest?> RestoreAsync()
 	{
 		var s = await revenueCatImpl.RestoreAsync();
 
-		return s;
+		return CustomerInfoRequest.FromJson(s);
 	}
 
 	public async Task<StoreTransaction> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier)

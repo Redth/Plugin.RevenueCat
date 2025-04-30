@@ -12,7 +12,7 @@ public interface IRevenueCatManager
 
 	Task<Offering?> GetOfferingAsync(string offeringIdentifier);
 	
-	Task<string?> RestoreAsync();
+	Task<CustomerInfoRequest?> RestoreAsync();
 
 	Task<StoreTransaction> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier);
 }
