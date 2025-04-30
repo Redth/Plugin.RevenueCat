@@ -14,20 +14,35 @@ public class RevenueCatApple : IRevenueCatImpl
         revenueCatManager.Initialize(debugLog, apiKey, userId);
     }
 
-    public Task<string?> LoginAsync(string userId)
-        => revenueCatManager.LoginAsync(userId);
+    public async Task<string?> LoginAsync(string userId)
+    {
+        var s = await revenueCatManager.LoginAsync(userId);
+        return s.ToString();
+    }
 
-    public Task<string?> RestoreAsync()
-        => revenueCatManager.RestoreAsync();
+    public async Task<string?> RestoreAsync()
+    {
+        var s = await revenueCatManager.RestoreAsync();
+        return s.ToString();
+    }
 
-    public Task<string?> PurchaseAsync(string offeringIdentifier, string packageIdentifier)
-	    => revenueCatManager.PurchaseAsync(new NSString(offeringIdentifier), new NSString(packageIdentifier));
-		
-	public async Task<string?> GetOfferingAsync(string offeringIdentifier)
-	    => revenueCatManager.GetOfferingAsync(new NSString(offeringIdentifier));
+    public async Task<string?> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier)
+    {
+        var s = revenueCatManager.PurchaseAsync(new NSString(offeringIdentifier), new NSString(packageIdentifier));
+        return s.ToString();
+    }
 
-    public Task<string?> GetCustomerInfoAsync(bool force)
-        => revenueCatManager.GetCustomerInfoAsync(force);
+    public async Task<string?> GetOfferingAsync(string offeringIdentifier)
+    {
+        var s = await revenueCatManager.GetOfferingAsync(new NSString(offeringIdentifier));
+        return s.ToString();
+    }
+
+    public async Task<string?> GetCustomerInfoAsync(bool force)
+    {
+        var s = await revenueCatManager.GetCustomerInfoAsync(force);
+        return s.ToString();
+    }
 
     Action<string>? customerInfoUpdatedHandler = null;
 
