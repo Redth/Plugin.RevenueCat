@@ -28,7 +28,7 @@
     </XcodeProject>
   </ItemGroup>
 
-  <Target Name="DownloadNativeDependencies">
+  <Target Name="DownloadNativeDependencies" BeforeTargets="Build" Condition=" '$(IsCrossTargetingBuild)' == 'true' ">
     <PropertyGroup>
       <RevenueCatSdkVersion>5.22.1</RevenueCatSdkVersion>
 
