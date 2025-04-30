@@ -1,0 +1,83 @@
+{
+	"request_date_ms" : 1746043756033,
+	"subscriber" : {
+	  "other_purchases" : { },
+	  "first_seen" : "2024-07-02T20:13:28Z",
+	  "subscriptions" : {
+		"rc_promo_pro1year_six_month" : {
+		  "expires_date" : "2025-07-25T01:04:06Z",
+		  "purchase_date" : "2025-01-23T01:04:06Z",
+		  "store" : "promotional",
+		  "refunded_at" : null,
+		  "display_name" : null,
+		  "period_type" : "normal",
+		  "billing_issues_detected_at" : null,
+		  "unsubscribe_detected_at" : null,
+		  "is_sandbox" : false,
+		  "store_transaction_id" : "b5cd0ad31dc71cbffcbdf454725bd9ad",
+		  "price" : {
+			"currency" : "USD",
+			"amount" : 0
+		  },
+		  "auto_resume_date" : null,
+		  "grace_period_expires_date" : null,
+		  "original_purchase_date" : "2025-01-23T01:04:06Z"
+		},
+		"pro1year" : {
+		  "original_purchase_date" : "2024-05-24T13:20:20Z",
+		  "period_type" : "normal",
+		  "refunded_at" : null,
+		  "billing_issues_detected_at" : null,
+		  "unsubscribe_detected_at" : "2024-07-02T20:13:28Z",
+		  "grace_period_expires_date" : null,
+		  "ownership_type" : "PURCHASED",
+		  "is_sandbox" : true,
+		  "store" : "play_store",
+		  "store_transaction_id" : "GPA.3340-9976-5588-39148..5",
+		  "display_name" : null,
+		  "price" : {
+			"currency" : "CAD",
+			"amount" : 0
+		  },
+		  "auto_resume_date" : null,
+		  "product_plan_identifier" : "p1y",
+		  "purchase_date" : "2024-05-24T13:20:20Z",
+		  "expires_date" : "2024-05-24T16:50:18Z"
+		},
+		"rc_promo_pro1year_three_month" : {
+		  "billing_issues_detected_at" : null,
+		  "expires_date" : "2025-04-25T01:00:46Z",
+		  "grace_period_expires_date" : null,
+		  "unsubscribe_detected_at" : null,
+		  "original_purchase_date" : "2025-01-23T01:00:46Z",
+		  "auto_resume_date" : null,
+		  "purchase_date" : "2025-01-23T01:00:46Z",
+		  "store" : "promotional",
+		  "price" : {
+			"amount" : 0,
+			"currency" : "USD"
+		  },
+		  "store_transaction_id" : "9d1aa4358bfed135e3926379671637dd",
+		  "display_name" : null,
+		  "period_type" : "normal",
+		  "is_sandbox" : false,
+		  "refunded_at" : null
+		}
+	  },
+	  "original_application_version" : "1.0",
+	  "original_purchase_date" : "2013-08-01T07:00:00Z",
+	  "original_app_user_id" : "tfp-120465",
+	  "last_seen" : "2025-04-30T20:06:18Z",
+	  "non_subscriptions" : { },
+	  "entitlements" : {
+		"pro1year" : {
+		  "grace_period_expires_date" : null,
+		  "purchase_date" : "2025-01-23T01:04:06Z",
+		  "expires_date" : "2025-07-25T01:04:06Z",
+		  "product_identifier" : "rc_promo_pro1year_six_month"
+		}
+	  },
+	  "management_url" : null
+	},
+	"request_date" : "2025-04-30T20:09:16Z"
+}

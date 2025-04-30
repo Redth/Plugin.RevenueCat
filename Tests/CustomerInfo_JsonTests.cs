@@ -9,13 +9,14 @@ namespace Tests
 
 		[TestMethod]
 		[DeploymentItem("data/custoimerinfo_json_android.json")]
-		public void Can_Deserialize_Android_Json()
+		[DeploymentItem("data/custoimerinfo_json_ios.json")]
+		[DataRow("android")]
+		[DataRow("ios")]
+		public void Can_Deserialize_Json(string platform)
 		{
-
 			// Simulate creating a log file for this test
-			var jsonFile = Path.Combine(AppContext.BaseDirectory, "data", "customerinfo_json_android.json");
-			
-			var json = File.ReadAllText(jsonFile);
+			var platformFile = $"customerinfo_json_{platform}.json";
+			var json = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "data", platformFile));
 
 			var c = CustomerInfoRequest.FromJson(json);
 
