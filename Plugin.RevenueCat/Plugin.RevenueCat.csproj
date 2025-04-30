@@ -27,6 +27,10 @@
         <ProjectReference Include="..\android\RevenueCat.Android.Binding\RevenueCat.Android.Binding.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Plugin.RevenueCat.Core\Plugin.RevenueCat.Core.csproj" />
+    </ItemGroup>
+
     <!-- <ItemGroup>
         <None Include="Plugin.RevenueCat.targets" Pack="True" PackagePath="buildTransitive/Plugin.RevenueCat.targets" />
     </ItemGroup> -->

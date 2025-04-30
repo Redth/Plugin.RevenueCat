@@ -63,7 +63,7 @@ public partial class CustomerInfoRequest
 	public Subscriber Subscriber { get; set; }
 
 	[JsonPropertyName("schema_version")]
-	public string SchemaVersion { get; set; }
+	public int? SchemaVersion { get; set; }
 
 	[JsonPropertyName("verification_result")]
 	public string VerificationResult { get; set; }
@@ -211,6 +211,7 @@ public static class ModelExtensions
 			new TimeOnlyConverter(),
 			IsoDateTimeOffsetConverter.Singleton
 		},
+		NumberHandling = JsonNumberHandling.AllowReadingFromString
 	};
 }
 
