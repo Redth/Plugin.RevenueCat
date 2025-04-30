@@ -13,6 +13,7 @@ import com.revenuecat.purchases.LogLevel;
 import com.revenuecat.purchases.Offering;
 import com.revenuecat.purchases.Offerings;
 import com.revenuecat.purchases.Package;
+import com.revenuecat.purchases.PackageType;
 import com.revenuecat.purchases.PurchaseParams;
 import com.revenuecat.purchases.Purchases;
 import com.revenuecat.purchases.PurchasesConfiguration;
@@ -127,6 +128,9 @@ public class RevenueCatManager
                     Map<String, Object> packageInfo = new HashMap<>();
                     packageInfo.put("id", pkg.getIdentifier());
                     packageInfo.put("identifier", pkg.getIdentifier());
+                    packageInfo.put("type", pkg.getPackageType().getIdentifier());
+
+
 
                     StoreProduct storeProduct = pkg.getProduct();
                     Map<String, Object> productInfo = new HashMap<>();
@@ -136,6 +140,7 @@ public class RevenueCatManager
                     productInfo.put("price_string", storeProduct.getPrice().getFormatted());
                     productInfo.put("currency_code", storeProduct.getPrice().getCurrencyCode());
                     productInfo.put("is_family_shareable", false);
+
 
                     if (storeProduct.getPeriod() != null) {
                         Map<String, Object> subscriptionPeriodInfo = new HashMap<>();
@@ -184,24 +189,46 @@ public class RevenueCatManager
         return future;
     }
 
-    public static CompletableFuture<String> purchase(String offeringIdentifier, String packageIdentifier)
+    public static CompletableFuture<String> purchase(Activity activity, String offeringIdentifier, String packageIdentifier)
     {
         CompletableFuture<String> future = new CompletableFuture<>();
 
-//        Purchases.getSharedInstance().purchase(
-//                new PurchaseParams.Builder(activity, (StoreProduct) productInfo.getRevenueCatProduct()).build(), new PurchaseCallback() {
-//                    @Override
-//                    public void onCompleted(@NonNull StoreTransaction storeTransaction, @NonNull CustomerInfo customerInfo) {
-//                        handleCustomerInfoUpdated(customerInfo);
-//                        future.complete(storeTransaction.getOriginalJson().toString());
-//                    }
-//
-//                    @Override
-//                    public void onError(@NonNull PurchasesError purchasesError, boolean b) {
-//                        future.completeExceptionally(new Exception(purchasesError.getMessage()));
-//                    }
-//                }
-//        );
+        Purchases.getSharedInstance().getOfferings(new ReceiveOfferingsCallback() {
+            @Override
+            public void onReceived(@NonNull Offerings offerings) {
+                Offering offering = offerings.get(offeringIdentifier);
+
+                Package pkg = null;
+                if (offering != null) {
+                    pkg = offering.getPackage(packageIdentifier);
+                }
+
+                if (pkg == null) {
+                    future.completeExceptionally(new Exception("Offering and/or Package not found"));
+                    return;
+                }
+
+                Purchases.getSharedInstance().purchase(
+                        new PurchaseParams.Builder(activity, pkg).build(), new PurchaseCallback() {
+                            @Override
+                            public void onCompleted(@NonNull StoreTransaction storeTransaction, @NonNull CustomerInfo customerInfo) {
+                                handleCustomerInfoUpdated(customerInfo);
+                                future.complete(storeTransaction.getOriginalJson().toString());
+                            }
+
+                            @Override
+                            public void onError(@NonNull PurchasesError purchasesError, boolean b) {
+                                future.completeExceptionally(new Exception(purchasesError.getMessage()));
+                            }
+                        }
+                );
+            }
+
+            @Override
+            public void onError(@NonNull PurchasesError purchasesError) {
+                future.completeExceptionally(new Exception(purchasesError.getMessage()));
+            }
+        });
 
         return future;
     }
