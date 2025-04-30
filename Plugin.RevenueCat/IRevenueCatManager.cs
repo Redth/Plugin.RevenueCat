@@ -11,6 +11,7 @@ public interface IRevenueCatManager
 	Task<CustomerInfoRequest?> GetCustomerInfoAsync(bool force);
 
 	Task<Offering?> GetOfferingAsync(string offeringIdentifier);
-	//void SetEntitlementsUpdatedHandler(System.Action<string[]> entitlementsHandler);
+
+	Task<StoreTransaction> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier);
 }
 
