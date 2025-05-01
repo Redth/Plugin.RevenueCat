@@ -9,13 +9,13 @@ public partial class MainPage : ContentPage
 {
     readonly IRevenueCatManager revenueCatManager;
 
-	public MainPage(IRevenueCatManager revenueCatManager)
-	{
-		InitializeComponent();
+    public MainPage(IRevenueCatManager revenueCatManager)
+    {
+        InitializeComponent();
 
         this.revenueCatManager = revenueCatManager;
 
-		this.revenueCatManager.CustomerInfoUpdated += RevenueCatManager_CustomerInfoUpdated;
+        this.revenueCatManager.CustomerInfoUpdated += RevenueCatManager_CustomerInfoUpdated;
         //this.revenueCatManager.SetEntitlementsUpdatedHandler(entitlements =>
         //{
         //    Dispatcher.Dispatch(() =>
@@ -26,6 +26,11 @@ public partial class MainPage : ContentPage
         //                                + "Refreshed at: " + DateTime.Now.ToLongDateString() + ", " + DateTime.Now.ToLongTimeString();
         //    });
         //});
+
+        if (!OperatingSystem.IsAndroid())
+        {
+            this.rcApiKey.Text = "appl_MhvNaMequbUAzjayKBwJSMVKGqE";
+        }
     }
 
 	private void RevenueCatManager_CustomerInfoUpdated(object? sender, CustomerInfoUpdatedEventArgs e)
@@ -88,19 +93,40 @@ public partial class MainPage : ContentPage
         Console.WriteLine($"Package: {package.Identifier}");
         
         object? platformContext = null;
-        
-        #if ANDROID
+
+#if ANDROID
         var activity = this.Window.Handler.MauiContext.Context.GetActivity();
         platformContext = activity;
-        #endif
-        var sk  = await revenueCatManager.PurchaseAsync(platformContext, offering.Identifier, package.Identifier);
+#endif
+
+        try
+        {
+            var sk = await revenueCatManager.PurchaseAsync(platformContext, offering.Identifier, package.Identifier);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("PURCHASE FAILED");
+            Console.WriteLine($"Error: {ex.Message}");
+            Console.WriteLine(ex);
+            await this.DisplayAlert("Error", ex.Message, "OK");
+        }
     }
 
     private async void Restore_Clicked(object? sender, EventArgs e)
     {
-        var s= await revenueCatManager.RestoreAsync();
+        try
+        {
+            var sk = await revenueCatManager.RestoreAsync();
+            
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("RESTORE FAILED");
+            Console.WriteLine($"Error: {ex.Message}");
+            Console.WriteLine(ex);
+            await this.DisplayAlert("Error", ex.Message, "OK");
+        }
         
-        Console.WriteLine(s);
     }
     
 
