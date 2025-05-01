@@ -1,0 +1,51 @@
+name: Build and Publish
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+  release:
+    types: [published]
+
+jobs:
+  build:
+    name: 🔨 Build
+    env:
+      NUPKG_MAJOR: 0.999
+    runs-on: macos-latest
+    steps:
+    - name: 🛒 Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 #Nerdbank needs full clone
+    - name: 🥅 Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+    - name: 📦 Build + Pack
+      run: dotnet pack --configuration Release ./Plugin.RevenueCat/Plugin.RevenueCat.csproj
+    - name: ⬆️ Packages
+      uses: actions/upload-artifact@v4
+      with:
+        name: Packages
+        path: |
+          ./artifacts/package/release/*.nupkg
+          ./artifacts/package/release/*.snupkg
+
+  publish:
+    name: 📢 Publish
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+    steps:
+      - name: ⬇️ Packages
+        uses: actions/download-artifact@v4.1.7
+        with:
+          name: Packages
+      - name: 🥅 Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - name: 🚢 Push NuGet
+        run: |
+          dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_ORG_API_KEY }} --skip-duplicate
