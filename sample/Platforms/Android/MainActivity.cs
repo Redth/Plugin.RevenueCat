@@ -10,7 +10,5 @@ public class MainActivity : MauiAppCompatActivity
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
-
-        //Com.Revenuecat.Revenuecatbinding.RevenueCatManager.OnCreate(this);
     }
 }
