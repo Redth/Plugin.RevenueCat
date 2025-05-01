@@ -33,11 +33,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Xamarin.GooglePlayServices.Ads.Identifier" Version="117.0.1.5" />
-    <PackageReference Include="Org.Jetbrains.Kotlinx.KotlinxSerializationJson" Version="1.7.3" />
-    <PackageReference Include="Xamarin.Android.Google.BillingClient" Version="7.1.1.2" />
-    <PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" Version="2.8.7.3" />
-    <PackageReference Include="Xamarin.Kotlin.Parcelize.Runtime" Version="2.0.21.3" />
+    <PackageReference Include="Xamarin.GooglePlayServices.Ads.Identifier" />
+    <PackageReference Include="Org.Jetbrains.Kotlinx.KotlinxSerializationJson" />
+    <PackageReference Include="Xamarin.Android.Google.BillingClient" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" />
+    <PackageReference Include="Xamarin.Kotlin.Parcelize.Runtime" />
   </ItemGroup>
 
   <ItemGroup>
