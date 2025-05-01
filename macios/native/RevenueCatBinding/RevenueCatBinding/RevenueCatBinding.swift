@@ -162,7 +162,10 @@ public class RevenueCatManager : NSObject
             if let offering = offerings?.offering(identifier: offeringIdentifier as String) {
                 if let pkg = offering.package(identifier: packageIdentifier as String) {
                     Purchases.shared.purchase(package: pkg) { storeTransaction, customerInfo, error, ok in
-                        self.processStoreTransaction(storeTransaction: storeTransaction, originalError: error, callback: callback)
+                        
+                        // Send back updated customer info
+                        self.processCustomerInfo(customerInfo: customerInfo, originalError: error, callback: callback)
+                        //self.processStoreTransaction(storeTransaction: storeTransaction, originalError: error, callback: callback)
                         return
                     }
                 } else {
@@ -215,11 +218,17 @@ public class RevenueCatManager : NSObject
         }
         
         do {
-            let jsonData = try JSONSerialization.data(withJSONObject: storeTransaction!, options: [])
-            let jsonStr = NSString(data: jsonData, encoding: String.Encoding.utf8.rawValue)
+            var storeTransactionInfo = [String: Any]()
+            storeTransactionInfo["id"] = rawData.id
+            storeTransactionInfo["transaction_identifier"] = rawData.transactionIdentifier
+            storeTransactionInfo["product_identifier"] = rawData.productIdentifier
+            storeTransactionInfo["purchase_date"] = rawData.purchaseDate.ISO8601Format()
+            storeTransactionInfo["quantity"] = rawData.quantity
             
+            let jsonData = try JSONSerialization.data(withJSONObject: storeTransactionInfo, options: [])
+            let jsonStr = NSString(data: jsonData, encoding: String.Encoding.utf8.rawValue)
+
             callback(jsonStr, nil)
-            return
         } catch let error as NSError {
             callback(nil, error)
             return

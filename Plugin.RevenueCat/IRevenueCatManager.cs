@@ -14,6 +14,6 @@ public interface IRevenueCatManager
 	
 	Task<CustomerInfoRequest?> RestoreAsync();
 
-	Task<StoreTransaction> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier);
+	Task<CustomerInfoRequest?> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier);
 }
 

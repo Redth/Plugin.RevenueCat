@@ -79,13 +79,10 @@ public class RevenueCatManager(IRevenueCatImpl revenueCatImpl) : IRevenueCatMana
 		return CustomerInfoRequest.FromJson(s);
 	}
 
-	public async Task<StoreTransaction> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier)
+	public async Task<CustomerInfoRequest?> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier)
 	{
-		var json = await revenueCatImpl.PurchaseAsync(platformContext, offeringIdentifier, packageIdentifier);
-
-		// TODO: StoreTransaction is serialized here, it _should_ be the same on both platforms
-
-		return new StoreTransaction();
+		var s = await revenueCatImpl.PurchaseAsync(platformContext, offeringIdentifier, packageIdentifier);
+		return CustomerInfoRequest.FromJson(s);
 	}
 }
 
