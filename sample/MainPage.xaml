@@ -13,7 +13,7 @@
                 Style="{StaticResource SubHeadline}"
                 SemanticProperties.HeadingLevel="Level2" />
 
-            <Entry x:Name="rcApiKey" Placeholder="Public API Key" Text="goog_kPxQRsYSTBgsBRMlucULuPZIYkW"></Entry>
+            <Entry x:Name="rcApiKey" Placeholder="Public API Key" Text=""></Entry>
 
             <Label
                 Text="RevenueCat User ID"

@@ -7,6 +7,14 @@ public static class MauiProgram
 {
 	public static MauiApp CreateMauiApp()
 	{
+		var revenueCatApiKey =
+#if ANDROID
+			"goog_kPxQRsYSTBgsBRMlucULuPZIYkW";
+#elif IOS || MACCATALYST
+			"appl_MhvNaMequbUAzjayKBwJSMVKGqE";
+#else
+			"";
+#endif
 		var builder = MauiApp.CreateBuilder();
 		builder
 			.UseMauiApp<App>()
@@ -14,17 +22,10 @@ public static class MauiProgram
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-			});
+			})
+			.UseRevenueCat(revenueCatApiKey);
 
-        builder.Services.AddTransient<MainPage>();
-
-#if ANDROID
-		builder.Services.AddSingleton<IRevenueCatImpl, RevenueCatAndroid>();
-		builder.Services.AddSingleton<IRevenueCatManager, RevenueCatManager>();
-#elif IOS || MACCATALYST
-        builder.Services.AddSingleton<IRevenueCatImpl, RevenueCatApple>();
-		builder.Services.AddSingleton<IRevenueCatManager, RevenueCatManager>();
-#endif
+		builder.Services.AddTransient<MainPage>();
 
 #if DEBUG
 		builder.Logging.AddDebug();

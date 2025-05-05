@@ -16,21 +16,8 @@ public partial class MainPage : ContentPage
         this.revenueCatManager = revenueCatManager;
 
         this.revenueCatManager.CustomerInfoUpdated += RevenueCatManager_CustomerInfoUpdated;
-        //this.revenueCatManager.SetEntitlementsUpdatedHandler(entitlements =>
-        //{
-        //    Dispatcher.Dispatch(() =>
-        //    {
-        //        txtEntitlements.Text = "Entitlements: "
-        //                                + string.Join(", ", entitlements)
-        //                                + Environment.NewLine
-        //                                + "Refreshed at: " + DateTime.Now.ToLongDateString() + ", " + DateTime.Now.ToLongTimeString();
-        //    });
-        //});
 
-        if (!OperatingSystem.IsAndroid())
-        {
-            this.rcApiKey.Text = "appl_MhvNaMequbUAzjayKBwJSMVKGqE";
-        }
+        this.rcApiKey.Text = revenueCatManager.ApiKey;
     }
 
 	private void RevenueCatManager_CustomerInfoUpdated(object? sender, CustomerInfoUpdatedEventArgs e)
@@ -52,24 +39,17 @@ public partial class MainPage : ContentPage
         {
             if (string.IsNullOrEmpty(rcApiKey.Text))
             {
-                this.DisplayAlert("Error", "API Key is required", "OK");
+                await this.DisplayAlert("Error", "API Key is required", "OK");
                 return;
             }
 
-            string? appStore = null;
-            object platformContext = null;
-            #if ANDROID
-            appStore = "google";
-            platformContext = this.Window.Handler.MauiContext.Context;
-            #endif
-
-            revenueCatManager.Initialize(platformContext, true, appStore, rcApiKey.Text, rcUserId.Text);
+            revenueCatManager.Initialize(rcApiKey.Text, true, userId: rcUserId.Text);
             isInitialized = true;
         }
 
         if (string.IsNullOrEmpty(rcUserId.Text))
         {
-            this.DisplayAlert("Error", "User ID is required", "OK");
+            await this.DisplayAlert("Error", "User ID is required", "OK");
             return;
         }
 
@@ -81,27 +61,26 @@ public partial class MainPage : ContentPage
     {
         if (string.IsNullOrEmpty(rcOfferingId.Text))
         {
-            this.DisplayAlert("Error", "Offering Identifier is required", "OK");
+            await this.DisplayAlert("Error", "Offering Identifier is required", "OK");
             return;
         }
 
         var offering = await revenueCatManager.GetOfferingAsync("pro1year");
 
-        var package = offering.Packages.FirstOrDefault();
+        var package = offering?.Packages?.FirstOrDefault();
         
-        Console.WriteLine($"Offering: {offering.Identifier}");
-        Console.WriteLine($"Package: {package.Identifier}");
+        Console.WriteLine($"Offering: {offering?.Identifier}");
+        Console.WriteLine($"Package: {package?.Identifier}");
         
-        object? platformContext = null;
-
-#if ANDROID
-        var activity = this.Window.Handler.MauiContext.Context.GetActivity();
-        platformContext = activity;
-#endif
+        if (offering == null || package == null)
+        {
+            await this.DisplayAlert("Error", "Offering or Package not found", "OK");
+            return;
+        }
 
         try
         {
-            var sk = await revenueCatManager.PurchaseAsync(platformContext, offering.Identifier, package.Identifier);
+            var sk = await revenueCatManager.PurchaseAsync(offering.Identifier, package.Identifier);
         }
         catch (Exception ex)
         {
