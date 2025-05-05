@@ -21,7 +21,7 @@
 		<DebugType>portable</DebugType>
 	</PropertyGroup>
 
-	<ItemGroup>
+	<ItemGroup Condition=" '$(EnableVersioning)' == 'true' ">
 		<PackageReference Include="Nerdbank.GitVersioning">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
