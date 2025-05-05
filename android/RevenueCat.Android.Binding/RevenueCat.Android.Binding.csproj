@@ -42,14 +42,14 @@
 
   <ItemGroup>
     <!-- RevenueCat SDK libraries -->
-    <AndroidMavenLibrary Include="com.revenuecat.purchases:purchases" Version="8.16.0" Bind="false"  VerifyDependencies="False" />
-    <AndroidMavenLibrary Include="com.revenuecat.purchases:purchases-store-amazon" Version="8.16.0" Bind="false"  VerifyDependencies="False" />
+    <AndroidMavenLibrary Include="com.revenuecat.purchases:purchases" Version="8.16.0" Bind="false" Pack="True" VerifyDependencies="False" />
+    <AndroidMavenLibrary Include="com.revenuecat.purchases:purchases-store-amazon" Version="8.16.0" Bind="false" Pack="True" VerifyDependencies="False" />
     
     <!-- Amazon AppStore SDK -->
-    <AndroidMavenLibrary Include="com.amazon.device:amazon-appstore-sdk" Version="3.0.5" Bind="false"  VerifyDependencies="False" />
+    <AndroidMavenLibrary Include="com.amazon.device:amazon-appstore-sdk" Version="3.0.5" Bind="false" Pack="True" VerifyDependencies="False" />
     
     <!-- Kotlin data class annotations -->
-    <AndroidMavenLibrary Include="dev.drewhamilton.poko:poko-annotations" Version="0.13.1" Bind="false" VerifyDependencies="False" />
+    <AndroidMavenLibrary Include="dev.drewhamilton.poko:poko-annotations" Version="0.13.1" Bind="false" Pack="True" VerifyDependencies="False" />
   </ItemGroup>
 
   <ItemGroup>
