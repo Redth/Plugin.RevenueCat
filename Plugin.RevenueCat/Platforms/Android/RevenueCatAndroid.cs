@@ -9,10 +9,23 @@ namespace Plugin.RevenueCat;
 // All the code in this file is only included on Android.
 public class RevenueCatAndroid : Java.Lang.Object, IRevenueCatImpl, ICustomerInfoUpdatedListener
 {
-	public void Initialize(object platformContext, bool debugLog, string appStore, string apiKey, string userId)
+	bool initialized = false;
+
+	public void Initialize(string apiKey, bool debugLog = false, string? appStore = null, string? userId = null)
 	{
+		if (initialized)
+		{
+			return;
+		}
+		initialized = true;
+
+#if ANDROID
+		appStore ??= "google";
+#endif
+
+		var context = global::Android.App.Application.Context;
 		global::RevenueCat.RevenueCatManager.SetCustomerInfoUpdatedListener(this);
-		global::RevenueCat.RevenueCatManager.Initialize(platformContext as Android.Content.Context, debugLog, appStore, apiKey, userId);
+		global::RevenueCat.RevenueCatManager.Initialize(context, debugLog, appStore, apiKey, userId);
 	}
 
 	public async Task<string?> LoginAsync(string userId)

@@ -1,4 +1,5 @@
-﻿using Plugin.RevenueCat.Models;
+﻿using Microsoft.Maui.Platform;
+using Plugin.RevenueCat.Models;
 using RevenueCat;
 
 namespace Plugin.RevenueCat;
@@ -14,14 +15,25 @@ public class RevenueCatManager(IRevenueCatImpl revenueCatImpl) : IRevenueCatMana
 {
 	public event EventHandler<Plugin.RevenueCat.CustomerInfoUpdatedEventArgs>? CustomerInfoUpdated;
 
-	public void Initialize(object platformContext, bool debugLog, string appStore, string apiKey, string userId)
+	public string ApiKey { get;  private set; } = string.Empty;
+
+	public void Initialize(string apiKey, bool debugLog = false, string? appStore = null, string? userId = null, Action<CustomerInfoRequest>? customerInfoUpdatedCallback = null)
 	{
+		ApiKey = apiKey;
+		
 		revenueCatImpl.SetCustomerInfoUpdatedHandler((json) =>
 		{
 			var cir = CustomerInfoRequest.FromJson(json);
-			CustomerInfoUpdated?.Invoke(this, new CustomerInfoUpdatedEventArgs(cir));
+
+			if (cir is not null && customerInfoUpdatedCallback is not null)
+			{
+				// Call callback first
+				customerInfoUpdatedCallback.Invoke(cir);
+				// Raise event too
+				CustomerInfoUpdated?.Invoke(this, new CustomerInfoUpdatedEventArgs(cir));
+			}
 		});
-		revenueCatImpl.Initialize(platformContext, debugLog, appStore, apiKey, userId);
+		revenueCatImpl.Initialize(apiKey, debugLog, appStore, userId);
 	}
 
 	public async Task<CustomerInfoRequest?> LoginAsync(string userId)
@@ -82,7 +94,19 @@ public class RevenueCatManager(IRevenueCatImpl revenueCatImpl) : IRevenueCatMana
 	public async Task<CustomerInfoRequest?> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier)
 	{
 		var s = await revenueCatImpl.PurchaseAsync(platformContext, offeringIdentifier, packageIdentifier);
-		return CustomerInfoRequest.FromJson(s);
+		if (string.IsNullOrEmpty(s))
+			return null;
+
+		try
+		{
+			return CustomerInfoRequest.FromJson(s);
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine(ex);
+		}
+
+		return null;
 	}
 }
 

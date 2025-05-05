@@ -7,8 +7,16 @@ public class RevenueCatApple : IRevenueCatImpl
 {
     readonly global::RevenueCat.RevenueCatManager revenueCatManager = new();
 
-    public void Initialize(object platformContext, bool debugLog, string appStore, string apiKey, string userId)
+    bool initialized = false;
+    
+    public void Initialize(string apiKey, bool debugLog = false, string? appStore = null, string? userId = null)
     {
+        if (initialized)
+        {
+            return;
+        }
+        initialized = true;
+
         revenueCatManager.SetCustomerInfoChangedHandler(nsstr => customerInfoUpdatedHandler?.Invoke(nsstr.ToString()));
         revenueCatManager.Initialize(debugLog, apiKey, userId);
     }

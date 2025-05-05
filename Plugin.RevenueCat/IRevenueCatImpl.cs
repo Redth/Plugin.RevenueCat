@@ -6,7 +6,7 @@ public interface IRevenueCatImpl
 {
 	void SetCustomerInfoUpdatedHandler(Action<string> handler);
 
-	void Initialize(object platformContext, bool debugLog, string appStore, string apiKey, string userId);
+	void Initialize(string apiKey, bool debugLog = false, string? appStore = null, string? userId = null);
 
 	Task<string?> LoginAsync(string userId);
 
