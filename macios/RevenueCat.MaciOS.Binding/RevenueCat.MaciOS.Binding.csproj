@@ -1,44 +1,46 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFrameworks>net9.0-ios;net9.0-maccatalyst</TargetFrameworks>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>true</ImplicitUsings>
-    <IsBindingProject>true</IsBindingProject>
+	<PropertyGroup>
+		<TargetFrameworks>net9.0-ios;net9.0-maccatalyst</TargetFrameworks>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>true</ImplicitUsings>
+		<IsBindingProject>true</IsBindingProject>
+		<IsTrimmable>true</IsTrimmable>
+		<EnableVersioning>true</EnableVersioning>
+	</PropertyGroup>
 
-    <!--
-      Enable trim analyzers for class libraries.
-      To learn more, see: https://learn.microsoft.com/dotnet/core/deploying/trimming/prepare-libraries-for-trimming
-    -->
-    <IsTrimmable>true</IsTrimmable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<PackageId>Plugin.RevenueCat.MaciOS.Binding</PackageId>
+		<Title>RevenueCat for .NET MAUI (Mac/iOS Binding)</Title>
+		<PackageDescription>This package contains Mac/iOS Binding types for Plugin.RevenueCat and is not intended to be referenced directly.</PackageDescription>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ObjcBindingApiDefinition Include="ApiDefinition.cs" />
-    <ObjcBindingCoreSource Include="StructsAndEnums.cs" />
-  </ItemGroup>
+	<ItemGroup>
+		<ObjcBindingApiDefinition Include="ApiDefinition.cs" />
+		<ObjcBindingCoreSource Include="StructsAndEnums.cs" />
+	</ItemGroup>
 
-  <!-- Reference to Xcode project -->
-  <ItemGroup>
-    <XcodeProject Include="../native/RevenueCatBinding/RevenueCatBinding.xcodeproj">
-      <SchemeName>RevenueCatBinding</SchemeName>
-      <!-- Metadata applicable to @(NativeReference) will be used if set, otherwise the following defaults will be used:
-      <Kind>Framework</Kind>
-      <SmartLink>true</SmartLink>
-      -->
-    </XcodeProject>
-  </ItemGroup>
+	<!-- Reference to Xcode project -->
+	<ItemGroup>
+		<XcodeProject Include="../native/RevenueCatBinding/RevenueCatBinding.xcodeproj">
+			<SchemeName>RevenueCatBinding</SchemeName>
+			<!-- Metadata applicable to @(NativeReference) will be used if set, otherwise the following defaults will be used:
+			<Kind>Framework</Kind>
+			<SmartLink>true</SmartLink>
+			-->
+		</XcodeProject>
+	</ItemGroup>
 
-  <Target Name="DownloadNativeDependencies" BeforeTargets="Build" Condition=" '$(IsCrossTargetingBuild)' == 'true' ">
-    <PropertyGroup>
-      <RevenueCatSdkVersion>5.22.1</RevenueCatSdkVersion>
+	<Target Name="DownloadNativeDependencies" BeforeTargets="Build" Condition=" '$(IsCrossTargetingBuild)' == 'true' ">
+		<PropertyGroup>
+			<RevenueCatSdkVersion>5.22.1</RevenueCatSdkVersion>
 
-      <RevenueCatSdkUrl>https://github.com/RevenueCat/purchases-ios/releases/download/$(RevenueCatSdkVersion)/RevenueCat.xcframework.zip</RevenueCatSdkUrl>
-    </PropertyGroup>
+			<RevenueCatSdkUrl>https://github.com/RevenueCat/purchases-ios/releases/download/$(RevenueCatSdkVersion)/RevenueCat.xcframework.zip</RevenueCatSdkUrl>
+		</PropertyGroup>
 
-    <DownloadFile SourceUrl="$(RevenueCatSdkUrl)" DestinationFolder="$([System.IO.Path]::GetFullPath($(MSBuildProjectDirectory)/../native/bin/deps))">
-      <Output TaskParameter="DownloadedFile" ItemName="RevenueCatSdkArchives" />
-    </DownloadFile>
+		<DownloadFile SourceUrl="$(RevenueCatSdkUrl)" DestinationFolder="$([System.IO.Path]::GetFullPath($(MSBuildProjectDirectory)/../native/bin/deps))">
+			<Output TaskParameter="DownloadedFile" ItemName="RevenueCatSdkArchives" />
+		</DownloadFile>
 
-    <Exec Command="unzip -q -o -d $([System.IO.Path]::GetFullPath($(MSBuildProjectDirectory)/../native/bin/deps)) @(RevenueCatSdkArchives)" />
-  </Target>
+		<Exec Command="unzip -q -o -d $([System.IO.Path]::GetFullPath($(MSBuildProjectDirectory)/../native/bin/deps)) @(RevenueCatSdkArchives)" />
+	</Target>
 </Project>

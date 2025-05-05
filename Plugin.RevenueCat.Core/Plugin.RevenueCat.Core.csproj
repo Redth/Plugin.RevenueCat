@@ -1,10 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <EnableVersioning>true</EnableVersioning>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<EnableVersioning>true</EnableVersioning>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<PackageId>Plugin.RevenueCat.Core</PackageId>
+		<Title>RevenueCat for .NET MAUI (Core Types)</Title>
+		<PackageDescription>This package contains core types for Plugin.RevenueCat and is not intended to be referenced directly.</PackageDescription>
+	</PropertyGroup>
 
 </Project>
