@@ -27,6 +27,7 @@ jobs:
     - name: 📦 Build + Pack
       run: |
         dotnet pack --configuration Release ./android/RevenueCat.Android.Binding/RevenueCat.Android.Binding.csproj
+        dotnet build -t:DownloadNativeDependencies ./macios/RevenueCat.MaciOS.Binding/RevenueCat.MaciOS.Binding.csproj
         dotnet pack --configuration Release ./macios/RevenueCat.MaciOS.Binding/RevenueCat.MaciOS.Binding.csproj
         dotnet pack --configuration Release ./Plugin.RevenueCat.Core/Plugin.RevenueCat.Core.csproj
         dotnet pack --configuration Release ./Plugin.RevenueCat/Plugin.RevenueCat.csproj
