@@ -16,6 +16,7 @@
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<NoPack>True</NoPack>
 
 		<!-- Display name -->
 		<ApplicationTitle>MauiSample</ApplicationTitle>
@@ -58,4 +59,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Plugin.RevenueCat\Plugin.RevenueCat.csproj" />
 	</ItemGroup>
+
+	<Target Name="Pack"></Target>
 </Project>
