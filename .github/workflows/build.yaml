@@ -21,8 +21,8 @@ jobs:
     - name: 🥅 Setup .NET
       uses: actions/setup-dotnet@v4
 
-    - name: 🥅 .NET Workload Restore
-      run: dotnet workload restore ./RevenueCat.sln
+    - name: 🥅 .NET Workload Install
+      run: dotnet workload install maui android ios maccatalyst
 
     - name: 📦 Build + Pack
       run: |
