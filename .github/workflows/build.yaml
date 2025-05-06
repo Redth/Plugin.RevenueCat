@@ -20,8 +20,10 @@ jobs:
         fetch-depth: 0 #Nerdbank needs full clone
     - name: 🥅 Setup .NET
       uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.0.x
+
+    - name: 🥅 .NET Workload Restore
+      run: dotnet workload restore ./RevenueCat.sln
+
     - name: 📦 Build + Pack
       run: |
         dotnet pack --configuration Release ./android/RevenueCat.Android.Binding/RevenueCat.Android.Binding.csproj
