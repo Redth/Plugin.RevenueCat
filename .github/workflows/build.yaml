@@ -12,7 +12,7 @@ jobs:
     name: 🔨 Build
     env:
       NUPKG_MAJOR: 0.999
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
     - name: 🛒 Checkout
       uses: actions/checkout@v4
@@ -23,6 +23,10 @@ jobs:
 
     - name: 🥅 .NET Workload Install
       run: dotnet workload install maui android ios maccatalyst
+
+    # - uses: maxim-lobanov/setup-xcode@v1
+    #   with:
+    #     xcode-version: '16.3'
 
     - name: 📦 Build + Pack
       run: |
