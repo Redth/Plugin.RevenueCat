@@ -20,7 +20,7 @@ My current main use case is subscriptions, so I have not done much work around c
 
 ## Usage
 
-In your builder, call `.UseRevenueCat("API_KEY")` to register `IRevenueCatManager` with dependency injection and have the initialization methods invoked in the appropriate application lifecycle events:
+In your builder, call `.UseRevenueCat(...)` to register `IRevenueCatManager` with dependency injection, set configuration options, and have the initialization methods invoked in the appropriate application lifecycle events:
 
 ```csharp
 var builder = MauiApp.CreateBuilder();
@@ -52,7 +52,7 @@ Typically you will want to check the entitlements you care about for your app wh
 
 ### Purchases
 
-Use the `IRevenueCatManager` instance (resolved through dependency injection) to interact with the SDK.  This is basically a wrapper/abstraction around the underlying platform specific implementations of `IRevenueCatImpl` (which you do not need to worry about directly).
+Use the `IRevenueCatManager` instance (resolved through dependency injection) to interact with the SDK.  This is basically a wrapper/abstraction around the underlying platform specific implementations of `IRevenueCatPlatformImplementation` (which you do not need to worry about directly).
 
 - `Initialize(...)` - this is called for you if you use the `UseRevenueCat()` builder method and calling it again manually has no effect
 - `Task<CustomerInfoRequest?> LoginAsync(string userId)` once you know the user identifier for your purchases, you should call this.  You should avoid calling it unnecessarily as it can cause multiple user account objects to be created if you do.  You should also try to call it as early in the lifecycle of your app as possible.
@@ -62,4 +62,3 @@ Use the `IRevenueCatManager` instance (resolved through dependency injection) to
 - `Task<CustomerInfoRequest?> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier)` - Initiates a purchase.  The `platformContext` should be an `Activity` (likely the current one) on Android, and is currently unused on iOS/MacCatalyst.  There's a version of this method you can call which infers the default 'current' activity of your MAUI app automatically.  You also need to pass the `offeringIdentifier` and the `packageIdentifier` the user wants to purchase (if you only have one package, pick the first one).
 - `Task<CustomerInfoRequest?> PurchaseAsync(string offeringIdentifier, string packageIdentifier)` - Same as above, but Initiates a purchase.  The `platformContext` should be an `Activity` (likely the current one) on Android, and is currently unused on iOS/MacCatalyst.  There's a version of this method you can call which infers the default 'current' activity of your MAUI app automatically.  You also need to pass the `offeringIdentifier` and the `packageIdentifier` the user wants to purchase (if you only have one package, pick the first one).
 - `Task<CustomerInfoRequest?> PurchaseAsync(string offeringIdentifier, string packageIdentifier)` - Same as above, but automatically infers the default 'current' activity of your MAUI app automatically.
-
