@@ -6,6 +6,8 @@
 		<IsBindingProject>true</IsBindingProject>
 		<IsTrimmable>true</IsTrimmable>
 		<EnableVersioning>true</EnableVersioning>
+		<!-- Zip the RevenueCat.MaciOS.Binding.resources side car -->
+		<CompressBindingResourcePackage>true</CompressBindingResourcePackage>
 	</PropertyGroup>
 
 	<PropertyGroup>
