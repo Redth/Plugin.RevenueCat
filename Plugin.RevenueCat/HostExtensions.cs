@@ -11,8 +11,6 @@ using Plugin.RevenueCat.Models;
 
 public static class HostExtensions
 {
-	static IRevenueCatManager? Manager { get; set; }
-
 	public static MauiAppBuilder UseRevenueCat(this MauiAppBuilder builder, Action<RevenueCatOptionsBuilder>? configure = null)
 	{
 		var optionsBuilder = new RevenueCatOptionsBuilder();
@@ -41,7 +39,9 @@ public static class HostExtensions
 			{
 				android.OnApplicationCreate(app =>
 				{
-					if (Manager is not null)
+					var manager = Application.Current?.Handler?.MauiContext?.Services?.GetService<IRevenueCatManager>();
+					
+					if (manager is not null)
 					{
 						var amazon = RevenueCatAndroid.IsAmazon();
 
@@ -51,7 +51,7 @@ public static class HostExtensions
 							throw new ArgumentException("Android API Key is required");
 
 						// Initialize the SDK
-						Manager.Initialize(options);
+						manager.Initialize();
 					}
 				});
 			});
