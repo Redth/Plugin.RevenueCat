@@ -9,9 +9,9 @@ public static class MauiProgram
 	{
 		var revenueCatApiKey =
 #if ANDROID
-			"goog_kPxQRsYSTBgsBRMlucULuPZIYkW";
+			"goog_[YOUR_GOOGLE_CLIENT_KEY]";
 #elif IOS || MACCATALYST
-			"appl_MhvNaMequbUAzjayKBwJSMVKGqE";
+			"appl_[YOUR_APPLE_CLIENT_KEY]";
 #else
 			"";
 #endif
@@ -23,7 +23,11 @@ public static class MauiProgram
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 			})
-			.UseRevenueCat(revenueCatApiKey);
+			.UseRevenueCat(revenueCatApiKey,
+				debugLog: true,
+				userId: null,
+				appStore: null,
+				customerInfoUpdatedCallback: null);
 
 		builder.Services.AddTransient<MainPage>();
 

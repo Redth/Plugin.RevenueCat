@@ -4,7 +4,7 @@ namespace Plugin.RevenueCat;
 
 public interface IRevenueCatManager
 {
-	event EventHandler<Plugin.RevenueCat.CustomerInfoUpdatedEventArgs>? CustomerInfoUpdated;
+	event EventHandler<CustomerInfoUpdatedEventArgs>? CustomerInfoUpdated;
 
 	string ApiKey { get; }
 	
