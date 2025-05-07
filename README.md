@@ -27,10 +27,13 @@ var builder = MauiApp.CreateBuilder();
 builder
 	.UseMauiApp<App>()
 	/* ... */
-	.UseRevenueCat(revenueCatApiKey);
+	.UseRevenueCat(o => o
+		.WithAndroidApiKey("goog_[YOUR_GOOGLE_CLIENT_KEY]")
+		.WithAppleApiKey("appl_[YOUR_APPLE_CLIENT_KEY]")
+		.WithDebug(true));
 ```
 
-You can optionally pass in additional parameters to this call:
+You can optionally set additional options:
  - `string? userId` if you know it at this point (you can call `LoginAsync` to set it later too)
  - `string? appStore` if you need to pass a non-default value (according to the RevenueCat SDK docs)
  - `bool debugLog` to enable more debug logging at hte native RevenueCat SDK level 

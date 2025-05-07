@@ -11,6 +11,8 @@ using System.Text.Json.Serialization;
 
 public static class ModelExtensions
 {
+	public static T? ToModel<T>(this string? json) => json is null ? default : JsonSerializer.Deserialize<T>(json, Settings);
+	
 	public static string ToJson(this CustomerInfoRequest self) => JsonSerializer.Serialize(self, Settings);
 
 	public static string ToJson(this Offering self) => JsonSerializer.Serialize(self, Settings);
