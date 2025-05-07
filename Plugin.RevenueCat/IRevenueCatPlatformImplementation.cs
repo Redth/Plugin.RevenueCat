@@ -2,11 +2,13 @@
 
 namespace Plugin.RevenueCat;
 
-public interface IRevenueCatImpl
+public interface IRevenueCatPlatformImplementation
 {
 	void SetCustomerInfoUpdatedHandler(Action<string> handler);
 
-	void Initialize(string apiKey, bool debugLog = false, string? appStore = null, string? userId = null);
+	string? ApiKey { get; }
+	
+	void Initialize(RevenueCatOptions options);
 
 	Task<string?> LoginAsync(string userId);
 

@@ -7,11 +7,13 @@ using RevenueCat;
 namespace Plugin.RevenueCat;
 
 // All the code in this file is only included on Android.
-public class RevenueCatAndroid : Java.Lang.Object, IRevenueCatImpl, ICustomerInfoUpdatedListener
+public class RevenueCatAndroid : Java.Lang.Object, IRevenueCatPlatformImplementation, ICustomerInfoUpdatedListener
 {
 	bool initialized = false;
 
-	public void Initialize(string apiKey, bool debugLog = false, string? appStore = null, string? userId = null)
+	public string? ApiKey { get; private set; }
+	
+	public void Initialize(RevenueCatOptions options)
 	{
 		if (initialized)
 		{
@@ -19,15 +21,45 @@ public class RevenueCatAndroid : Java.Lang.Object, IRevenueCatImpl, ICustomerInf
 		}
 		initialized = true;
 
-#if ANDROID
-		appStore ??= "google";
-#endif
-
+		// Detect the correct app store to use
+		var amazon = IsAmazon();
+		var appStore = amazon ? "amazon" : "google";
+		ApiKey = amazon ? options.AmazonApiKey : options.AndroidApiKey;
+		
 		var context = global::Android.App.Application.Context;
 		global::RevenueCat.RevenueCatManager.SetCustomerInfoUpdatedListener(this);
-		global::RevenueCat.RevenueCatManager.Initialize(context, debugLog, appStore, apiKey, userId);
+		global::RevenueCat.RevenueCatManager.Initialize(context, options.Debug, appStore, ApiKey, options.UserId);
 	}
 
+	public static bool IsAmazon()
+	{
+		var pkgManager = Android.App.Application.Context.PackageManager;
+
+		string? installerPackageName = null;
+
+		var pkgName = Android.App.Application.Context.PackageName;
+
+		if (string.IsNullOrEmpty(pkgName) || pkgManager is null)
+			return false;
+		
+		if (OperatingSystem.IsAndroidVersionAtLeast(30))
+		{
+			var installSourceInfo = pkgManager.GetInstallSourceInfo(pkgName);
+			installerPackageName = installSourceInfo?.InitiatingPackageName;
+		}
+		
+		if (string.IsNullOrEmpty(installerPackageName))
+		{
+			// Fallback to the old method, it's deprecated on > 30 but still try if need be
+#pragma warning disable CA1422
+			installerPackageName = pkgManager.GetInstallerPackageName(pkgName);
+#pragma warning restore CA1422
+		}
+				
+		return (installerPackageName?.StartsWith("com.amazon", StringComparison.OrdinalIgnoreCase) ?? false)
+			|| (Android.OS.Build.Manufacturer?.StartsWith("amazon", StringComparison.OrdinalIgnoreCase) ?? false);
+	}
+	
 	public async Task<string?> LoginAsync(string userId)
 	{
 		var s = await global::RevenueCat.RevenueCatManager.Login(userId)!.AsTask<Java.Lang.String>();

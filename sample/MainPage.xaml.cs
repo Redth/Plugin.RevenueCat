@@ -16,8 +16,6 @@ public partial class MainPage : ContentPage
         this.revenueCatManager = revenueCatManager;
 
         this.revenueCatManager.CustomerInfoUpdated += RevenueCatManager_CustomerInfoUpdated;
-
-        this.rcApiKey.Text = revenueCatManager.ApiKey;
     }
 
 	private void RevenueCatManager_CustomerInfoUpdated(object? sender, CustomerInfoUpdatedEventArgs e)
@@ -35,18 +33,6 @@ public partial class MainPage : ContentPage
 
     private async void Identify_Clicked(object? sender, EventArgs e)
     {
-        if (!isInitialized)
-        {
-            if (string.IsNullOrEmpty(rcApiKey.Text))
-            {
-                await this.DisplayAlert("Error", "API Key is required", "OK");
-                return;
-            }
-
-            revenueCatManager.Initialize(rcApiKey.Text, true, userId: rcUserId.Text);
-            isInitialized = true;
-        }
-
         if (string.IsNullOrEmpty(rcUserId.Text))
         {
             await this.DisplayAlert("Error", "User ID is required", "OK");
@@ -67,7 +53,15 @@ public partial class MainPage : ContentPage
 
         var offering = await revenueCatManager.GetOfferingAsync("pro1year");
 
-        var package = offering?.Packages?.FirstOrDefault();
+        if (!(offering?.Packages?.Any() ?? false))
+        {
+	        await this.DisplayAlert("Error", "No packages found for offering", "OK");
+	        return;
+        }
+
+        var packageChoice = await this.DisplayActionSheet("Select Package", "Cancel", null, offering?.Packages.Select(x => x.Identifier).ToArray());
+        
+        var package = offering?.Packages.FirstOrDefault(x => x.Identifier == packageChoice);
         
         Console.WriteLine($"Offering: {offering?.Identifier}");
         Console.WriteLine($"Package: {package?.Identifier}");
@@ -107,7 +101,6 @@ public partial class MainPage : ContentPage
         }
         
     }
-    
 
     private async void Update_Clicked(object? sender, EventArgs e)
     {

@@ -9,32 +9,41 @@ public class CustomerInfoUpdatedEventArgs(CustomerInfoRequest customerInfoReques
 	public CustomerInfoRequest CustomerInfoRequest => customerInfoRequest;
 }
 
-public class RevenueCatManager(IRevenueCatImpl revenueCatImpl, ILogger? logger = null) : IRevenueCatManager
+public class RevenueCatManager : IRevenueCatManager
 {
-	public event EventHandler<CustomerInfoUpdatedEventArgs>? CustomerInfoUpdated;
-
-	public string ApiKey { get;  private set; } = string.Empty;
-
-	ILogger Logger => logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
-	
-	public void Initialize(string apiKey, bool debugLog = false, string? appStore = null, string? userId = null, Action<CustomerInfoRequest>? customerInfoUpdatedCallback = null)
+	public RevenueCatManager(RevenueCatOptions options, IRevenueCatPlatformImplementation platformImplementation, ILoggerFactory? loggerFactory = null)
 	{
-		ApiKey = apiKey;
-		
+		Options = options;
+		PlatformImplementation = platformImplementation;
+		Logger = loggerFactory?.CreateLogger<RevenueCatManager>() ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<RevenueCatManager>.Instance;
+	}
+
+	public readonly IRevenueCatPlatformImplementation PlatformImplementation;
+	
+	public readonly RevenueCatOptions Options;
+	
+	public event EventHandler<CustomerInfoUpdatedEventArgs>? CustomerInfoUpdated;
+	
+	public string? ApiKey => PlatformImplementation.ApiKey;
+
+	protected readonly ILogger Logger;
+	
+	public void Initialize()
+	{
 		Logger.LogInformation($"RevenueCat->{nameof(Initialize)}: Initializing...");
 		
-		revenueCatImpl.SetCustomerInfoUpdatedHandler((json) =>
+		PlatformImplementation.SetCustomerInfoUpdatedHandler((json) =>
 		{
 			Logger.LogInformation($"RevenueCat->{nameof(CustomerInfoUpdated)}: Deserializing JSON...");
 			
 			var customerInfoRequest = ParseJson<CustomerInfoRequest>(nameof(Initialize), json);
 			
-			if (customerInfoRequest is not null && customerInfoUpdatedCallback is not null)
+			if (customerInfoRequest is not null)
 			{
 				Logger.LogInformation($"RevenueCat->{nameof(CustomerInfoUpdated)}: Callback...");
 				
 				// Call callback first
-				customerInfoUpdatedCallback.Invoke(customerInfoRequest);
+				Options.CustomerInfoUpdatedCallback?.Invoke(customerInfoRequest);
 				// Raise event too
 				CustomerInfoUpdated?.Invoke(this, new CustomerInfoUpdatedEventArgs(customerInfoRequest));
 			}
@@ -42,7 +51,7 @@ public class RevenueCatManager(IRevenueCatImpl revenueCatImpl, ILogger? logger =
 
 		try
 		{
-			revenueCatImpl.Initialize(apiKey, debugLog, appStore, userId);
+			PlatformImplementation.Initialize(Options);
 			Logger.LogInformation($"RevenueCat->{nameof(Initialize)}: Initialized.");
 		}
 		catch (Exception ex)
@@ -52,19 +61,19 @@ public class RevenueCatManager(IRevenueCatImpl revenueCatImpl, ILogger? logger =
 	}
 
 	public Task<CustomerInfoRequest?> LoginAsync(string userId)
-		=> Request<CustomerInfoRequest>(nameof(LoginAsync), () => revenueCatImpl.LoginAsync(userId));
+		=> Request<CustomerInfoRequest>(nameof(LoginAsync), () => PlatformImplementation.LoginAsync(userId));
 
 	public Task<CustomerInfoRequest?> GetCustomerInfoAsync(bool force)
-		=> Request<CustomerInfoRequest>(nameof(GetCustomerInfoAsync), () => revenueCatImpl.GetCustomerInfoAsync(force));
+		=> Request<CustomerInfoRequest>(nameof(GetCustomerInfoAsync), () => PlatformImplementation.GetCustomerInfoAsync(force));
 	
 	public Task<Offering?> GetOfferingAsync(string offeringIdentifier)
-		=> Request<Offering>(nameof(GetOfferingAsync), () => revenueCatImpl.GetOfferingAsync(offeringIdentifier));
+		=> Request<Offering>(nameof(GetOfferingAsync), () => PlatformImplementation.GetOfferingAsync(offeringIdentifier));
 
 	public Task<CustomerInfoRequest?> RestoreAsync()
-		=> Request<CustomerInfoRequest>(nameof(RestoreAsync), revenueCatImpl.RestoreAsync);
+		=> Request<CustomerInfoRequest>(nameof(RestoreAsync), PlatformImplementation.RestoreAsync);
 
 	public Task<CustomerInfoRequest?> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier)
-		=> Request<CustomerInfoRequest>(nameof(PurchaseAsync), () => revenueCatImpl.PurchaseAsync(platformContext, offeringIdentifier, packageIdentifier));
+		=> Request<CustomerInfoRequest>(nameof(PurchaseAsync), () => PlatformImplementation.PurchaseAsync(platformContext, offeringIdentifier, packageIdentifier));
 
 	async Task<TObject?> Request<TObject>(string name, Func<Task<string?>> requestFunc)
 	{

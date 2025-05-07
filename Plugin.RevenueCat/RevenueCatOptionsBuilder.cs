@@ -4,45 +4,83 @@ namespace Plugin.RevenueCat;
 
 public class RevenueCatOptionsBuilder
 {
+	public const string AndroidPlatform = "android";
+	public const string iOSPlatform = "ios";
+	public const string MacCatalystPlatform = "maccatalyst";
+	public const string AmazonPlatform = "amazon";
+	
+	public static RevenueCatOptionsBuilder Create()
+		=> new ();
+	
 	readonly Dictionary<string, string> apiKeys = new();
 
+	public string? GetApiKey(string platform)
+		=> apiKeys.GetValueOrDefault(platform);
+
+	public void SetApiKey(string platform, string? apiKey)
+	{
+		if (string.IsNullOrEmpty(apiKey))
+		{
+			apiKeys.Remove(platform);
+		}
+		else
+		{
+			apiKeys[platform] = apiKey;
+		}
+	}
+	
+	public string? AmazonApiKey
+	{
+		get => GetApiKey(AmazonPlatform);
+		set => SetApiKey(AmazonPlatform, value);
+	}
+	public RevenueCatOptionsBuilder WithAmazonApiKey(string? apiKey)
+	{
+		SetApiKey(AmazonPlatform, apiKey);
+		return this;
+	}
+	
 	public string? AndroidApiKey
 	{
-		get => apiKeys["android"];
-		set => apiKeys["android"] = value;
+		get => GetApiKey(AndroidPlatform);
+		set => SetApiKey(AndroidPlatform, value);
 	}
 	public RevenueCatOptionsBuilder WithAndroidApiKey(string apiKey)
 	{
-		apiKeys["android"] = apiKey;
+		SetApiKey(AndroidPlatform, apiKey);
 		return this;
 	}
 	
 	public string? iOSApiKey
 	{
-		get => apiKeys["ios"];
-		set => apiKeys["ios"] = value;
+		get => GetApiKey(iOSPlatform);
+		set => SetApiKey(iOSPlatform, value);
 	}
 	public RevenueCatOptionsBuilder WithiOSApiKey(string apiKey)
 	{
-		apiKeys["ios"] = apiKey;
+		SetApiKey(iOSPlatform, apiKey);
 		return this;
 	}
 	
 	public string? MacCatalystApiKey
 	{
-		get => apiKeys["maccatalyst"];
-		set => apiKeys["maccatalyst"] = value;
+		get => GetApiKey(MacCatalystPlatform);
+		set => SetApiKey(MacCatalystPlatform, value);
 	}
 	public RevenueCatOptionsBuilder WithMacCatalystApiKey(string apiKey)
 	{
-		apiKeys["maccatalyst"] = apiKey;
+		SetApiKey(MacCatalystPlatform, apiKey);
 		return this;
 	}
 	
 	public string? AppleApiKey
 	{
-		get => apiKeys["ios"];
-		set => apiKeys["maccatalsyt"] = apiKeys["ios"] = value;
+		get => GetApiKey(iOSPlatform);
+		set
+		{
+			SetApiKey(iOSPlatform, value);
+			SetApiKey(MacCatalystPlatform, value);
+		}
 	}
 	public RevenueCatOptionsBuilder WithAppleApiKey(string apiKey)
 		=> WithiOSApiKey(apiKey).WithMacCatalystApiKey(apiKey);
@@ -78,6 +116,7 @@ public class RevenueCatOptionsBuilder
 	public RevenueCatOptions Build()
 		=> new (
 			AndroidApiKey,
+			AmazonApiKey,
 			iOSApiKey,
 			MacCatalystApiKey,
 			Debug,

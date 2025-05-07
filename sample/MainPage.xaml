@@ -9,13 +9,6 @@
             Spacing="25">
 
             <Label
-                Text="RevenueCat Public API Key"
-                Style="{StaticResource SubHeadline}"
-                SemanticProperties.HeadingLevel="Level2" />
-
-            <Entry x:Name="rcApiKey" Placeholder="Public API Key" Text=""></Entry>
-
-            <Label
                 Text="RevenueCat User ID"
                 Style="{StaticResource SubHeadline}"
                 SemanticProperties.HeadingLevel="Level2" />

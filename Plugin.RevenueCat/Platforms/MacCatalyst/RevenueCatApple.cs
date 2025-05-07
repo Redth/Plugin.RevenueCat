@@ -3,22 +3,31 @@
 namespace Plugin.RevenueCat;
 
 // All the code in this file is only included on iOS.
-public class RevenueCatApple : IRevenueCatImpl
+public class RevenueCatApple : IRevenueCatPlatformImplementation
 {
     readonly global::RevenueCat.RevenueCatManager revenueCatManager = new();
 
     bool initialized = false;
     
-    public void Initialize(string apiKey, bool debugLog = false, string? appStore = null, string? userId = null)
+    public string? ApiKey { get; private set; }
+    
+    public void Initialize(RevenueCatOptions options)
     {
-        if (initialized)
-        {
-            return;
-        }
-        initialized = true;
+	    if (initialized)
+	    {
+		    return;
+	    }
+	    initialized = true;
 
-        revenueCatManager.SetCustomerInfoChangedHandler(nsstr => customerInfoUpdatedHandler?.Invoke(nsstr.ToString()));
-        revenueCatManager.Initialize(debugLog, apiKey, userId);
+	    revenueCatManager.SetCustomerInfoChangedHandler(nsstr => customerInfoUpdatedHandler?.Invoke(nsstr.ToString()));
+
+#if IOS
+	    ApiKey = options.iOSApiKey;
+#elif MACCATALYST
+	    ApiKey = options.MacCatalystApiKey;
+#endif
+	    
+	    revenueCatManager.Initialize(options.Debug, ApiKey, options.UserId);
     }
 
     public async Task<string?> LoginAsync(string userId)

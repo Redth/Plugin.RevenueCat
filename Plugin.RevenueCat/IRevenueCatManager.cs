@@ -6,9 +6,9 @@ public interface IRevenueCatManager
 {
 	event EventHandler<CustomerInfoUpdatedEventArgs>? CustomerInfoUpdated;
 
-	string ApiKey { get; }
+	string? ApiKey { get; }
 	
-	void Initialize(string apiKey, bool debugLog = false, string? appStore = null, string? userId = null, Action<CustomerInfoRequest>? customerInfoUpdatedCallback = null);
+	void Initialize();
 
 	Task<CustomerInfoRequest?> LoginAsync(string userId);
 	Task<CustomerInfoRequest?> GetCustomerInfoAsync(bool force);

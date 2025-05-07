@@ -4,9 +4,10 @@ namespace Plugin.RevenueCat;
 
 public record RevenueCatOptions(
 	string? AndroidApiKey,
+	string? AmazonApiKey,
 	string? iOSApiKey,
 	string? MacCatalystApiKey,
-	bool? Debug,
+	bool Debug,
 	string? UserId,
 	string? AppStore,
 	Action<CustomerInfoRequest>? CustomerInfoUpdatedCallback);
