@@ -30,11 +30,6 @@ public partial class CustomerInfoRequest
 	[JsonPropertyName("customer_info_request_date")]
 	public DateTimeOffset? CustomerInfoRequestDate { get; set; }
 }
-
-public partial class CustomerInfoRequest
-{
-	public static CustomerInfoRequest FromJson(string json) => JsonSerializer.Deserialize<CustomerInfoRequest>(json, ModelExtensions.Settings);
-}
 #pragma warning restore CS8618
 #pragma warning restore CS8601
 #pragma warning restore CS8603

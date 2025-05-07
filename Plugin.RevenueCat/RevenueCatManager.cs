@@ -1,112 +1,116 @@
-﻿using Microsoft.Maui.Platform;
+﻿using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Plugin.RevenueCat.Models;
-using RevenueCat;
 
 namespace Plugin.RevenueCat;
 
-public class CustomerInfoUpdatedEventArgs(CustomerInfoRequest customerInfoRequest) : global::System.EventArgs
+public class CustomerInfoUpdatedEventArgs(CustomerInfoRequest customerInfoRequest) : EventArgs
 {
 	public CustomerInfoRequest CustomerInfoRequest => customerInfoRequest;
-
 }
 
-// All the code in this file is included in all platforms.
-public class RevenueCatManager(IRevenueCatImpl revenueCatImpl) : IRevenueCatManager
+public class RevenueCatManager(IRevenueCatImpl revenueCatImpl, ILogger? logger = null) : IRevenueCatManager
 {
-	public event EventHandler<Plugin.RevenueCat.CustomerInfoUpdatedEventArgs>? CustomerInfoUpdated;
+	public event EventHandler<CustomerInfoUpdatedEventArgs>? CustomerInfoUpdated;
 
 	public string ApiKey { get;  private set; } = string.Empty;
 
+	ILogger Logger => logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
+	
 	public void Initialize(string apiKey, bool debugLog = false, string? appStore = null, string? userId = null, Action<CustomerInfoRequest>? customerInfoUpdatedCallback = null)
 	{
 		ApiKey = apiKey;
 		
+		Logger.LogInformation($"RevenueCat->{nameof(Initialize)}: Initializing...");
+		
 		revenueCatImpl.SetCustomerInfoUpdatedHandler((json) =>
 		{
-			var cir = CustomerInfoRequest.FromJson(json);
-
-			if (cir is not null && customerInfoUpdatedCallback is not null)
+			Logger.LogInformation($"RevenueCat->{nameof(CustomerInfoUpdated)}: Deserializing JSON...");
+			
+			var customerInfoRequest = ParseJson<CustomerInfoRequest>(nameof(Initialize), json);
+			
+			if (customerInfoRequest is not null && customerInfoUpdatedCallback is not null)
 			{
+				Logger.LogInformation($"RevenueCat->{nameof(CustomerInfoUpdated)}: Callback...");
+				
 				// Call callback first
-				customerInfoUpdatedCallback.Invoke(cir);
+				customerInfoUpdatedCallback.Invoke(customerInfoRequest);
 				// Raise event too
-				CustomerInfoUpdated?.Invoke(this, new CustomerInfoUpdatedEventArgs(cir));
+				CustomerInfoUpdated?.Invoke(this, new CustomerInfoUpdatedEventArgs(customerInfoRequest));
 			}
 		});
-		revenueCatImpl.Initialize(apiKey, debugLog, appStore, userId);
-	}
-
-	public async Task<CustomerInfoRequest?> LoginAsync(string userId)
-	{
-		var s = await revenueCatImpl.LoginAsync(userId);
-
-		CustomerInfoRequest cir = null;
-
-		try {
-			cir = CustomerInfoRequest.FromJson(s);
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine(ex);
-		}
-		Console.WriteLine(s);
-
-		return cir;
-	}
-
-	public async Task<CustomerInfoRequest?> GetCustomerInfoAsync(bool force)
-	{
-		var s = await revenueCatImpl.GetCustomerInfoAsync(force);
-
-		var cir = CustomerInfoRequest.FromJson(s);
-
-		Console.WriteLine(s);
-
-
-		return cir;
-	}
-
-	public async Task<Offering?> GetOfferingAsync(string offeringIdentifier)
-	{
-		Offering? o = null;
-
-		try {
-			var s = await revenueCatImpl.GetOfferingAsync(offeringIdentifier);
-
-			o = Offering.FromJson(s);
-
-			Console.WriteLine(s);
-		} catch (Exception ex) {
-
-			Console.WriteLine(ex);
-		}
-
-		return o;
-	}
-
-	public async Task<CustomerInfoRequest?> RestoreAsync()
-	{
-		var s = await revenueCatImpl.RestoreAsync();
-
-		return CustomerInfoRequest.FromJson(s);
-	}
-
-	public async Task<CustomerInfoRequest?> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier)
-	{
-		var s = await revenueCatImpl.PurchaseAsync(platformContext, offeringIdentifier, packageIdentifier);
-		if (string.IsNullOrEmpty(s))
-			return null;
 
 		try
 		{
-			return CustomerInfoRequest.FromJson(s);
+			revenueCatImpl.Initialize(apiKey, debugLog, appStore, userId);
+			Logger.LogInformation($"RevenueCat->{nameof(Initialize)}: Initialized.");
 		}
 		catch (Exception ex)
 		{
-			Console.WriteLine(ex);
+			Logger.LogError(ex, $"RevenueCatManager->{nameof(Initialize)}: Request failed.");
+		}
+	}
+
+	public Task<CustomerInfoRequest?> LoginAsync(string userId)
+		=> Request<CustomerInfoRequest>(nameof(LoginAsync), () => revenueCatImpl.LoginAsync(userId));
+
+	public Task<CustomerInfoRequest?> GetCustomerInfoAsync(bool force)
+		=> Request<CustomerInfoRequest>(nameof(GetCustomerInfoAsync), () => revenueCatImpl.GetCustomerInfoAsync(force));
+	
+	public Task<Offering?> GetOfferingAsync(string offeringIdentifier)
+		=> Request<Offering>(nameof(GetOfferingAsync), () => revenueCatImpl.GetOfferingAsync(offeringIdentifier));
+
+	public Task<CustomerInfoRequest?> RestoreAsync()
+		=> Request<CustomerInfoRequest>(nameof(RestoreAsync), revenueCatImpl.RestoreAsync);
+
+	public Task<CustomerInfoRequest?> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier)
+		=> Request<CustomerInfoRequest>(nameof(PurchaseAsync), () => revenueCatImpl.PurchaseAsync(platformContext, offeringIdentifier, packageIdentifier));
+
+	async Task<TObject?> Request<TObject>(string name, Func<Task<string?>> requestFunc)
+	{
+		Logger.LogInformation("RevenueCatManager->{Name}: Starting request...", name);
+
+		string? json;
+
+		try
+		{
+			json = await requestFunc();
+			
+			Logger.LogInformation("RevenueCatManager->{Name}: Received json response: {JsonLength}.", name, json?.Length);
+		}
+		catch (Exception ex)
+		{
+			Logger.LogError(ex, "RevenueCatManager->{Name}: Request failed.", name);
+			return default;
 		}
 
-		return null;
+		var obj = ParseJson<TObject>(name, json);
+
+		Logger.LogInformation("RevenueCatManager->{Name} Request Complete.", name);
+
+		return obj;
+	}
+
+	TObject? ParseJson<TObject>(string name, string? json)
+	{
+		if (string.IsNullOrEmpty(json))
+		{
+			Logger.LogWarning("RevenueCatManager->{Name}: JSON response is null or empty.", name);
+			return default;
+		}
+		
+		TObject? obj = default;
+		
+		try
+		{
+			obj = JsonSerializer.Deserialize<TObject>(json, ModelExtensions.Settings);
+		}
+		catch (Exception ex)
+		{
+			Logger.LogError(ex, "RevenueCatManager->{Name}: Error parsing JSON response.", name);
+		}
+
+		return obj;
 	}
 }
 

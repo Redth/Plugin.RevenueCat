@@ -26,8 +26,3 @@ public partial class Offering
 #pragma warning restore CS8618
 #pragma warning restore CS8601
 #pragma warning restore CS8603
-
-public partial class Offering
-{
-	public static Offering FromJson(string json) => JsonSerializer.Deserialize<Offering>(json, ModelExtensions.Settings);
-}
