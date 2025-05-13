@@ -24,6 +24,7 @@
 	<ItemGroup>
 		<AndroidGradleProject Include="../native/build.gradle.kts">
 			<ModuleName>revenuecatbinding</ModuleName>
+			<OutputPath>$(MSBuildThisFileDirectory)..\..\artifacts\grdl\rcbnd\</OutputPath>
 			<!-- Metadata applicable to @(AndroidLibrary) will be used if set, otherwise the following defaults will be used:
 			<Bind>true</Bind>
 			<Pack>true</Pack>
@@ -45,7 +46,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Xamarin.GooglePlayServices.Ads.Identifier" />
-		<PackageReference Include="Org.Jetbrains.Kotlinx.KotlinxSerializationJson" />
+		<PackageReference Include="Xamarin.KotlinX.Serialization.Json" />
 		<PackageReference Include="Xamarin.Android.Google.BillingClient" />
 		<PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" />
 		<PackageReference Include="Xamarin.Kotlin.Parcelize.Runtime" />
@@ -56,6 +57,8 @@
 		<AndroidIgnoredJavaDependency Include="androidx.lifecycle:lifecycle-runtime:2.5.0" />
 		<AndroidIgnoredJavaDependency Include="androidx.annotation:annotation:1.6.0" />
 		<AndroidIgnoredJavaDependency Include="org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1" />
+		<AndroidIgnoredJavaDependency Include="org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3" />
+		<AndroidIgnoredJavaDependency Include="org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.7.3" />
 		<AndroidIgnoredJavaDependency Include="org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22" />
 		<AndroidIgnoredJavaDependency Include="androidx.core:core-ktx:1.8.0" />
 		<AndroidIgnoredJavaDependency Include="com.google.crypto.tink:tink-android:1.8.0" />
