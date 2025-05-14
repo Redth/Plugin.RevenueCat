@@ -33,11 +33,11 @@ jobs:
 
     - name: 📦 Build + Pack
       run: |
-        dotnet pack -c Release -p:PublicRelease=${{ env.NBGV_PublicRelease }} ./android/RevenueCat.Android.Binding/RevenueCat.Android.Binding.csproj
+        dotnet pack -c Release -p:PublicRelease=${{ env.NBGV_PublicRelease }} -bl:${{ github.workspace}}/artifacts/Plugin.RevenueCat.Android.Binding.binlog ./android/RevenueCat.Android.Binding/RevenueCat.Android.Binding.csproj
         dotnet build -t:DownloadNativeDependencies ./macios/RevenueCat.MaciOS.Binding/RevenueCat.MaciOS.Binding.csproj
-        dotnet pack -c Release -p:PublicRelease=${{ env.NBGV_PublicRelease }} ./macios/RevenueCat.MaciOS.Binding/RevenueCat.MaciOS.Binding.csproj
-        dotnet pack -c Release -p:PublicRelease=${{ env.NBGV_PublicRelease }} ./Plugin.RevenueCat.Core/Plugin.RevenueCat.Core.csproj
-        dotnet pack -c Release -p:PublicRelease=${{ env.NBGV_PublicRelease }} ./Plugin.RevenueCat/Plugin.RevenueCat.csproj
+        dotnet pack -c Release -p:PublicRelease=${{ env.NBGV_PublicRelease }} -bl:${{ github.workspace}}/artifacts/Plugin.RevenueCat.MaciOS.Binding.binlog ./macios/RevenueCat.MaciOS.Binding/RevenueCat.MaciOS.Binding.csproj
+        dotnet pack -c Release -p:PublicRelease=${{ env.NBGV_PublicRelease }} -bl:${{ github.workspace}}/artifacts/Plugin.RevenueCat.Core.binlog ./Plugin.RevenueCat.Core/Plugin.RevenueCat.Core.csproj
+        dotnet pack -c Release -p:PublicRelease=${{ env.NBGV_PublicRelease }} -bl:${{ github.workspace}}/artifacts/Plugin.RevenueCat.binlog ./Plugin.RevenueCat/Plugin.RevenueCat.csproj
 
     - name: ⬆️ Packages
       uses: actions/upload-artifact@v4
@@ -46,6 +46,14 @@ jobs:
         path: |
           ./artifacts/package/release/*.nupkg
           ./artifacts/package/release/*.snupkg
+
+    - name: ⬆️ Logs
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: Packages
+        path: |
+          ./artifacts/*.binlog
 
   publish:
     name: 📢 Publish
