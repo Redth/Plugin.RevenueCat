@@ -18,7 +18,7 @@ namespace Tests
 			var platformFile = $"customerinfo_json_{platform}.json";
 			var json = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "data", platformFile));
 
-			var c  = json.ToModel<CustomerInfoRequest>();
+			var c  = json.ToModel<CustomerInfo>();
 
 			Assert.IsNotNull(c);
 		}

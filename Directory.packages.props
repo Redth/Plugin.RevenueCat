@@ -1,16 +1,21 @@
 <Project>
-	<PropertyGroup>
-		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-	</PropertyGroup>
-	<ItemGroup>
-		<PackageVersion Include="Microsoft.Maui.Controls" Version="9.0.51" />
-		<PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
-		<PackageVersion Include="Nerdbank.GitVersioning" Version="3.7.115" />
-
-		<PackageVersion Include="Xamarin.GooglePlayServices.Ads.Identifier" Version="117.0.1.5" />
-		<PackageVersion Include="Xamarin.KotlinX.Serialization.Json" Version="1.7.3.4" />
-		<PackageVersion Include="Xamarin.Android.Google.BillingClient" Version="7.1.1.2" />
-		<PackageVersion Include="Xamarin.AndroidX.Lifecycle.Process" Version="2.8.7.3" />
-		<PackageVersion Include="Xamarin.Kotlin.Parcelize.Runtime" Version="2.0.21.3" />
-	</ItemGroup>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="9.0.5" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.5" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.5" />
+    <PackageVersion Include="Microsoft.Maui.Controls" Version="9.0.51" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
+    <PackageVersion Include="Nerdbank.GitVersioning" Version="3.7.115" />
+    <PackageVersion Include="Refit" Version="8.0.0" />
+    <PackageVersion Include="Refit.HttpClientFactory" Version="8.0.0" />
+    <PackageVersion Include="Refitter.SourceGenerator" Version="1.5.5" />
+    <PackageVersion Include="Xamarin.GooglePlayServices.Ads.Identifier" Version="117.0.1.5" />
+    <PackageVersion Include="Xamarin.KotlinX.Serialization.Json" Version="1.7.3.4" />
+    <PackageVersion Include="Xamarin.Android.Google.BillingClient" Version="7.1.1.2" />
+    <PackageVersion Include="Xamarin.AndroidX.Lifecycle.Process" Version="2.8.7.3" />
+    <PackageVersion Include="Xamarin.Kotlin.Parcelize.Runtime" Version="2.0.21.3" />
+  </ItemGroup>
 </Project>

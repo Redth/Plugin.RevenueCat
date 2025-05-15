@@ -87,10 +87,10 @@ public static class HostExtensions
 		return builder;
 	}
 
-	public static Task<CustomerInfoRequest?> PurchaseAsync(this IRevenueCatManager? manager, string offeringIdentifier, string packageIdentifier)
+	public static Task<CustomerInfo?> PurchaseAsync(this IRevenueCatManager? manager, string offeringIdentifier, string packageIdentifier)
 	{
 		if (manager is null)
-			return Task.FromResult<CustomerInfoRequest?>(null);
+			return Task.FromResult<CustomerInfo?>(null);
 
 		object? platformContext = null;
 

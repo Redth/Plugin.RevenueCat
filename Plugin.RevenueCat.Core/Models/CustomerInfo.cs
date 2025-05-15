@@ -10,7 +10,7 @@ using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-public partial class CustomerInfoRequest
+public partial class CustomerInfo
 {
 	[JsonPropertyName("request_date")]
 	public DateTimeOffset RequestDate { get; set; }

@@ -4,9 +4,9 @@ using Plugin.RevenueCat.Models;
 
 namespace Plugin.RevenueCat;
 
-public class CustomerInfoUpdatedEventArgs(CustomerInfoRequest customerInfoRequest) : EventArgs
+public class CustomerInfoUpdatedEventArgs(CustomerInfo customerInfoRequest) : EventArgs
 {
-	public CustomerInfoRequest CustomerInfoRequest => customerInfoRequest;
+	public CustomerInfo CustomerInfoRequest => customerInfoRequest;
 }
 
 public class RevenueCatManager : IRevenueCatManager
@@ -36,7 +36,7 @@ public class RevenueCatManager : IRevenueCatManager
 		{
 			Logger.LogInformation($"RevenueCat->{nameof(CustomerInfoUpdated)}: Deserializing JSON...");
 			
-			var customerInfoRequest = ParseJson<CustomerInfoRequest>(nameof(Initialize), json);
+			var customerInfoRequest = ParseJson<CustomerInfo>(nameof(Initialize), json);
 			
 			if (customerInfoRequest is not null)
 			{
@@ -60,20 +60,20 @@ public class RevenueCatManager : IRevenueCatManager
 		}
 	}
 
-	public Task<CustomerInfoRequest?> LoginAsync(string userId)
-		=> Request<CustomerInfoRequest>(nameof(LoginAsync), () => PlatformImplementation.LoginAsync(userId));
+	public Task<CustomerInfo?> LoginAsync(string userId)
+		=> Request<CustomerInfo>(nameof(LoginAsync), () => PlatformImplementation.LoginAsync(userId));
 
-	public Task<CustomerInfoRequest?> GetCustomerInfoAsync(bool force)
-		=> Request<CustomerInfoRequest>(nameof(GetCustomerInfoAsync), () => PlatformImplementation.GetCustomerInfoAsync(force));
+	public Task<CustomerInfo?> GetCustomerInfoAsync(bool force)
+		=> Request<CustomerInfo>(nameof(GetCustomerInfoAsync), () => PlatformImplementation.GetCustomerInfoAsync(force));
 	
 	public Task<Offering?> GetOfferingAsync(string offeringIdentifier)
 		=> Request<Offering>(nameof(GetOfferingAsync), () => PlatformImplementation.GetOfferingAsync(offeringIdentifier));
 
-	public Task<CustomerInfoRequest?> RestoreAsync()
-		=> Request<CustomerInfoRequest>(nameof(RestoreAsync), PlatformImplementation.RestoreAsync);
+	public Task<CustomerInfo?> RestoreAsync()
+		=> Request<CustomerInfo>(nameof(RestoreAsync), PlatformImplementation.RestoreAsync);
 
-	public Task<CustomerInfoRequest?> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier)
-		=> Request<CustomerInfoRequest>(nameof(PurchaseAsync), () => PlatformImplementation.PurchaseAsync(platformContext, offeringIdentifier, packageIdentifier));
+	public Task<CustomerInfo?> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier)
+		=> Request<CustomerInfo>(nameof(PurchaseAsync), () => PlatformImplementation.PurchaseAsync(platformContext, offeringIdentifier, packageIdentifier));
 
 	async Task<TObject?> Request<TObject>(string name, Func<Task<string?>> requestFunc)
 	{

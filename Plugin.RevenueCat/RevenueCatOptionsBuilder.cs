@@ -106,8 +106,8 @@ public class RevenueCatOptionsBuilder
 		return this;
 	}
 	
-	public Action<CustomerInfoRequest>? CustomerInfoUpdatedCallback { get; set; }
-	public RevenueCatOptionsBuilder WithCallback(Action<CustomerInfoRequest>? callback)
+	public Action<CustomerInfo>? CustomerInfoUpdatedCallback { get; set; }
+	public RevenueCatOptionsBuilder WithCallback(Action<CustomerInfo>? callback)
 	{
 		CustomerInfoUpdatedCallback = callback;
 		return this;

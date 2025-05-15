@@ -10,4 +10,4 @@ public record RevenueCatOptions(
 	bool Debug,
 	string? UserId,
 	string? AppStore,
-	Action<CustomerInfoRequest>? CustomerInfoUpdatedCallback);
+	Action<CustomerInfo>? CustomerInfoUpdatedCallback);

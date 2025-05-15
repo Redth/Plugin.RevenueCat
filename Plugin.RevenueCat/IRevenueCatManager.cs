@@ -10,13 +10,13 @@ public interface IRevenueCatManager
 	
 	void Initialize();
 
-	Task<CustomerInfoRequest?> LoginAsync(string userId);
-	Task<CustomerInfoRequest?> GetCustomerInfoAsync(bool force);
+	Task<CustomerInfo?> LoginAsync(string userId);
+	Task<CustomerInfo?> GetCustomerInfoAsync(bool force);
 
 	Task<Offering?> GetOfferingAsync(string offeringIdentifier);
 	
-	Task<CustomerInfoRequest?> RestoreAsync();
+	Task<CustomerInfo?> RestoreAsync();
 
-	Task<CustomerInfoRequest?> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier);
+	Task<CustomerInfo?> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier);
 }
 
