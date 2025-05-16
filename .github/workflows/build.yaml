@@ -37,6 +37,7 @@ jobs:
         dotnet pack -m:1 -c Release -p:PublicRelease=${{ env.NBGV_PublicRelease }} -bl:${{ github.workspace}}/artifacts/Plugin.RevenueCat.Android.Binding.binlog ./android/RevenueCat.Android.Binding/RevenueCat.Android.Binding.csproj
         dotnet pack -m:1 -c Release -p:PublicRelease=${{ env.NBGV_PublicRelease }} -bl:${{ github.workspace}}/artifacts/Plugin.RevenueCat.MaciOS.Binding.binlog ./macios/RevenueCat.MaciOS.Binding/RevenueCat.MaciOS.Binding.csproj
         dotnet pack -m:1 -c Release -p:PublicRelease=${{ env.NBGV_PublicRelease }} -bl:${{ github.workspace}}/artifacts/Plugin.RevenueCat.Core.binlog ./Plugin.RevenueCat.Core/Plugin.RevenueCat.Core.csproj
+        dotnet pack -m:1 -c Release -p:PublicRelease=${{ env.NBGV_PublicRelease }} -bl:${{ github.workspace}}/artifacts/Plugin.RevenueCat.Api.binlog ./Plugin.RevenueCat.Api/Plugin.RevenueCat.Api.csproj
         dotnet pack -m:1 -c Release -p:PublicRelease=${{ env.NBGV_PublicRelease }} -bl:${{ github.workspace}}/artifacts/Plugin.RevenueCat.binlog ./Plugin.RevenueCat/Plugin.RevenueCat.csproj
 
     - name: ⬆️ Packages
