@@ -1,18 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<EnableVersioning>True</EnableVersioning>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Refit" />
-    <PackageReference Include="Refit.HttpClientFactory" />
-  </ItemGroup>
+	<PropertyGroup>
+		<PackageId>Plugin.RevenueCat.Api</PackageId>
+		<Title>RevenueCat REST API Client</Title>
+		<PackageDescription>Very basic RevenueCat REST API Client for use in client apps.</PackageDescription>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Plugin.RevenueCat.Core\Plugin.RevenueCat.Core.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Refit" />
+		<PackageReference Include="Refit.HttpClientFactory" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Plugin.RevenueCat.Core\Plugin.RevenueCat.Core.csproj" />
+	</ItemGroup>
 
 </Project>
