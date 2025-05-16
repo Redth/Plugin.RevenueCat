@@ -22,7 +22,7 @@
 		<PackageDescription>RevenueCat for .NET MAUI using a slim binding approach.</PackageDescription>
 	</PropertyGroup>
 
-	<ItemGroup>
+	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) != ''">
 		<PackageReference Include="Microsoft.Maui.Controls" />
 	</ItemGroup>
 
@@ -34,8 +34,16 @@
 		<ProjectReference Include="..\android\RevenueCat.Android.Binding\RevenueCat.Android.Binding.csproj" />
 	</ItemGroup>
 
+	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == ''">
+	  <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+	  <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+	</ItemGroup>
+
 	<ItemGroup>
 		<ProjectReference Include="..\Plugin.RevenueCat.Core\Plugin.RevenueCat.Core.csproj" />
 	</ItemGroup>
 
+	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == ''">
+		<Compile Remove="Platforms/**/*.cs" />
+	</ItemGroup>
 </Project>

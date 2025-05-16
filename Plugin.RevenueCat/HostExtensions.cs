@@ -1,9 +1,11 @@
 using System;
 using System.Threading.Tasks;
+#if ANDROID || MACCCATALYST || IOS
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Hosting;
 using Microsoft.Maui.LifecycleEvents;
+#endif
 
 using Plugin.RevenueCat;
 using Plugin.RevenueCat.Models;
@@ -11,6 +13,7 @@ using Plugin.RevenueCat.Models;
 
 public static class HostExtensions
 {
+#if ANDROID || MACCCATALYST || IOS
 	public static MauiAppBuilder UseRevenueCat(this MauiAppBuilder builder, Action<RevenueCatOptionsBuilder>? configure = null)
 	{
 		var optionsBuilder = new RevenueCatOptionsBuilder();
@@ -100,4 +103,5 @@ public static class HostExtensions
 
 		return manager.PurchaseAsync(platformContext, offeringIdentifier, packageIdentifier);
 	}
+#endif
 }
