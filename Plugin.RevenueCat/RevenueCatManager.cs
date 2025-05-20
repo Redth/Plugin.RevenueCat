@@ -34,6 +34,9 @@ public class RevenueCatManager : IRevenueCatManager
 		
 		PlatformImplementation.SetCustomerInfoUpdatedHandler((json) =>
 		{
+			if (Options.Debug)
+				Logger.LogDebug($"RevenueCat->{nameof(CustomerInfoUpdated)}: Received JSON: {json}");
+
 			Logger.LogInformation($"RevenueCat->{nameof(CustomerInfoUpdated)}: Deserializing JSON...");
 			
 			var customerInfoRequest = ParseJson<CustomerInfo>(nameof(Initialize), json);
@@ -84,7 +87,10 @@ public class RevenueCatManager : IRevenueCatManager
 		try
 		{
 			json = await requestFunc();
-			
+
+			if (Options.Debug)
+				Logger.LogDebug("RevenueCat->{Name}: Received JSON: {json}", name, json);
+
 			Logger.LogInformation("RevenueCatManager->{Name}: Received json response: {JsonLength}.", name, json?.Length);
 		}
 		catch (Exception ex)
