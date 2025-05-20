@@ -35,7 +35,7 @@ public class RevenueCatManager : IRevenueCatManager
 		PlatformImplementation.SetCustomerInfoUpdatedHandler((json) =>
 		{
 			if (Options.Debug)
-				Logger.LogDebug($"RevenueCat->{nameof(CustomerInfoUpdated)}: Received JSON: {json}");
+				Logger.LogInformation($"RevenueCat->{nameof(CustomerInfoUpdated)}: Received JSON: {json}");
 
 			Logger.LogInformation($"RevenueCat->{nameof(CustomerInfoUpdated)}: Deserializing JSON...");
 			
@@ -89,7 +89,7 @@ public class RevenueCatManager : IRevenueCatManager
 			json = await requestFunc();
 
 			if (Options.Debug)
-				Logger.LogDebug("RevenueCat->{Name}: Received JSON: {json}", name, json);
+				Logger.LogInformation("RevenueCat->{Name}: Received JSON: {json}", name, json);
 
 			Logger.LogInformation("RevenueCatManager->{Name}: Received json response: {JsonLength}.", name, json?.Length);
 		}
