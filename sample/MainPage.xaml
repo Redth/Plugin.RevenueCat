@@ -36,6 +36,11 @@
             <Entry x:Name="rcOfferingId" Placeholder="Offering Identifier" Text="pro1year"></Entry>
 
             <Button
+                Text="Get Offering"
+                Clicked="GetOffering_Clicked"
+                HorizontalOptions="Fill" />
+
+            <Button
                 Text="Purchase"
                 SemanticProperties.Hint="Navigates to getting started documentation"
                 Clicked="Purchase_Clicked"

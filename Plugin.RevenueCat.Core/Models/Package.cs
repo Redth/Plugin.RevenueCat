@@ -14,21 +14,14 @@ public partial class Package
 	[JsonPropertyName("identifier")]
 	public string Identifier { get; set; }
 
-	[JsonPropertyName("description")]
-	public string Description { get; set; }
-
-	[JsonPropertyName("localized_introductory_price_string")]
-	public string LocalizedIntroductoryPriceString { get; set; }
-
-	[JsonPropertyName("localized_price_string")]
-	public string LocalizedPriceString { get; set; }
-
-	[JsonPropertyName("offering_identifier")]
-	public string OfferingIdentifier { get; set; }
-
 	[JsonPropertyName("package_type")]
-	public string PackageType { get; set; }
+	[JsonConverter(typeof(JsonStringEnumConverter<PackageType>))]
+	public PackageType PackageType { get; set; } = PackageType.Unknown;
+	
+	[JsonPropertyName("store_product")]
+	public StoreProduct? StoreProduct { get; set; }
 }
+
 #pragma warning restore CS8618
 #pragma warning restore CS8601
 #pragma warning restore CS8603
