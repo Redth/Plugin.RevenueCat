@@ -1,0 +1,27 @@
+{
+	"id": "pro1year",
+	"metadata": {
+		"id": "pro1year"
+	},
+	"description": "1 Year Pool Math Premium",
+	"identifier": "pro1year",
+	"packages": [
+		{
+			"identifier": "$rc_annual",
+			"store_product": {
+				"is_family_shareable": true,
+				"identifier": "pro1year",
+				"description": "Auto-Renewing Pool Math Premium Subscription",
+				"price_string": "$10.99",
+				"currency_code": "CAD",
+				"subscription_period": {
+					"value": 1,
+					"unit": "year"
+				},
+				"title": "Pool Math Premium Subscription"
+			},
+			"type": "annual",
+			"id": "$rc_annual"
+		}
+	]
+}
