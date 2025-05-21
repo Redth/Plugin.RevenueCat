@@ -43,7 +43,6 @@ internal class IsoDateTimeOffsetConverter : JsonConverter<DateTimeOffset>
 	{
 		string text;
 
-
 		if ((_dateTimeStyles & DateTimeStyles.AdjustToUniversal) == DateTimeStyles.AdjustToUniversal
 				|| (_dateTimeStyles & DateTimeStyles.AssumeUniversal) == DateTimeStyles.AssumeUniversal)
 		{
@@ -57,6 +56,13 @@ internal class IsoDateTimeOffsetConverter : JsonConverter<DateTimeOffset>
 
 	public override DateTimeOffset Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 	{
+		// Try and read MS if it is a number
+		if (reader.TokenType == JsonTokenType.Number)
+		{
+			long milliseconds = reader.GetInt64();
+			return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds);
+		}
+
 		string? dateText = reader.GetString();
 
 		if (string.IsNullOrEmpty(dateText) == false)
@@ -75,9 +81,6 @@ internal class IsoDateTimeOffsetConverter : JsonConverter<DateTimeOffset>
 			return default;
 		}
 	}
-
-
-	public static readonly IsoDateTimeOffsetConverter Singleton = new IsoDateTimeOffsetConverter();
 }
 #pragma warning restore CS8618
 #pragma warning restore CS8601

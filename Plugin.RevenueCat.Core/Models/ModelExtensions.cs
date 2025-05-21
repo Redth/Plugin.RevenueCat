@@ -23,7 +23,7 @@ public static class ModelExtensions
 		{
 			new DateOnlyConverter(),
 			new TimeOnlyConverter(),
-			IsoDateTimeOffsetConverter.Singleton
+			new IsoDateTimeOffsetConverter()
 		},
 		NumberHandling = JsonNumberHandling.AllowReadingFromString
 	};
