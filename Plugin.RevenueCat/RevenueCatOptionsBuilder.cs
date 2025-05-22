@@ -106,15 +106,35 @@ public class RevenueCatOptionsBuilder
 		return this;
 	}
 	
-	public Action<CustomerInfo>? CustomerInfoUpdatedCallback { get; set; }
+	public Action<IServiceProvider, CustomerInfo>? CustomerInfoUpdatedCallback { get; set; }
+
 	public RevenueCatOptionsBuilder WithCallback(Action<CustomerInfo>? callback)
 	{
+		if (callback is null)
+		{
+			CustomerInfoUpdatedCallback = null;
+			return this;
+		}
+
+
+		CustomerInfoUpdatedCallback = (s, c) => callback(c);
+		return this;
+	}
+	
+	public RevenueCatOptionsBuilder WithCallback(Action<IServiceProvider, CustomerInfo>? callback)
+	{
+		if (callback is null)
+		{
+			CustomerInfoUpdatedCallback = null;
+			return this;
+		}
+
 		CustomerInfoUpdatedCallback = callback;
 		return this;
 	}
 
 	public RevenueCatOptions Build()
-		=> new (
+		=> new(
 			AndroidApiKey,
 			AmazonApiKey,
 			iOSApiKey,
