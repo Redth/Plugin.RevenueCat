@@ -4,9 +4,9 @@ using Plugin.RevenueCat.Models;
 
 namespace Plugin.RevenueCat;
 
-public class CustomerInfoUpdatedEventArgs(CustomerInfo customerInfo) : EventArgs
+public class CustomerInfoUpdatedEventArgs(CustomerInfo customerInfoRequest) : EventArgs
 {
-	public CustomerInfo CustomerInfo => customerInfoRequest;
+	public CustomerInfo CustomerInfoRequest => customerInfoRequest;
 }
 
 public class RevenueCatManager : IRevenueCatManager
