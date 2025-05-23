@@ -31,6 +31,10 @@ namespace RevenueCat
 		[Async]
 		void Restore(System.Action<NSString?, NSError?> callback);
 		
+		[Export("syncPurchases:")]
+		[Async]
+		void SyncPurchases(System.Action<NSString?, NSError?> callback);
+		
 		// Purchase method
 		[Export("purchase:packageIdentifier:callback:")]
 		[Async]

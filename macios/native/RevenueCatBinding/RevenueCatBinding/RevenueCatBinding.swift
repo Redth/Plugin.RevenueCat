@@ -53,6 +53,13 @@ public class RevenueCatManager : NSObject
             self.processCustomerInfo(customerInfo: customerInfo, originalError: error, callback: callback)
         }
     }
+	
+	@objc(syncPurchases:)
+	public func syncPurchases(callback: @escaping (NSString?, NSError?) -> Void) {
+		Purchases.shared.syncPurchases() { (customerInfo, error) in
+			self.processCustomerInfo(customerInfo: customerInfo, originalError: error, callback: callback)
+		}
+	}
 
     @objc(getOffering:callback:)
     public func getOffering(offeringId: String, callback: @escaping (NSString?, NSError?) -> Void) {
