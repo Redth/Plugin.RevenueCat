@@ -8,24 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		646070992D42CC940036C905 /* RevenueCat.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 646070982D42CC940036C905 /* RevenueCat.xcframework */; };
-		6460709A2D42CC940036C905 /* RevenueCat.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 646070982D42CC940036C905 /* RevenueCat.xcframework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		83E34F572C21CB2B008AA950 /* RevenueCat.h in Headers */ = {isa = PBXBuildFile; fileRef = 83E34F562C21CB2B008AA950 /* RevenueCat.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		83E34F5E2C21CC53008AA950 /* RevenueCatBinding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E34F5D2C21CC53008AA950 /* RevenueCatBinding.swift */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		6460709B2D42CC940036C905 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				6460709A2D42CC940036C905 /* RevenueCat.xcframework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		646070982D42CC940036C905 /* RevenueCat.xcframework */ = {isa = PBXFileReference; expectedSignature = "AppleDeveloperProgram:8SXR2327BM:RevenueCat, Inc."; lastKnownFileType = wrapper.xcframework; name = RevenueCat.xcframework; path = ../bin/deps/RevenueCat/RevenueCat.xcframework; sourceTree = "<group>"; };
@@ -102,7 +87,6 @@
 				83E34F4F2C21CB2B008AA950 /* Sources */,
 				83E34F502C21CB2B008AA950 /* Frameworks */,
 				83E34F512C21CB2B008AA950 /* Resources */,
-				6460709B2D42CC940036C905 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);

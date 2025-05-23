@@ -30,6 +30,11 @@
 			<SmartLink>true</SmartLink>
 			-->
 		</XcodeProject>
+
+		<NativeReference Include="../native/bin/deps/RevenueCat.xcframework">
+			<Kind>Framework</Kind>
+			<SmartLink>true</SmartLink>
+		</NativeReference>
 	</ItemGroup>
 
 	<Target Name="DownloadNativeDependencies" BeforeTargets="Build" Condition=" '$(IsCrossTargetingBuild)' == 'true' ">
