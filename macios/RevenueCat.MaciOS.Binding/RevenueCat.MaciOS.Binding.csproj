@@ -31,10 +31,12 @@
 			-->
 		</XcodeProject>
 
-		<NativeReference Include="../native/bin/deps/RevenueCat.xcframework">
+		<NativeReference Include="../native/bin/deps/RevenueCat/RevenueCat.xcframework">
 			<Kind>Framework</Kind>
 			<SmartLink>true</SmartLink>
 			<ForceLoad>true</ForceLoad>
+			<Frameworks></Frameworks>
+			<Visible>true</Visible>
 		</NativeReference>
 	</ItemGroup>
 
