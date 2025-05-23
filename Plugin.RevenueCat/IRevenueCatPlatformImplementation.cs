@@ -19,4 +19,6 @@ public interface IRevenueCatPlatformImplementation
 	Task<string?> GetOfferingAsync(string offeringIdentifier);
 
 	Task<string?> RestoreAsync();
+	
+	Task<string?> SyncPurchasesAsync();
 }

@@ -23,6 +23,7 @@ import com.revenuecat.purchases.interfaces.LogInCallback;
 import com.revenuecat.purchases.interfaces.PurchaseCallback;
 import com.revenuecat.purchases.interfaces.ReceiveCustomerInfoCallback;
 import com.revenuecat.purchases.interfaces.ReceiveOfferingsCallback;
+import com.revenuecat.purchases.interfaces.SyncPurchasesCallback;
 import com.revenuecat.purchases.models.StoreProduct;
 import com.revenuecat.purchases.models.StoreTransaction;
 import com.revenuecat.purchases.models.Period;
@@ -252,6 +253,26 @@ public class RevenueCatManager
 
         return future;
     }
+
+	public static CompletableFuture<String> syncPurchases()
+	{
+		CompletableFuture<String> future = new CompletableFuture<>();
+
+		Purchases.getSharedInstance().syncPurchases(new SyncPurchasesCallback() {
+			@Override
+			public void onSuccess(@NonNull CustomerInfo customerInfo) {
+				handleCustomerInfoUpdated(customerInfo);
+				future.complete(customerInfo.getRawData().toString());
+			}
+
+			@Override
+			public void onError(@NonNull PurchasesError purchasesError) {
+				future.completeExceptionally(new Exception(purchasesError.getMessage()));
+			}
+		});
+
+		return future;
+	}
 
 
     static CustomerInfoUpdatedListener customerInfoUpdatedListener;

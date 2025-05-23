@@ -43,6 +43,12 @@ public class RevenueCatApple : IRevenueCatPlatformImplementation
         var s = await revenueCatManager.RestoreAsync();
         return s.ToString();
     }
+    
+    public async Task<string?> SyncPurchasesAsync()
+    {
+	    var s = await revenueCatManager.SyncPurchasesAsync();
+	    return s.ToString();
+    }
 
     public async Task<string?> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier)
     {

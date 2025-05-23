@@ -74,6 +74,9 @@ public class RevenueCatManager : IRevenueCatManager
 
 	public Task<CustomerInfo?> RestoreAsync()
 		=> Request<CustomerInfo>(nameof(RestoreAsync), PlatformImplementation.RestoreAsync);
+	
+	public Task<CustomerInfo?> SyncPurchasesAsync()
+		=> Request<CustomerInfo>(nameof(SyncPurchasesAsync), PlatformImplementation.SyncPurchasesAsync);
 
 	public Task<CustomerInfo?> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier)
 		=> Request<CustomerInfo>(nameof(PurchaseAsync), () => PlatformImplementation.PurchaseAsync(platformContext, offeringIdentifier, packageIdentifier));
