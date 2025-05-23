@@ -16,6 +16,11 @@ public static class MauiProgram
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 			})
 			.UseRevenueCat(o => o
+				.WithCallback((sp, customerInfo) =>
+				{
+					var logger = sp.GetRequiredService<ILogger<RevenueCatManager>>();
+					logger.LogInformation($"Received customer info: {customerInfo}");
+				})
 				.WithAndroidApiKey("goog_[YOUR_GOOGLE_CLIENT_KEY]")
 				.WithAppleApiKey("appl_[YOUR_APPLE_CLIENT_KEY]")
 				.WithDebug(true));
