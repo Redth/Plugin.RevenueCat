@@ -79,6 +79,12 @@ public class RevenueCatAndroid : Java.Lang.Object, IRevenueCatPlatformImplementa
 		var s = await global::RevenueCat.RevenueCatManager.Restore()!.AsTask<Java.Lang.String>();
 		return s?.ToString();
 	}
+	
+	public async Task<string?> SyncPurchasesAsync()
+	{
+		var s = await global::RevenueCat.RevenueCatManager.SyncPurchases()!.AsTask<Java.Lang.String>();
+		return s?.ToString();
+	}
 
 	public async Task<string?> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier)
 	{
