@@ -81,6 +81,36 @@ public class RevenueCatManager : IRevenueCatManager
 	public Task<CustomerInfo?> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier)
 		=> Request<CustomerInfo>(nameof(PurchaseAsync), () => PlatformImplementation.PurchaseAsync(platformContext, offeringIdentifier, packageIdentifier));
 
+	public Task SyncOfferingsAndAttributesIfNeeded()
+		=> PlatformImplementation.SyncOfferingsAndAttributesIfNeeded();
+
+	public void SetEmail(string email)
+		=> PlatformImplementation.SetEmail(email);
+
+	public void SetDisplayName(string displayName)
+		=> PlatformImplementation.SetDisplayName(displayName);
+
+	public void SetAd(string ad)
+		=> PlatformImplementation.SetAd(ad);
+
+	public void SetAdGroup(string adGroup)
+		=> PlatformImplementation.SetAdGroup(adGroup);
+
+	public void SetCampaign(string campaign)
+		=> PlatformImplementation.SetCampaign(campaign);
+
+	public void SetCreative(string creative)
+		=> PlatformImplementation.SetCreative(creative);
+
+	public void SetKeyword(string keyword)
+		=> PlatformImplementation.SetKeyword(keyword);
+
+	public void SetAttribute(string key, string? value)
+		=> PlatformImplementation.SetAttribute(key, value);
+
+	public void SetAttributes(IDictionary<string, string> attributes)
+		=> PlatformImplementation.SetAttributes(attributes);
+
 	async Task<TObject?> Request<TObject>(string name, Func<Task<string?>> requestFunc)
 	{
 		Logger.LogInformation("RevenueCatManager->{Name}: Starting request...", name);

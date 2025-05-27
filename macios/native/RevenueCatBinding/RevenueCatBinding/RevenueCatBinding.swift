@@ -29,7 +29,6 @@ public class RevenueCatManager : NSObject
         }
     }
     
-    
     @objc(getCustomerInfo:callback:)
     public func getCustomerInfo(force: Bool, callback: @escaping (NSString?, NSError?) -> Void) {
         let fetchPolicy = force ? CacheFetchPolicy.fetchCurrent : CacheFetchPolicy.notStaleCachedOrFetched
@@ -241,4 +240,57 @@ public class RevenueCatManager : NSObject
             return
         }
     }
+	
+	
+	@objc(setEmail:)
+	public func setEmail(email: NSString) {
+		Purchases.shared.attribution.setEmail(email as String)
+	}
+	
+	@objc(setDisplayName:)
+	public func setDisplayName(displayName: NSString) {
+		Purchases.shared.attribution.setDisplayName(displayName as String)
+	}
+	
+	@objc(setAd:)
+	public func setAd(ad: NSString) {
+		Purchases.shared.attribution.setAd(ad as String)
+	}
+	
+	@objc(setAdGroup:)
+	public func setAdGroup(adGroup: NSString) {
+		Purchases.shared.attribution.setAdGroup(adGroup as String)
+	}
+	
+	@objc(setCampaign:)
+	public func setCampaign(campaign: NSString) {
+		Purchases.shared.attribution.setCampaign(campaign as String)
+	}
+	
+	@objc(setCreative:)
+	public func setCreative(creative: NSString) {
+		Purchases.shared.attribution.setCreative(creative as String)
+	}
+	
+	@objc(setKeyword:)
+	public func setKeyword(keyword: NSString) {
+		Purchases.shared.attribution.setKeyword(keyword as String)
+	}
+	
+	@objc(setAttribute:value:)
+	public func setAttributes(key: NSString, value: NSString) {
+		Purchases.shared.attribution.setAttributes([key: value] as [String: String])
+	}
+	
+	@objc(setAttributes:)
+	public func setAttributes(userAttributes: [NSString: NSString]) {
+		Purchases.shared.attribution.setAttributes(userAttributes as [String: String])
+	}
+	
+	@objc(syncOfferingsAndAttributesIfNeeded:)
+	public func syncOfferingsAndAttributesIfNeeded(callback: @escaping (NSError?) -> Void) {
+		Purchases.shared.syncAttributesAndOfferingsIfNeeded { offerings, err in
+			callback(err)
+		}
+	}
 }

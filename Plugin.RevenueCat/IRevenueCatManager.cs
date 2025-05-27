@@ -20,5 +20,26 @@ public interface IRevenueCatManager
 	Task<CustomerInfo?> SyncPurchasesAsync();
 
 	Task<CustomerInfo?> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier);
+
+	Task SyncOfferingsAndAttributesIfNeeded();
+	
+	void SetEmail(string email);
+	
+	void SetDisplayName(string displayName);
+	
+	void SetAd(string ad);
+	
+	void SetAdGroup(string adGroup);
+	
+	void SetCampaign(string campaign);
+	
+	void SetCreative(string creative);
+	
+	void SetKeyword(string keyword);
+	
+	void SetAttribute(string key, string? value);
+
+	void SetAttributes(IDictionary<string, string> attributes);
+
 }
 

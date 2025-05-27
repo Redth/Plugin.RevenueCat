@@ -73,4 +73,33 @@ public class RevenueCatApple : IRevenueCatPlatformImplementation
         customerInfoUpdatedHandler = handler; 
     }
 
+    public Task SyncOfferingsAndAttributesIfNeeded()
+	    => revenueCatManager.SyncOfferingsAndAttributesIfNeeded();
+
+    public void SetEmail(string email)
+	    => revenueCatManager.SetEmail(email);
+    
+    public void SetDisplayName(string displayName)
+	    => revenueCatManager.SetDisplayName(displayName);
+
+    public void SetAd(string ad)
+	    => revenueCatManager.SetAd(ad);
+
+    public void SetAdGroup(string adGroup)
+	    => revenueCatManager.SetAdGroup(adGroup);
+
+    public void SetCampaign(string campaign)
+	    => revenueCatManager.SetCampaign(campaign);
+
+    public void SetCreative(string creative)
+	    => revenueCatManager.SetCreative(creative);
+
+    public void SetKeyword(string keyword)
+	    => revenueCatManager.SetKeyword(keyword);
+
+    public void SetAttribute(string key, string? value)
+	    => revenueCatManager.SetAttribute(key, value);
+
+    public void SetAttributes(IDictionary<string, string> attributes)
+	    => revenueCatManager.SetAttributes(attributes);
 }
