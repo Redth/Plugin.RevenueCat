@@ -16,6 +16,7 @@ import com.revenuecat.purchases.Package;
 import com.revenuecat.purchases.PackageType;
 import com.revenuecat.purchases.PurchaseParams;
 import com.revenuecat.purchases.Purchases;
+import com.revenuecat.purchases.PurchasesAreCompletedBy;
 import com.revenuecat.purchases.PurchasesConfiguration;
 import com.revenuecat.purchases.PurchasesError;
 import com.revenuecat.purchases.Store;
@@ -23,6 +24,7 @@ import com.revenuecat.purchases.interfaces.LogInCallback;
 import com.revenuecat.purchases.interfaces.PurchaseCallback;
 import com.revenuecat.purchases.interfaces.ReceiveCustomerInfoCallback;
 import com.revenuecat.purchases.interfaces.ReceiveOfferingsCallback;
+import com.revenuecat.purchases.interfaces.SyncAttributesAndOfferingsCallback;
 import com.revenuecat.purchases.interfaces.SyncPurchasesCallback;
 import com.revenuecat.purchases.models.StoreProduct;
 import com.revenuecat.purchases.models.StoreTransaction;
@@ -76,10 +78,6 @@ public class RevenueCatManager
         });
 
         return future;
-    }
-
-    public static void setAttributes(Map<String, String> attr)  {
-        Purchases.getSharedInstance().setAttributes(attr);
     }
 
     public static CompletableFuture<String> getCustomerInfo(boolean force) {
@@ -287,5 +285,61 @@ public class RevenueCatManager
             customerInfoUpdatedListener.onCustomerInfoUpdated(customerInfo.getRawData().toString());
         }
     }
+
+	public static void setEmail(String email) {
+		Purchases.getSharedInstance().setEmail(email);
+	}
+
+	public static void setDisplayName(String displayName) {
+		Purchases.getSharedInstance().setDisplayName(displayName);
+	}
+
+	public static void setAd(String ad) {
+		Purchases.getSharedInstance().setAd(ad);
+	}
+
+	public static void setAdGroup(String adGroup) {
+		Purchases.getSharedInstance().setAdGroup(adGroup);
+	}
+
+	public static void setCampaign(String campaign) {
+		Purchases.getSharedInstance().setCampaign(campaign);
+	}
+
+	public static void setCreative(String creative) {
+		Purchases.getSharedInstance().setCreative(creative);
+	}
+
+	public static void setKeyword(String keyword) {
+		Purchases.getSharedInstance().setKeyword(keyword);
+	}
+
+	public static void setAttribute(String key, String value) {
+		Map<String, String> attrs = new HashMap<>();
+		attrs.put(key, value);
+		Purchases.getSharedInstance().setAttributes(attrs);
+	}
+
+	public static void setAttributes(Map<String, String> userAttributes) {
+		Purchases.getSharedInstance().setAttributes(userAttributes);
+	}
+
+	public static CompletableFuture<Boolean> syncAttributesAndOfferingsIfNeeded() {
+		CompletableFuture<Boolean> future = new CompletableFuture<>();
+
+		Purchases.getSharedInstance().syncAttributesAndOfferingsIfNeeded(new SyncAttributesAndOfferingsCallback() {
+			@Override
+			public void onSuccess(@NonNull Offerings offerings) {
+				future.complete(true);
+			}
+
+			@Override
+			public void onError(@NonNull PurchasesError purchasesError) {
+				future.completeExceptionally(new Exception(purchasesError.getMessage()));
+			}
+		});
+
+		return future;
+	}
 }
 

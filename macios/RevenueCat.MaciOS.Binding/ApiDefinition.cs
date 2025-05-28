@@ -43,5 +43,36 @@ namespace RevenueCat
 		[Export("getOffering:callback:")]
 		[Async]
 		void GetOffering(NSString offeringIdentifier, System.Action<NSString?, NSError?> callback);
+		
+		[Export("setEmail:")]
+		void SetEmail(NSString email);
+		
+		[Export("setDisplayName:")]
+		void SetDisplayName(NSString displayName);
+		
+		[Export("setAd:")]
+		void SetAd(NSString ad);
+		
+		[Export("setAdGroup:")]
+		void SetAdGroup(NSString adGroup);
+		
+		[Export("setCampaign:")]
+		void SetCampaign(NSString campaign);
+		
+		[Export("setCreative:")]
+		void SetCreative(NSString creative);
+		
+		[Export("setKeyword:")]
+		void SetKeyword(NSString keyword);
+		
+		[Export("setAttribute:value:")]
+		void SetAttribute(NSString key, NSString? value);
+		
+		[Export("setAttributes:")]
+		void SetAttributes(NSDictionary<NSString, NSString> attributes);
+		
+		[Export("syncOfferingsAndAttributesIfNeeded:")]
+		[Async]
+		void SyncOfferingsAndAttributesIfNeeded(System.Action<NSError?> callback);
 	}
 }
