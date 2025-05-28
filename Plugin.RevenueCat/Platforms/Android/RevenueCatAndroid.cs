@@ -97,6 +97,36 @@ public class RevenueCatAndroid : Java.Lang.Object, IRevenueCatPlatformImplementa
 		var s = await global::RevenueCat.RevenueCatManager.GetOffering(offeringIdentifier)!.AsTask<Java.Lang.String>();
 		return s?.ToString();
 	}
+	
+	public async Task SyncOfferingsAndAttributesIfNeeded()
+		=> await global::RevenueCat.RevenueCatManager.SyncAttributesAndOfferingsIfNeeded()!.AsTask<Java.Lang.Boolean>().ConfigureAwait(false);
+
+	public void SetEmail(string email)
+		=> global::RevenueCat.RevenueCatManager.SetEmail(email);
+    
+	public void SetDisplayName(string displayName)
+		=> global::RevenueCat.RevenueCatManager.SetDisplayName(displayName);
+
+	public void SetAd(string ad)
+		=> global::RevenueCat.RevenueCatManager.SetAd(ad);
+
+	public void SetAdGroup(string adGroup)
+		=> global::RevenueCat.RevenueCatManager.SetAdGroup(adGroup);
+
+	public void SetCampaign(string campaign)
+		=> global::RevenueCat.RevenueCatManager.SetCampaign(campaign);
+
+	public void SetCreative(string creative)
+		=> global::RevenueCat.RevenueCatManager.SetCreative(creative);
+
+	public void SetKeyword(string keyword)
+		=> global::RevenueCat.RevenueCatManager.SetKeyword(keyword);
+
+	public void SetAttribute(string key, string? value)
+		=> global::RevenueCat.RevenueCatManager.SetAttribute(key, value);
+
+	public void SetAttributes(IDictionary<string, string> attributes)
+		=> global::RevenueCat.RevenueCatManager.SetAttributes(attributes);
 
 	public void SetCustomerInfoUpdatedHandler(Action<string> handler)
 		=> customerInfoUpdateHandler = handler;
@@ -145,34 +175,4 @@ internal class CompletableFutureListener<TResult> : Java.Lang.Object, IBiConsume
 				_tcs.TrySetException(new InvalidCastException(t.GetType().Name));
 		}
 	}
-	
-	public async Task SyncOfferingsAndAttributesIfNeeded()
-		=> await global::RevenueCat.RevenueCatManager.SyncOfferingsAndAttributesIfNeeded()!.AsTask<bool>().ConfigureAwait(false);
-
-	public void SetEmail(string email)
-		=> global::RevenueCat.RevenueCatManager.SetEmail(email);
-    
-	public void SetDisplayName(string displayName)
-		=> global::RevenueCat.RevenueCatManager.SetDisplayName(displayName);
-
-	public void SetAd(string ad)
-		=> global::RevenueCat.RevenueCatManager.SetAd(ad);
-
-	public void SetAdGroup(string adGroup)
-		=> global::RevenueCat.RevenueCatManager.SetAdGroup(adGroup);
-
-	public void SetCampaign(string campaign)
-		=> global::RevenueCat.RevenueCatManager.SetCampaign(campaign);
-
-	public void SetCreative(string creative)
-		=> global::RevenueCat.RevenueCatManager.SetCreative(creative);
-
-	public void SetKeyword(string keyword)
-		=> global::RevenueCat.RevenueCatManager.SetKeyword(keyword);
-
-	public void SetAttribute(string key, string? value)
-		=> global::RevenueCat.RevenueCatManager.SetAttribute(key, value);
-
-	public void SetAttributes(IDictionary<string, string> attributes)
-		=> global::RevenueCat.RevenueCatManager.SetAttributes(attributes);
 }

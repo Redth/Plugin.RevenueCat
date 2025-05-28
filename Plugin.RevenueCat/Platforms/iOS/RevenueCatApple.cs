@@ -76,32 +76,44 @@ public class RevenueCatApple : IRevenueCatPlatformImplementation
     }
 
     public Task SyncOfferingsAndAttributesIfNeeded()
-	    => revenueCatManager.SyncOfferingsAndAttributesIfNeeded();
+	    => revenueCatManager.SyncOfferingsAndAttributesIfNeededAsync();
 
     public void SetEmail(string email)
-	    => revenueCatManager.SetEmail(email);
+	    => revenueCatManager.SetEmail(new NSString(email));
     
     public void SetDisplayName(string displayName)
-	    => revenueCatManager.SetDisplayName(displayName);
+	    => revenueCatManager.SetDisplayName(new NSString(displayName));
 
     public void SetAd(string ad)
-	    => revenueCatManager.SetAd(ad);
+	    => revenueCatManager.SetAd(new NSString(ad));
 
     public void SetAdGroup(string adGroup)
-	    => revenueCatManager.SetAdGroup(adGroup);
+	    => revenueCatManager.SetAdGroup(new NSString(adGroup));
 
     public void SetCampaign(string campaign)
-	    => revenueCatManager.SetCampaign(campaign);
+	    => revenueCatManager.SetCampaign(new NSString(campaign));
 
     public void SetCreative(string creative)
-	    => revenueCatManager.SetCreative(creative);
+	    => revenueCatManager.SetCreative(new NSString(creative));
 
     public void SetKeyword(string keyword)
-	    => revenueCatManager.SetKeyword(keyword);
+	    => revenueCatManager.SetKeyword(new NSString(keyword));
 
     public void SetAttribute(string key, string? value)
-	    => revenueCatManager.SetAttribute(key, value);
+	    => revenueCatManager.SetAttribute(new NSString(key), new NSString(value));
 
     public void SetAttributes(IDictionary<string, string> attributes)
-	    => revenueCatManager.SetAttributes(attributes);
+    {
+	    var md = new NSMutableDictionary<NSString, NSString>();
+
+	    foreach (var kvp in attributes)
+	    {
+		    var key = new NSString(kvp.Key);
+		    var value = new NSString(kvp.Value);
+		    md.SetValueForKey(value, key);
+	    }
+	    
+	    var d = new NSDictionary<NSString, NSString>(md.Keys, md.Values); 
+	    revenueCatManager.SetAttributes(d);
+    }
 }
