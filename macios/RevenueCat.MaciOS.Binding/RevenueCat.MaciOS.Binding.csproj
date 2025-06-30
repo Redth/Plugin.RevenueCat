@@ -42,7 +42,7 @@
 
 	<Target Name="DownloadNativeDependencies" BeforeTargets="Build" Condition=" '$(IsCrossTargetingBuild)' == 'true' ">
 		<PropertyGroup>
-			<RevenueCatSdkVersion>5.22.1</RevenueCatSdkVersion>
+			<RevenueCatSdkVersion>5.30.0</RevenueCatSdkVersion>
 
 			<RevenueCatSdkUrl>https://github.com/RevenueCat/purchases-ios/releases/download/$(RevenueCatSdkVersion)/RevenueCat.xcframework.zip</RevenueCatSdkUrl>
 		</PropertyGroup>
