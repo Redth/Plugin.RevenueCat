@@ -32,14 +32,11 @@ public partial class Subscriber
 	[JsonPropertyName("original_purchase_date")]
 	public DateTimeOffset? OriginalPurchaseDate { get; set; }
 
-	[JsonPropertyName("other_purchases")]
-	public NonSubscriptions OtherPurchases { get; set; }
-
 	[JsonPropertyName("subscriptions")]
 	public IDictionary<string, Subscription> Subscriptions { get; set; } = new Dictionary<string, Subscription>();
 
 	[JsonPropertyName("non_subscriptions")]
-	public Dictionary<string, NonSubscription> NonSubscriptions { get; set; } = new();
+	public Dictionary<string, List<NonSubscription>> NonSubscriptions { get; set; } = new();
 }
 #pragma warning restore CS8618
 #pragma warning restore CS8601
