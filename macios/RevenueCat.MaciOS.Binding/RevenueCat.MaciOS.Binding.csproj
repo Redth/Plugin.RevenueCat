@@ -127,6 +127,7 @@
 			
 			<_RevenueCatDownloadPath>$([System.IO.Path]::GetFullPath($(MSBuildProjectDirectory)))/../native/bin/deps</_RevenueCatDownloadPath>
 			<_RevenueCatFrameworkPListFilePath>$(_RevenueCatDownloadPath)/RevenueCat/RevenueCat.xcframework/Info.plist</_RevenueCatFrameworkPListFilePath>
+			<_RevenueCatXcFrameworkPath>$(_RevenueCatDownloadPath)/RevenueCat/RevenueCat.xcframework</_RevenueCatXcFrameworkPath>
 		</PropertyGroup>
 
 		<DownloadFile SourceUrl="$(RevenueCatSdkUrl)" DestinationFolder="$([System.IO.Path]::GetFullPath($(MSBuildProjectDirectory)/../native/bin/deps))">
@@ -143,12 +144,22 @@
 			<_RevenueCatUnwantedPlatforms Include="watchos-arm64_i386_x86_64-simulator" />
 		</ItemGroup>
 		
+		<Exec Command="codesign --deep --remove-signature $(_RevenueCatDownloadPath)/RevenueCat/RevenueCat.xcframework" />
+		
 		<!-- Remove vision and watchos to save space -->
-		<RemoveDir Directories="$(_RevenueCatDownloadPath)/RevenueCat/RevenueCat.xcframework/%(_RevenueCatUnwantedPlatforms.Identity)" />
+		<RemoveDir Directories="$(_RevenueCatXcFrameworkPath)/%(_RevenueCatUnwantedPlatforms.Identity)" />
+		
+		<ItemGroup>
+			<_RevenueCatCodeSignatureDirs Include="$(_RevenueCatXcFrameworkPath)/_CodeSignature" />
+			<_RevenueCatCodeSignatureDirs
+				Include="$(_RevenueCatXcFrameworkPath)/ios-arm64_x86_64-simulator/RevenueCat.framework/_CodeSignature" />
+			<_RevenueCatCodeSignatureDirs
+				Include="$(_RevenueCatXcFrameworkPath)/tvos-arm64_x86_64-simulator/RevenueCat.framework/_CodeSignature" />
+		</ItemGroup>
 
 		<!-- Remove _CodeSignature directory -->
-		<RemoveDir Directories="$(_RevenueCatDownloadPath)/RevenueCat/RevenueCat.xcframework/_CodeSignature" />
-		
+		<RemoveDir Directories="%(_RevenueCatCodeSignatureDirs.Identity)" ContinueOnError="true" />
+
 		<RevenueCatRemoveLibraryIdentifier
 			PlistFile="$(_RevenueCatFrameworkPListFilePath)"
 			LibraryIdentifierPrefix="%(_RevenueCatUnwantedPlatforms.Identity)" />
