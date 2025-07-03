@@ -117,13 +117,10 @@
 			<_RevenueCatFrameworkPListFilePath>$(_RevenueCatDownloadPath)/RevenueCat/RevenueCat.xcframework/Info.plist</_RevenueCatFrameworkPListFilePath>
 		</PropertyGroup>
 
-<!--		<DownloadFile SourceUrl="$(RevenueCatSdkUrl)" DestinationFolder="$([System.IO.Path]::GetFullPath($(MSBuildProjectDirectory)/../native/bin/deps))">-->
-<!--			<Output TaskParameter="DownloadedFile" ItemName="RevenueCatSdkArchives" />-->
-<!--		</DownloadFile>-->
+		<DownloadFile SourceUrl="$(RevenueCatSdkUrl)" DestinationFolder="$([System.IO.Path]::GetFullPath($(MSBuildProjectDirectory)/../native/bin/deps))">
+			<Output TaskParameter="DownloadedFile" ItemName="RevenueCatSdkArchives" />
+		</DownloadFile>
 
-		<ItemGroup>
-			<RevenueCatSdkArchives Include="$(_RevenueCatDownloadPath)/RevenueCat.xcframework.zip" />
-		</ItemGroup>
 		<Exec Command="unzip -q -o -d $(_RevenueCatDownloadPath) @(RevenueCatSdkArchives)" />
 		
 		
