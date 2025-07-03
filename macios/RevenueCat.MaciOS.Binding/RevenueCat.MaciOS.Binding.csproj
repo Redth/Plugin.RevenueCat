@@ -40,17 +40,109 @@
 		</NativeReference>
 	</ItemGroup>
 
+	<UsingTask TaskName="RevenueCatRemoveLibraryIdentifier"
+			   TaskFactory="RoslynCodeTaskFactory"
+			   AssemblyName="Microsoft.Build.Tasks.Core">
+		<ParameterGroup>
+			<PlistFile ParameterType="System.String" Required="true" />
+			<LibraryIdentifierPrefix ParameterType="System.String" Required="true" />
+		</ParameterGroup>
+		<Task>
+			<Using Namespace="Microsoft.Build.Framework" />
+			<Using Namespace="System" />
+			<Using Namespace="System.IO" />
+			<Using Namespace="System.Xml" />
+			<Using Namespace="System.Xml.XPath" />
+			<Code Type="Class" Language="cs">
+				<![CDATA[
+        public class RevenueCatRemoveLibraryIdentifier : Microsoft.Build.Utilities.Task
+        {
+            [Microsoft.Build.Framework.Required]
+            public string PlistFile { get; set; }
+
+            [Microsoft.Build.Framework.Required]
+            public string LibraryIdentifierPrefix { get; set; }
+
+            public override bool Execute()
+            {
+                try
+                {
+                    var doc = new System.Xml.XmlDocument();
+                    doc.Load(PlistFile);
+
+                    var prefix = LibraryIdentifierPrefix.Trim();
+                    if (string.IsNullOrEmpty(prefix))
+                    {
+                        Log.LogError("LibraryIdentifierPrefix cannot be empty.");
+                        return false;
+                    }
+
+                    var xpath = $"//array/dict[key='LibraryIdentifier' and string[starts-with(., '{prefix}')]]";
+                    var nodesToRemove = doc.SelectNodes(xpath);
+
+                    if (nodesToRemove == null || nodesToRemove.Count == 0)
+                    {
+                        Log.LogMessage($"No matching dict nodes found for prefix '{prefix}'.");
+                        return true;
+                    }
+
+                    foreach (System.Xml.XmlNode node in nodesToRemove)
+                    {
+                        node.ParentNode.RemoveChild(node);
+                    }
+
+                    doc.Save(PlistFile);
+                    Log.LogMessage($"Removed {nodesToRemove.Count} dict(s) from AvailableLibraries with prefix '{prefix}'.");
+                    return true;
+                }
+                catch (System.Exception ex)
+                {
+                    Log.LogErrorFromException(ex);
+                    return false;
+                }
+            }
+        }
+        ]]>
+			</Code>
+		</Task>
+	</UsingTask>
+	
 	<Target Name="DownloadNativeDependencies" BeforeTargets="Build" Condition=" '$(IsCrossTargetingBuild)' == 'true' ">
 		<PropertyGroup>
 			<RevenueCatSdkVersion>5.30.0</RevenueCatSdkVersion>
 
 			<RevenueCatSdkUrl>https://github.com/RevenueCat/purchases-ios/releases/download/$(RevenueCatSdkVersion)/RevenueCat.xcframework.zip</RevenueCatSdkUrl>
+			
+			<_RevenueCatDownloadPath>$([System.IO.Path]::GetFullPath($(MSBuildProjectDirectory)))/../native/bin/deps</_RevenueCatDownloadPath>
+			<_RevenueCatFrameworkPListFilePath>$(_RevenueCatDownloadPath)/RevenueCat/RevenueCat.xcframework/Info.plist</_RevenueCatFrameworkPListFilePath>
 		</PropertyGroup>
 
-		<DownloadFile SourceUrl="$(RevenueCatSdkUrl)" DestinationFolder="$([System.IO.Path]::GetFullPath($(MSBuildProjectDirectory)/../native/bin/deps))">
-			<Output TaskParameter="DownloadedFile" ItemName="RevenueCatSdkArchives" />
-		</DownloadFile>
+<!--		<DownloadFile SourceUrl="$(RevenueCatSdkUrl)" DestinationFolder="$([System.IO.Path]::GetFullPath($(MSBuildProjectDirectory)/../native/bin/deps))">-->
+<!--			<Output TaskParameter="DownloadedFile" ItemName="RevenueCatSdkArchives" />-->
+<!--		</DownloadFile>-->
 
-		<Exec Command="unzip -q -o -d $([System.IO.Path]::GetFullPath($(MSBuildProjectDirectory)/../native/bin/deps)) @(RevenueCatSdkArchives)" />
+		<ItemGroup>
+			<RevenueCatSdkArchives Include="$(_RevenueCatDownloadPath)/RevenueCat.xcframework.zip" />
+		</ItemGroup>
+		<Exec Command="unzip -q -o -d $(_RevenueCatDownloadPath) @(RevenueCatSdkArchives)" />
+		
+		
+		<ItemGroup>
+			<_RevenueCatUnwantedPlatforms Include="xros-arm64" />
+			<_RevenueCatUnwantedPlatforms Include="xros-arm64_x86_64-simulator" />
+			<_RevenueCatUnwantedPlatforms Include="watchos-arm64_arm64_32_armv7k" />
+			<_RevenueCatUnwantedPlatforms Include="watchos-arm64_i386_x86_64-simulator" />
+		</ItemGroup>
+		
+		<!-- Remove vision and watchos to save space -->
+		<RemoveDir Directories="$(_RevenueCatDownloadPath)/RevenueCat/RevenueCat.xcframework/%(_RevenueCatUnwantedPlatforms.Identity)" />
+
+		<!-- Remove _CodeSignature directory -->
+		<RemoveDir Directories="$(_RevenueCatDownloadPath)/RevenueCat/RevenueCat.xcframework/_CodeSignature" />
+		
+		<RevenueCatRemoveLibraryIdentifier
+			PlistFile="$(_RevenueCatFrameworkPListFilePath)"
+			LibraryIdentifierPrefix="%(_RevenueCatUnwantedPlatforms.Identity)" />
+
 	</Target>
 </Project>
