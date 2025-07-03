@@ -91,7 +91,19 @@
                         node.ParentNode.RemoveChild(node);
                     }
 
-                    doc.Save(PlistFile);
+                    // Convert the XmlDocument into an XmlReader
+                    using (System.Xml.XmlReader xmlReader = new System.Xml.XmlNodeReader(doc))
+                    {
+                        // Create the XDocument from the XmlReader
+                        var xDoc = System.Xml.Linq.XDocument.Load(xmlReader); 
+                        // Modify the InternalSubset:
+                        if (xDoc.DocumentType != null)
+                        {
+                            xDoc.DocumentType.InternalSubset = null;
+                        }
+                        // Save the XDocument
+                        xDoc.Save(PlistFile);
+                    }
                     Log.LogMessage($"Removed {nodesToRemove.Count} dict(s) from AvailableLibraries with prefix '{prefix}'.");
                     return true;
                 }
