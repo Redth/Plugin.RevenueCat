@@ -212,7 +212,7 @@ public class RevenueCatManager
                             @Override
                             public void onCompleted(@NonNull StoreTransaction storeTransaction, @NonNull CustomerInfo customerInfo) {
                                 handleCustomerInfoUpdated(customerInfo);
-                                future.complete(storeTransaction.getOriginalJson().toString());
+                                future.complete(customerInfo.getRawData().toString());
                             }
 
                             @Override
