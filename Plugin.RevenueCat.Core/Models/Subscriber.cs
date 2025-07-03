@@ -32,9 +32,6 @@ public partial class Subscriber
 	[JsonPropertyName("original_purchase_date")]
 	public DateTimeOffset? OriginalPurchaseDate { get; set; }
 
-	[JsonPropertyName("other_purchases")]
-	public NonSubscriptions OtherPurchases { get; set; }
-
 	[JsonPropertyName("subscriptions")]
 	public IDictionary<string, Subscription> Subscriptions { get; set; } = new Dictionary<string, Subscription>();
 
