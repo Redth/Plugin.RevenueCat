@@ -15,7 +15,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<RevenueCatSdkVersion>8.16.0</RevenueCatSdkVersion>
+		<RevenueCatSdkVersion>8.23.0</RevenueCatSdkVersion>
 		<RevenueCatSdkUrl>https://repo1.maven.org/maven2/com/revenuecat/purchases/purchases/$(RevenueCatSdkVersion)/purchases-$(RevenueCatSdkVersion).aar</RevenueCatSdkUrl>
 		<RevenueCatUISdkUrl>https://repo1.maven.org/maven2/com/revenuecat/purchases/purchases-ui/$(RevenueCatSdkVersion)/purchases-ui-$(RevenueCatSdkVersion).aar</RevenueCatUISdkUrl>
 	</PropertyGroup>
@@ -34,8 +34,8 @@
 
 	<ItemGroup>
 		<!-- RevenueCat SDK libraries -->
-		<AndroidMavenLibrary Include="com.revenuecat.purchases:purchases" Version="8.16.0" Bind="false" Pack="True" VerifyDependencies="False" />
-		<AndroidMavenLibrary Include="com.revenuecat.purchases:purchases-store-amazon" Version="8.16.0" Bind="false" Pack="True" VerifyDependencies="False" />
+		<AndroidMavenLibrary Include="com.revenuecat.purchases:purchases" Version="8.23.0" Bind="false" Pack="True" VerifyDependencies="False" />
+		<AndroidMavenLibrary Include="com.revenuecat.purchases:purchases-store-amazon" Version="8.23.0" Bind="false" Pack="True" VerifyDependencies="False" />
 
 		<!-- Amazon AppStore SDK -->
 		<AndroidMavenLibrary Include="com.amazon.device:amazon-appstore-sdk" Version="3.0.5" Bind="false" Pack="True" VerifyDependencies="False" />
