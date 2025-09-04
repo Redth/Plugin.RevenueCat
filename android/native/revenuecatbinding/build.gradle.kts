@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "com.example.newbinding"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 24
@@ -31,8 +31,8 @@ dependencies {
     // Uncomment line below and replace {dependency.name.goes.here} with your dependency
     // implementation("{dependency.name.goes.here}")
 
-    implementation("com.revenuecat.purchases:purchases:8.20.0")
-    implementation("com.revenuecat.purchases:purchases-store-amazon:8.20.0")
+    implementation("com.revenuecat.purchases:purchases:9.5.0")
+    implementation("com.revenuecat.purchases:purchases-store-amazon:9.5.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.7.3")
 //    implementation("com.revenuecat.purchases:purchases-ui:8.16.0")
     implementation("com.google.code.gson:gson:2.12.0")

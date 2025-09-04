@@ -6,9 +6,7 @@
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="9.0.5" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.6" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.6" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.5" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.6" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.5" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.6" />
     <PackageVersion Include="Microsoft.Maui.Controls" Version="9.0.51" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="9.0.6" />
@@ -18,8 +16,9 @@
     <PackageVersion Include="Refitter.SourceGenerator" Version="1.5.5" />
     <PackageVersion Include="Xamarin.GooglePlayServices.Ads.Identifier" Version="118.2.0.3" />
     <PackageVersion Include="Xamarin.KotlinX.Serialization.Json" Version="1.8.1" />
-    <PackageVersion Include="Xamarin.Android.Google.BillingClient" Version="7.1.1.4" />
+    <PackageVersion Include="Xamarin.Android.Google.BillingClient" Version="8.0.0" />
     <PackageVersion Include="Xamarin.AndroidX.Lifecycle.Process" Version="2.9.1" />
+    <PackageVersion Include="Xamarin.AndroidX.Lifecycle.LiveData.Core" Version="2.9.1" />
     <PackageVersion Include="Xamarin.Kotlin.Parcelize.Runtime" Version="2.2.0" />
   </ItemGroup>
 </Project>
