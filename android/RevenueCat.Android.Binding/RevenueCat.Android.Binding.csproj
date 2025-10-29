@@ -15,7 +15,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<RevenueCatSdkVersion>8.23.0</RevenueCatSdkVersion>
+		<RevenueCatSdkVersion>9.12.0</RevenueCatSdkVersion>
 		<RevenueCatSdkUrl>https://repo1.maven.org/maven2/com/revenuecat/purchases/purchases/$(RevenueCatSdkVersion)/purchases-$(RevenueCatSdkVersion).aar</RevenueCatSdkUrl>
 		<RevenueCatUISdkUrl>https://repo1.maven.org/maven2/com/revenuecat/purchases/purchases-ui/$(RevenueCatSdkVersion)/purchases-ui-$(RevenueCatSdkVersion).aar</RevenueCatUISdkUrl>
 	</PropertyGroup>
@@ -34,8 +34,8 @@
 
 	<ItemGroup>
 		<!-- RevenueCat SDK libraries -->
-		<AndroidMavenLibrary Include="com.revenuecat.purchases:purchases" Version="8.23.0" Bind="false" Pack="True" VerifyDependencies="False" />
-		<AndroidMavenLibrary Include="com.revenuecat.purchases:purchases-store-amazon" Version="8.23.0" Bind="false" Pack="True" VerifyDependencies="False" />
+		<AndroidMavenLibrary Include="com.revenuecat.purchases:purchases" Version="9.12.0" Bind="false" Pack="True" VerifyDependencies="False" />
+		<AndroidMavenLibrary Include="com.revenuecat.purchases:purchases-store-amazon" Version="9.12.0" Bind="false" Pack="True" VerifyDependencies="False" />
 
 		<!-- Amazon AppStore SDK -->
 		<AndroidMavenLibrary Include="com.amazon.device:amazon-appstore-sdk" Version="3.0.5" Bind="false" Pack="True" VerifyDependencies="False" />
@@ -50,6 +50,15 @@
 		<PackageReference Include="Xamarin.Android.Google.BillingClient" />
 		<PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" />
 		<PackageReference Include="Xamarin.Kotlin.Parcelize.Runtime" />
+		<!-- Explicit references to resolve NU1608 warnings -->
+		<PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" />
+		<PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData.Core" />
+		<PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" />
+		<PackageReference Include="Xamarin.AndroidX.Collection.Ktx" />
+		<PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime.Ktx" />
+		<PackageReference Include="Xamarin.AndroidX.Fragment.Ktx" />
+		<PackageReference Include="Xamarin.AndroidX.Activity.Ktx" />
+		<PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime.Ktx.Android" />
 	</ItemGroup>
 
 	<ItemGroup>

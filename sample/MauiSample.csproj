@@ -56,6 +56,11 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" />
 	</ItemGroup>
 
+	<!-- Fix dependency conflict from RevenueCat Android binding -->
+	<ItemGroup Condition="'$(TargetFramework)' == 'net9.0-android'">
+		<PackageReference Include="Xamarin.AndroidX.Collection.Jvm" />
+	</ItemGroup>
+
 	<ItemGroup>
 		<ProjectReference Include="..\Plugin.RevenueCat\Plugin.RevenueCat.csproj" />
 	</ItemGroup>
