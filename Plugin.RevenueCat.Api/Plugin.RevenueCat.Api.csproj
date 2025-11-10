@@ -5,6 +5,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<EnableVersioning>True</EnableVersioning>
+		<IsAotCompatible>true</IsAotCompatible>
 	</PropertyGroup>
 
 	<PropertyGroup>

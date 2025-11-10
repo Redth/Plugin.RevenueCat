@@ -139,6 +139,8 @@ public class RevenueCatManager : IRevenueCatManager
 		return obj;
 	}
 
+	[System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "TypeInfoResolver is configured with source-generated context")]
+	[System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050", Justification = "TypeInfoResolver is configured with source-generated context")]
 	TObject? ParseJson<TObject>(string name, string? json)
 	{
 		if (string.IsNullOrEmpty(json))
