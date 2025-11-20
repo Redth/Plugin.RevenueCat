@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     name: 🔨 Build
-    runs-on: macos-15
+    runs-on: macos-26
 
     env:
       CI: true
@@ -21,7 +21,7 @@ jobs:
       with:
         fetch-depth: 0 #Nerdbank needs full clone
     - name: 🥅 Setup .NET
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v5
 
     - name: 🥅 .NET Workload Install
       run: dotnet workload install maui android ios maccatalyst
@@ -41,7 +41,7 @@ jobs:
         dotnet pack -m:1 -c Release -p:PublicRelease=${{ env.NBGV_PublicRelease }} -bl:${{ github.workspace}}/artifacts/Plugin.RevenueCat.binlog ./Plugin.RevenueCat/Plugin.RevenueCat.csproj
 
     - name: ⬆️ Packages
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: Packages
         path: |
@@ -50,7 +50,7 @@ jobs:
 
     - name: ⬆️ Logs
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: Logs
         path: |
@@ -63,13 +63,11 @@ jobs:
     if: startsWith(github.event.ref, 'refs/tags/v')
     steps:
       - name: ⬇️ Packages
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@v5
         with:
           name: Packages
       - name: 🥅 Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '9.0.x'
+        uses: actions/setup-dotnet@v5
       - name: 🚢 Push NuGet
         run: |
           dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_ORG_API_KEY }} --skip-duplicate
