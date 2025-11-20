@@ -139,6 +139,8 @@ public class RevenueCatManager : IRevenueCatManager
 		return obj;
 	}
 
+	[System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026:RequiresUnreferencedCode", Justification = "Uses source generated context.")]
+	[System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050:RequiresDynamicCode", Justification = "Uses source generated context.")]
 	TObject? ParseJson<TObject>(string name, string? json)
 	{
 		if (string.IsNullOrEmpty(json))
