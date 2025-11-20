@@ -20,6 +20,8 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0 #Nerdbank needs full clone
+    - name: 🍎 Select Xcode 26.1
+      run: sudo xcode-select -s /Applications/Xcode_26.1.app/Contents/Developer
     - name: 🥅 Setup .NET
       uses: actions/setup-dotnet@v5
 
