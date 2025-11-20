@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Plugin.RevenueCat.Api;
-using Refit;
 
 namespace Tests;
 

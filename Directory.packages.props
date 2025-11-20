@@ -7,13 +7,11 @@
     <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.0" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
     <PackageVersion Include="Microsoft.Maui.Controls" Version="10.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
     <PackageVersion Include="Nerdbank.GitVersioning" Version="3.7.115" />
-    <PackageVersion Include="Refit" Version="8.0.0" />
-    <PackageVersion Include="Refit.HttpClientFactory" Version="8.0.0" />
-    <PackageVersion Include="Refitter.SourceGenerator" Version="1.5.5" />
     <PackageVersion Include="Xamarin.GooglePlayServices.Ads.Identifier" Version="118.2.0.3" />
     <PackageVersion Include="Xamarin.KotlinX.Serialization.Json" Version="1.8.1" />
     <PackageVersion Include="Xamarin.Android.Google.BillingClient" Version="8.0.0" />
