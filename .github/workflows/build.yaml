@@ -1,4 +1,4 @@
-name: Build and Publish
+name: 🔨 Build, Test, Publish
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: 🔨 Build
+    name: 🔨 Build + Test
     runs-on: macos-26
 
     env:
