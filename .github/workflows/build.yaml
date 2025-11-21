@@ -33,6 +33,25 @@ jobs:
       with:
         setAllVars: true
 
+    - name: 🧪 Run Tests
+      run: dotnet test ./Tests/Tests.csproj --configuration Release --logger "trx;LogFileName=test-results.trx"
+      continue-on-error: true
+      env:
+        # Tests require API keys - will be marked as inconclusive if not provided
+        AppSettings__ApiKeyV1: ${{ secrets.AppSettings__ApiKeyV1 }}
+        AppSettings__ApiKeyV2: ${{ secrets.AppSettings__ApiKeyV2 }}
+        TestSettings__ProjectId: ${{ secrets.TestSettings__ProjectId }}
+        TestSettings__CustomerId: ${{ secrets.TestSettings__CustomerId }}
+
+    - name: 📊 Test Report
+      uses: dorny/test-reporter@v2
+      if: always()
+      with:
+        name: Test Results
+        path: '**/test-results.trx'
+        reporter: dotnet-trx
+        fail-on-error: false
+
     - name: 📦 Build + Pack
       run: |
         dotnet build -m:1 -t:DownloadNativeDependencies ./macios/RevenueCat.MaciOS.Binding/RevenueCat.MaciOS.Binding.csproj
