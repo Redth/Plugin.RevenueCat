@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿﻿using Microsoft.Extensions.DependencyInjection;
 using Plugin.RevenueCat.Api.V1;
 using Plugin.RevenueCat.Api.V2;
 using System.Net.Http.Headers;
@@ -11,7 +11,7 @@ public static class HostExtensions
 	{
 		services.AddHttpClient<IRevenueCatApiV2, RevenueCatApiV2>(client =>
 		{
-			client.BaseAddress = new Uri("https://api.revenuecat.com/v2");
+			client.BaseAddress = new Uri("https://api.revenuecat.com/v2/");
 			client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", settings.ApiKey);
 		});
 
@@ -22,7 +22,7 @@ public static class HostExtensions
 	{
 		services.AddHttpClient<IRevenueCatApiV1, RevenueCatApiV1>(client =>
 		{
-			client.BaseAddress = new Uri("https://api.revenuecat.com/v1");
+			client.BaseAddress = new Uri("https://api.revenuecat.com/v1/");
 			client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", settings.ApiKey);
 		});
 

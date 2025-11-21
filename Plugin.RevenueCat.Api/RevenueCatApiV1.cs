@@ -14,7 +14,7 @@ public class RevenueCatApiV1 : IRevenueCatApiV1
 
 	public async Task<SubscriberResponse> GetOrCreateCustomer(string customer_id)
 	{
-		var response = await _httpClient.GetAsync($"/subscribers/{customer_id}");
+		var response = await _httpClient.GetAsync($"subscribers/{customer_id}");
 		response.EnsureSuccessStatusCode();
 		
 		var result = await response.Content.ReadFromJsonAsync<SubscriberResponse>(JsonUtil.Settings);
@@ -23,7 +23,7 @@ public class RevenueCatApiV1 : IRevenueCatApiV1
 
 	public async Task<OfferingsResponse> GetOfferings(string customer_id)
 	{
-		var response = await _httpClient.GetAsync($"/subscribers/{customer_id}/offerings");
+		var response = await _httpClient.GetAsync($"subscribers/{customer_id}/offerings");
 		response.EnsureSuccessStatusCode();
 		
 		var result = await response.Content.ReadFromJsonAsync<OfferingsResponse>(JsonUtil.Settings);
