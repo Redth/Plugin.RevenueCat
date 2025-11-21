@@ -397,6 +397,8 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
+# Environment variables
+.env
 
 # Common IntelliJ Platform excludes
 

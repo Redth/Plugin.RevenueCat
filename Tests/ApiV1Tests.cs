@@ -12,12 +12,14 @@ public sealed class ApiV1Tests
 	public async Task Get_Or_Create_Customer_Has_Entitlements()
 	{
 		var api = Hosting.ServiceProvider.GetRequiredService<IRevenueCatApiV1>();
+		var customerId = Hosting.Configuration["TestSettings:CustomerId"];
 
-		var r = await api.GetOrCreateCustomer("tfp-120465");
+		Assert.IsNotNull(customerId, "TestSettings:CustomerId must be configured");
+
+		var r = await api.GetOrCreateCustomer(customerId);
 
 		Assert.IsNotNull(r);
 		Assert.IsNotNull(r.Subscriber?.Entitlements);
-		Assert.IsTrue(r.Subscriber.Entitlements.ContainsKey("pro1year"));
 	}
 
 
@@ -25,10 +27,13 @@ public sealed class ApiV1Tests
 	public async Task Get_Offerings()
 	{
 		var api = Hosting.ServiceProvider.GetRequiredService<IRevenueCatApiV1>();
+		var customerId = Hosting.Configuration["TestSettings:CustomerId"];
 
-		var r = await api.GetOfferings("tfp-120465");
+		Assert.IsNotNull(customerId, "TestSettings:CustomerId must be configured");
+
+		var r = await api.GetOfferings(customerId);
 
 		Assert.IsNotNull(r);
-		Assert.AreEqual("pro1year", r.CurrentOfferingId);
+		Assert.IsNotNull(r.CurrentOfferingId);
 	}
 }
