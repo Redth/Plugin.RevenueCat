@@ -1,4 +1,4 @@
-name: Build and Publish
+name: 🔨 Build, Test, Publish
 
 on:
   pull_request:
@@ -9,8 +9,8 @@ on:
 
 jobs:
   build:
-    name: 🔨 Build
-    runs-on: macos-15
+    name: 🔨 Build + Test
+    runs-on: macos-26
 
     env:
       CI: true
@@ -20,8 +20,10 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0 #Nerdbank needs full clone
+    - name: 🍎 Select Xcode 26.1
+      run: sudo xcode-select -s /Applications/Xcode_26.1.app/Contents/Developer
     - name: 🥅 Setup .NET
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v5
 
     - name: 🥅 .NET Workload Install
       run: dotnet workload install maui android ios maccatalyst
@@ -40,8 +42,27 @@ jobs:
         dotnet pack -m:1 -c Release -p:PublicRelease=${{ env.NBGV_PublicRelease }} -bl:${{ github.workspace}}/artifacts/Plugin.RevenueCat.Api.binlog ./Plugin.RevenueCat.Api/Plugin.RevenueCat.Api.csproj
         dotnet pack -m:1 -c Release -p:PublicRelease=${{ env.NBGV_PublicRelease }} -bl:${{ github.workspace}}/artifacts/Plugin.RevenueCat.binlog ./Plugin.RevenueCat/Plugin.RevenueCat.csproj
 
+    - name: 🧪 Run Tests
+      run: dotnet test ./Tests/Tests.csproj --configuration Release --logger "trx;LogFileName=test-results.trx"
+      continue-on-error: true
+      env:
+        # Tests require API keys - will be marked as inconclusive if not provided
+        AppSettings__ApiKeyV1: ${{ secrets.AppSettings__ApiKeyV1 }}
+        AppSettings__ApiKeyV2: ${{ secrets.AppSettings__ApiKeyV2 }}
+        TestSettings__ProjectId: ${{ secrets.TestSettings__ProjectId }}
+        TestSettings__CustomerId: ${{ secrets.TestSettings__CustomerId }}
+
+    - name: 📊 Test Report
+      uses: dorny/test-reporter@v2
+      if: always()
+      with:
+        name: Test Results
+        path: '**/test-results.trx'
+        reporter: dotnet-trx
+        fail-on-error: false
+
     - name: ⬆️ Packages
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: Packages
         path: |
@@ -50,7 +71,7 @@ jobs:
 
     - name: ⬆️ Logs
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: Logs
         path: |
@@ -63,13 +84,11 @@ jobs:
     if: startsWith(github.event.ref, 'refs/tags/v')
     steps:
       - name: ⬇️ Packages
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@v5
         with:
           name: Packages
       - name: 🥅 Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '9.0.x'
+        uses: actions/setup-dotnet@v5
       - name: 🚢 Push NuGet
         run: |
           dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_ORG_API_KEY }} --skip-duplicate

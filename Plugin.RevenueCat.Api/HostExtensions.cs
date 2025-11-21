@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿﻿using Microsoft.Extensions.DependencyInjection;
 using Plugin.RevenueCat.Api.V1;
 using Plugin.RevenueCat.Api.V2;
-using Refit;
+using System.Net.Http.Headers;
 
 namespace Plugin.RevenueCat.Api;
 
@@ -9,30 +9,22 @@ public static class HostExtensions
 {
 	public static IServiceCollection AddRevenueCatApiV2(this IServiceCollection services, RevenueCatApiV2Settings settings)
 	{
-		var refitSettings = new RefitSettings
+		services.AddHttpClient<IRevenueCatApiV2, RevenueCatApiV2>(client =>
 		{
-			AuthorizationHeaderValueGetter = (rq, ct) =>
-				Task.FromResult(settings.ApiKey),
-			ContentSerializer = new SystemTextJsonContentSerializer(V2.JsonUtil.Settings)
-		};
-
-		services.AddRefitClient<IRevenueCatApiV2>(refitSettings)
-			.ConfigureHttpClient(c => c.BaseAddress = new Uri("https://api.revenuecat.com/v2"));
+			client.BaseAddress = new Uri("https://api.revenuecat.com/v2/");
+			client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", settings.ApiKey);
+		});
 
 		return services;
 	}
 
 	public static IServiceCollection AddRevenueCatApiV1(this IServiceCollection services, RevenueCatApiV1Settings settings)
 	{
-		var refitSettings = new RefitSettings
+		services.AddHttpClient<IRevenueCatApiV1, RevenueCatApiV1>(client =>
 		{
-			AuthorizationHeaderValueGetter = (rq, ct) =>
-				Task.FromResult(settings.ApiKey),
-			ContentSerializer = new SystemTextJsonContentSerializer(V1.JsonUtil.Settings)
-		};
-
-		services.AddRefitClient<IRevenueCatApiV1>(refitSettings)
-			.ConfigureHttpClient(c => c.BaseAddress = new Uri("https://api.revenuecat.com/v1"));
+			client.BaseAddress = new Uri("https://api.revenuecat.com/v1/");
+			client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", settings.ApiKey);
+		});
 
 		return services;
 	}
