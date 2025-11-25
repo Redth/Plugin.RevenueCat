@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+﻿﻿using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Plugin.RevenueCat.Models;
 
@@ -139,8 +139,6 @@ public class RevenueCatManager : IRevenueCatManager
 		return obj;
 	}
 
-	[System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026:RequiresUnreferencedCode", Justification = "Uses source generated context.")]
-	[System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050:RequiresDynamicCode", Justification = "Uses source generated context.")]
 	TObject? ParseJson<TObject>(string name, string? json)
 	{
 		if (string.IsNullOrEmpty(json))
@@ -153,7 +151,19 @@ public class RevenueCatManager : IRevenueCatManager
 		
 		try
 		{
-			obj = JsonSerializer.Deserialize<TObject>(json, ModelExtensions.Settings);
+			// Use source-generated context for AOT compatibility
+			if (typeof(TObject) == typeof(CustomerInfo))
+			{
+				obj = (TObject)(object)JsonSerializer.Deserialize(json, ModelSerializerContext.Default.CustomerInfo)!;
+			}
+			else if (typeof(TObject) == typeof(Offering))
+			{
+				obj = (TObject)(object)JsonSerializer.Deserialize(json, ModelSerializerContext.Default.Offering)!;
+			}
+			else
+			{
+				throw new NotSupportedException($"Type {typeof(TObject).Name} is not supported for AOT deserialization. Add it to ModelSerializerContext.");
+			}
 		}
 		catch (Exception ex)
 		{
