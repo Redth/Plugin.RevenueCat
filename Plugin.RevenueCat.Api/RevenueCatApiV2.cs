@@ -23,21 +23,25 @@ public class RevenueCatApiV2 : IRevenueCatApiV2
 		var response = await _httpClient.GetAsync(url);
 		response.EnsureSuccessStatusCode();
 		
-		var result = await response.Content.ReadFromJsonAsync<Customer>(JsonUtil.Settings);
+		var result = await response.Content.ReadFromJsonAsync(ApiV2SerializerContext.Default.Customer);
 		return result ?? throw new InvalidOperationException("Failed to deserialize response");
 	}
 
 	public async Task SetCustomerAttributes(string project_id, string customer_id, IEnumerable<CustomerAttribute> attributes)
 	{
 		// RevenueCat V2 API expects attributes as an array of objects with name and value properties
-		var payload = new
+		var payload = new SetAttributesRequest
 		{
-			attributes = attributes.Select(a => new { name = a.Name, value = a.Value }).ToArray()
+			Attributes = attributes.Select(a => new SetAttributesRequest.AttributeItem 
+			{ 
+				Name = a.Name, 
+				Value = a.Value 
+			}).ToArray()
 		};
 		
 		var request = new HttpRequestMessage(HttpMethod.Post, $"projects/{project_id}/customers/{customer_id}/attributes")
 		{
-			Content = JsonContent.Create(payload, options: JsonUtil.Settings)
+			Content = JsonContent.Create(payload, ApiV2SerializerContext.Default.SetAttributesRequest)
 		};
 		
 		var response = await _httpClient.SendAsync(request);
@@ -49,7 +53,7 @@ public class RevenueCatApiV2 : IRevenueCatApiV2
 		var response = await _httpClient.GetAsync($"projects/{project_id}/offerings?customer_id={customer_id}");
 		response.EnsureSuccessStatusCode();
 		
-		var result = await response.Content.ReadFromJsonAsync<PagedList<Offering>>(JsonUtil.Settings);
+		var result = await response.Content.ReadFromJsonAsync(ApiV2SerializerContext.Default.PagedListOffering);
 		return result ?? throw new InvalidOperationException("Failed to deserialize response");
 	}
 }

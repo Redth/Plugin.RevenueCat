@@ -17,7 +17,7 @@ public class RevenueCatApiV1 : IRevenueCatApiV1
 		var response = await _httpClient.GetAsync($"subscribers/{customer_id}");
 		response.EnsureSuccessStatusCode();
 		
-		var result = await response.Content.ReadFromJsonAsync<SubscriberResponse>(JsonUtil.Settings);
+		var result = await response.Content.ReadFromJsonAsync(ApiV1SerializerContext.Default.SubscriberResponse);
 		return result ?? throw new InvalidOperationException("Failed to deserialize response");
 	}
 
@@ -26,7 +26,7 @@ public class RevenueCatApiV1 : IRevenueCatApiV1
 		var response = await _httpClient.GetAsync($"subscribers/{customer_id}/offerings");
 		response.EnsureSuccessStatusCode();
 		
-		var result = await response.Content.ReadFromJsonAsync<OfferingsResponse>(JsonUtil.Settings);
+		var result = await response.Content.ReadFromJsonAsync(ApiV1SerializerContext.Default.OfferingsResponse);
 		return result ?? throw new InvalidOperationException("Failed to deserialize response");
 	}
 }
