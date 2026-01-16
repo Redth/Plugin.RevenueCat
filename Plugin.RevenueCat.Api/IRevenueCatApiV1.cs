@@ -7,4 +7,6 @@ public interface IRevenueCatApiV1
 	Task<SubscriberResponse> GetOrCreateCustomer(string customer_id);
 
 	Task<OfferingsResponse> GetOfferings(string customer_id);
+
+	Task<string?> GetManagementUrl(string customer_id);
 }

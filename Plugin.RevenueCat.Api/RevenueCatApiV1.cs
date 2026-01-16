@@ -29,4 +29,10 @@ public class RevenueCatApiV1 : IRevenueCatApiV1
 		var result = await response.Content.ReadFromJsonAsync(ApiV1SerializerContext.Default.OfferingsResponse);
 		return result ?? throw new InvalidOperationException("Failed to deserialize response");
 	}
+
+	public async Task<string?> GetManagementUrl(string customer_id)
+	{
+		var subscriber = await GetOrCreateCustomer(customer_id);
+		return subscriber.Subscriber?.ManagementUrl;
+	}
 }
