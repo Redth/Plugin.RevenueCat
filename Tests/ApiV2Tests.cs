@@ -98,4 +98,20 @@ public sealed class ApiV2Tests
 				"Please update your API key permissions in the RevenueCat dashboard.");
 		}
 	}
+
+	[TestMethod]
+	public async Task Get_Subscriptions()
+	{
+		var api = Hosting.ServiceProvider.GetRequiredService<IRevenueCatApiV2>();
+		var projectId = Hosting.Configuration["TestSettings:ProjectId"];
+		var customerId = Hosting.Configuration["TestSettings:CustomerId"];
+
+		Assert.IsNotNull(projectId, "TestSettings:ProjectId must be configured");
+		Assert.IsNotNull(customerId, "TestSettings:CustomerId must be configured");
+
+		var subscriptions = await api.GetSubscriptions(projectId, customerId);
+
+		Assert.IsNotNull(subscriptions);
+		Assert.IsNotNull(subscriptions.Items);
+	}
 }
