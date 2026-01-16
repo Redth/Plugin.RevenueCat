@@ -41,5 +41,5 @@ public class Subscription
 	public string Environment { get; set; }
 
 	[JsonPropertyName("management_url")]
-	public string ManagementUrl { get; set; }
+	public string? ManagementUrl { get; set; }
 }
