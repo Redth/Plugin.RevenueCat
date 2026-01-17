@@ -11,10 +11,11 @@ public class CustomerInfoUpdatedEventArgs(CustomerInfo customerInfoRequest) : Ev
 
 public class RevenueCatManager : IRevenueCatManager
 {
-	public RevenueCatManager(RevenueCatOptions options, IRevenueCatPlatformImplementation platformImplementation, ILoggerFactory? loggerFactory = null)
+	public RevenueCatManager(RevenueCatOptions options, IRevenueCatPlatformImplementation platformImplementation, IServiceProvider serviceProvider, ILoggerFactory? loggerFactory = null)
 	{
 		Options = options;
 		PlatformImplementation = platformImplementation;
+		ServiceProvider = serviceProvider;
 		Logger = loggerFactory?.CreateLogger<RevenueCatManager>() ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<RevenueCatManager>.Instance;
 	}
 
@@ -27,26 +28,27 @@ public class RevenueCatManager : IRevenueCatManager
 	public string? ApiKey => PlatformImplementation.ApiKey;
 
 	protected readonly ILogger Logger;
+	protected readonly IServiceProvider ServiceProvider;
 	
 	public void Initialize()
 	{
 		Logger.LogInformation($"RevenueCat->{nameof(Initialize)}: Initializing...");
-		
+
 		PlatformImplementation.SetCustomerInfoUpdatedHandler((json) =>
 		{
 			if (Options.Debug)
 				Logger.LogInformation($"RevenueCat->{nameof(CustomerInfoUpdated)}: Received JSON: {json}");
 
 			Logger.LogInformation($"RevenueCat->{nameof(CustomerInfoUpdated)}: Deserializing JSON...");
-			
+
 			var customerInfoRequest = ParseJson<CustomerInfo>(nameof(Initialize), json);
-			
+
 			if (customerInfoRequest is not null)
 			{
 				Logger.LogInformation($"RevenueCat->{nameof(CustomerInfoUpdated)}: Callback...");
-				
+
 				// Call callback first
-				Options.CustomerInfoUpdatedCallback?.Invoke(customerInfoRequest);
+				Options.CustomerInfoUpdatedCallback?.Invoke(ServiceProvider, customerInfoRequest);
 				// Raise event too
 				CustomerInfoUpdated?.Invoke(this, new CustomerInfoUpdatedEventArgs(customerInfoRequest));
 			}
