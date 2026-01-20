@@ -17,9 +17,11 @@ namespace Plugin.RevenueCat.Api.V2;
 [JsonSerializable(typeof(Offering))]
 [JsonSerializable(typeof(Package))]
 [JsonSerializable(typeof(Product))]
+[JsonSerializable(typeof(Subscription))]
 [JsonSerializable(typeof(PagedList<Offering>))]
 [JsonSerializable(typeof(PagedList<CustomerAttribute>))]
 [JsonSerializable(typeof(PagedList<Entitlement>))]
+[JsonSerializable(typeof(PagedList<Subscription>))]
 [JsonSerializable(typeof(SetAttributesRequest))]
 [JsonSerializable(typeof(SetAttributesRequest.AttributeItem))]
 public partial class ApiV2SerializerContext : JsonSerializerContext

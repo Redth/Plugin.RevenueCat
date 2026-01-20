@@ -56,4 +56,13 @@ public class RevenueCatApiV2 : IRevenueCatApiV2
 		var result = await response.Content.ReadFromJsonAsync(ApiV2SerializerContext.Default.PagedListOffering);
 		return result ?? throw new InvalidOperationException("Failed to deserialize response");
 	}
+
+	public async Task<PagedList<Subscription>> GetSubscriptions(string project_id, string customer_id)
+	{
+		var response = await _httpClient.GetAsync($"projects/{project_id}/customers/{customer_id}/subscriptions");
+		response.EnsureSuccessStatusCode();
+		
+		var result = await response.Content.ReadFromJsonAsync(ApiV2SerializerContext.Default.PagedListSubscription);
+		return result ?? throw new InvalidOperationException("Failed to deserialize response");
+	}
 }
