@@ -1229,6 +1229,57 @@ protected override void OnDisappearing()
 
 # Updating Bindings When Native SDK Changes
 
+## Validating API Changes Before Updating
+
+**IMPORTANT**: Before updating to a new SDK version, always validate whether API changes affect your bindings.
+
+### 1. Check Release Notes for Breaking Changes
+
+Review the native SDK's release notes between your current version and target version:
+
+```bash
+# For GitHub-hosted SDKs, check releases page
+# Example: https://github.com/VendorName/library-ios/releases
+
+# Look for:
+# - Breaking changes
+# - Deprecated APIs
+# - Changed method signatures
+# - Removed classes/methods
+```
+
+### 2. Identify APIs Used in Your Wrapper
+
+Review your Swift wrapper file to identify which native SDK APIs you consume:
+
+```bash
+# List all native SDK API calls in your wrapper
+grep -E "import |\.shared\.|configure\(|logIn\(|getCustomerInfo\(" macios/native/*/DotnetMyBinding.swift
+```
+
+### 3. Verify API Compatibility
+
+For each API your wrapper uses, verify it still exists and has the same signature:
+- Check the SDK's public headers or documentation
+- Look for migration guides in release notes
+- Test compilation of the wrapper against the new SDK
+
+### 4. Update Wrapper If APIs Changed
+
+If the native SDK APIs changed:
+1. Update method calls in your Swift wrapper (`DotnetMyBinding.swift`)
+2. If wrapper's public interface changes, update `ApiDefinition.cs` to match
+3. If return types change, update the corresponding .NET models
+
+### 5. When ApiDefinition.cs Needs Updating
+
+Update `ApiDefinition.cs` **only if** your Swift wrapper's `@objc` exposed interface changes:
+- New methods added to the wrapper → Add new `[Export]` bindings
+- Method signatures changed → Update the C# method signature
+- Methods removed → Remove the corresponding binding
+
+**Note**: If only the internal native SDK APIs changed but your wrapper's public interface remains the same, `ApiDefinition.cs` does not need changes.
+
 ## Step-by-step Update Process
 
 ### 1. Update Native Dependency Version
@@ -1289,14 +1340,46 @@ Manually merge:
 - Remove deleted methods
 - Preserve custom attributes (`[Async]`, `[NullAllowed]`, etc.)
 
-### 5. Test the Updated Bindings
+### 5. Verify Resources.zip Contents
+
+After rebuilding the binding project, verify the resources.zip contains both xcframeworks:
 
 ```bash
+# List xcframeworks in the resources.zip
+unzip -l bin/Debug/net10.0-ios/MyBinding.MaciOS.Binding.resources.zip | grep -E "\.xcframework/$"
+
+# Should see:
+# - NativeSDK.xcframework/           (the native SDK)
+# - MyBindingiOS.xcframework/        (your Swift wrapper)
+```
+
+If the wrapper xcframework is missing, clean and rebuild:
+```bash
+rm -f bin/Debug/net10.0-ios/MyBinding.MaciOS.Binding.resources.*
+dotnet build -f net10.0-ios
+```
+
+### 6. Test the Updated Bindings
+
+**IMPORTANT:** Clean consuming projects before testing to avoid stale cache issues:
+
+```bash
+# Clean sample/app project first
+rm -rf sample/obj sample/bin
+
+# Build and test
 dotnet build -c Release
 dotnet test  # If you have unit tests
 ```
 
-Run the sample app to verify functionality.
+Run the sample app to verify functionality for multiple architectures:
+```bash
+# Test iOS simulator (arm64 for Apple Silicon Macs)
+dotnet build sample/MySample.csproj -f net10.0-ios -r iossimulator-arm64
+
+# Test iOS device
+dotnet build sample/MySample.csproj -f net10.0-ios -r ios-arm64
+```
 
 # Troubleshooting
 
@@ -1320,6 +1403,7 @@ lipo -info path/to/Framework.framework/Framework
 1. **Missing linked frameworks** - Add system frameworks to Xcode project's "Link Binary with Libraries"
 2. **Static vs Dynamic mismatch** - Ensure consistent linkage (all static or all dynamic)
 3. **Symbol visibility** - Verify Swift classes/methods are `public` and have `@objc`
+4. **Stale build cache** - See "Stale Build Cache / Resources.zip Not Updated" below
 
 ```xml
 <!-- Force load symbols if needed -->
@@ -1329,6 +1413,52 @@ lipo -info path/to/Framework.framework/Framework
   <SmartLink>false</SmartLink>
 </XcodeProject>
 ```
+
+### Stale Build Cache / Resources.zip Not Updated
+
+**Symptom:** After updating the binding project, consuming projects (samples, apps) fail with linker errors like `_OBJC_CLASS_$_MyManager` not found, even though the binding project builds successfully.
+
+**Root Cause:** The binding project packages native xcframeworks into a `resources.zip` file. MSBuild incremental builds may not detect changes to the native xcframework outputs, leaving stale artifacts in the consuming project's `obj/` directory.
+
+**Diagnosis - Verify resources.zip contents:**
+```bash
+# Check that your wrapper xcframework is in the resources.zip
+unzip -l path/to/MyBinding.MaciOS.Binding/bin/Debug/net10.0-ios/MyBinding.MaciOS.Binding.resources.zip | grep -E "\.xcframework"
+
+# Expected output should include BOTH:
+# - The native SDK xcframework (e.g., RevenueCat.xcframework)
+# - Your wrapper xcframework (e.g., MyBindingiOS.xcframework)
+```
+
+**Solutions:**
+
+1. **Clean the consuming project:**
+```bash
+# Remove cached artifacts from the sample/app project
+rm -rf sample/obj sample/bin
+dotnet build sample/MySample.csproj -f net10.0-ios
+```
+
+2. **Force rebuild of binding project:**
+```bash
+# Delete resources.zip to force regeneration
+rm -f macios/MyBinding.MaciOS.Binding/bin/Debug/net10.0-ios/MyBinding.MaciOS.Binding.resources.*
+dotnet build macios/MyBinding.MaciOS.Binding/MyBinding.MaciOS.Binding.csproj -f net10.0-ios
+```
+
+3. **Full clean rebuild (nuclear option):**
+```bash
+# Clean everything and rebuild
+dotnet clean
+rm -rf */obj */bin */*/obj */*/bin
+dotnet build
+```
+
+**Prevention:** When updating native SDK versions, always:
+1. Clean the binding project: `dotnet clean`
+2. Rebuild the binding project
+3. Verify resources.zip contains expected xcframeworks
+4. Clean consuming projects before rebuilding them
 
 ### "No type or protocol named..."
 

@@ -76,17 +76,23 @@ Use these APIs when you need server-side operations or when the native SDK doesn
    </Target>
    ```
 
-2. **Update Xcode project references** if the RevenueCat SDK has API changes:
+2. **Validate API changes** before proceeding:
+   - Check RevenueCat iOS SDK release notes for breaking changes between versions
+   - Review `macios/native/RevenueCatBinding/RevenueCatBinding/RevenueCatBinding.swift` to identify which SDK APIs are used
+   - Verify those APIs haven't changed signatures or been removed
+   - If wrapper uses changed APIs, update the Swift wrapper accordingly
+
+3. **Update Xcode project references** if the RevenueCat SDK has API changes:
    - Open `macios/native/RevenueCatBinding/RevenueCatBinding.xcodeproj` in Xcode
    - Verify the RevenueCat package dependency version
    - Update `RevenueCatBinding.swift` if there are breaking API changes
 
-3. **Download new dependencies**:
+4. **Download new dependencies**:
    ```bash
    dotnet build -m:1 -t:DownloadNativeDependencies ./macios/RevenueCat.MaciOS.Binding/RevenueCat.MaciOS.Binding.csproj
    ```
 
-4. **Update binding definitions** in `ApiDefinition.cs` if the wrapper API surface changed
+5. **Update binding definitions** in `ApiDefinition.cs` only if the wrapper's `@objc` exposed interface changed (new methods, changed signatures, etc.)
 
 ### Updating Android Bindings
 
@@ -105,9 +111,15 @@ Use these APIs when you need server-side operations or when the native SDK doesn
    }
    ```
 
-3. **Re-evaluate the native dependency graph** (see section below)
+3. **Validate API changes** before proceeding:
+   - Check RevenueCat Android SDK release notes for breaking changes between versions
+   - Review `android/native/revenuecatbinding/src/main/java/.../RevenueCatManager.java` to identify which SDK APIs are used
+   - Verify those APIs haven't changed signatures or been removed
+   - If wrapper uses changed APIs, update the Java wrapper accordingly
 
-4. **Update `RevenueCatManager.java`** if there are breaking API changes in the native SDK
+4. **Re-evaluate the native dependency graph** (see section below)
+
+5. **Update `RevenueCatManager.java`** if there are breaking API changes in the native SDK
 
 ### Re-evaluating the Android Dependency Graph
 

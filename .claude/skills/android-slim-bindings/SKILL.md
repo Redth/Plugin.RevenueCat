@@ -1133,6 +1133,60 @@ protected override void OnDisappearing()
 
 # Updating Bindings When Native SDK Changes
 
+## Validating API Changes Before Updating
+
+**IMPORTANT**: Before updating to a new SDK version, always validate whether API changes affect your bindings.
+
+### 1. Check Release Notes for Breaking Changes
+
+Review the native SDK's release notes between your current version and target version:
+
+```bash
+# For GitHub-hosted SDKs, check releases page
+# Example: https://github.com/VendorName/library-android/releases
+
+# For Maven libraries, check changelog
+# Example: https://repo1.maven.org/maven2/com/vendor/library/
+
+# Look for:
+# - Breaking changes
+# - Deprecated APIs  
+# - Changed method signatures
+# - Removed classes/methods
+```
+
+### 2. Identify APIs Used in Your Wrapper
+
+Review your Java/Kotlin wrapper file to identify which native SDK APIs you consume:
+
+```bash
+# List all native SDK API calls in your wrapper
+grep -E "import |\.shared\.|configure\(|logIn\(|getCustomerInfo\(" android/native/app/src/main/java/*/*Binding.java
+```
+
+### 3. Verify API Compatibility
+
+For each API your wrapper uses, verify it still exists and has the same signature:
+- Check the SDK's Javadoc or source code
+- Look for migration guides in release notes
+- Test compilation of the wrapper against the new SDK
+
+### 4. Update Wrapper If APIs Changed
+
+If the native SDK APIs changed:
+1. Update method calls in your Java/Kotlin wrapper
+2. If wrapper's public interface changes, the generated C# bindings will automatically reflect the changes
+3. If return types change, update the corresponding .NET models
+
+### 5. When Metadata.xml Needs Updating
+
+Update `Metadata.xml` **only if** your wrapper's public interface changes:
+- New methods added → May need parameter name fixes
+- New classes → May need namespace mappings
+- Method signatures changed → May need type mappings
+
+**Note**: If only the internal native SDK APIs changed but your wrapper's public interface remains the same, binding files typically don't need changes.
+
 ## Step-by-step Update Process
 
 ### 1. Update Native Dependency Version
@@ -1190,7 +1244,19 @@ If new classes/methods were added to your wrapper, update parameter names and na
 
 ### 8. Test
 
-Build and run the sample app to verify functionality.
+**IMPORTANT:** Clean consuming projects before testing to avoid stale cache issues:
+
+```bash
+# Clean sample/app project first
+rm -rf sample/obj sample/bin
+
+# Build and run
+dotnet build sample/MySample.csproj -f net10.0-android
+```
+
+Build and run the sample app to verify functionality on:
+- Android emulator (x86_64 or arm64)
+- Physical Android device (arm64-v8a)
 
 # Handling Native Libraries (.so files)
 
@@ -1275,6 +1341,46 @@ Wrapper code references classes not available.
 ./gradlew clean
 ./gradlew :app:assembleRelease --stacktrace
 ```
+
+### Stale Build Cache After SDK Update
+
+**Symptom:** After updating native SDK versions in `build.gradle.kts` or the binding csproj, consuming projects (samples, apps) fail with runtime errors or incorrect behavior, even though the binding project builds successfully.
+
+**Root Cause:** MSBuild incremental builds may not detect changes to Gradle outputs or Maven dependencies, leaving stale cached artifacts.
+
+**Solutions:**
+
+1. **Clean the consuming project:**
+```bash
+# Remove cached artifacts from the sample/app project
+rm -rf sample/obj sample/bin
+dotnet build sample/MySample.csproj -f net10.0-android
+```
+
+2. **Force rebuild of binding project:**
+```bash
+# Clean Gradle and .NET caches
+cd android/native/mybinding
+./gradlew clean
+cd ../../..
+dotnet clean android/MyBinding.Android.Binding/MyBinding.Android.Binding.csproj
+dotnet build android/MyBinding.Android.Binding/MyBinding.Android.Binding.csproj
+```
+
+3. **Full clean rebuild (nuclear option):**
+```bash
+# Clean everything
+dotnet clean
+rm -rf */obj */bin */*/obj */*/bin
+cd android/native/mybinding && ./gradlew clean && cd ../../..
+dotnet build
+```
+
+**Prevention:** When updating native SDK versions, always:
+1. Run `./gradlew clean` in the native project
+2. Run `dotnet clean` on the binding project
+3. Rebuild the binding project
+4. Clean consuming projects before rebuilding them
 
 ## Runtime Errors
 
