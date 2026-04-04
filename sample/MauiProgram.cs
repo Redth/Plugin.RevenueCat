@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
+#if DEBUG
+using Microsoft.Maui.DevFlow.Agent;
+#endif
 using Plugin.RevenueCat;
 
 namespace MauiSample;
@@ -23,6 +26,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<MainPage>();
 
 #if DEBUG
+		builder.AddMauiDevFlowAgent(_ => { });
 		builder.Logging.AddDebug();
 #endif
 
