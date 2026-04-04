@@ -62,6 +62,21 @@ public class RevenueCatApple : IRevenueCatPlatformImplementation
         return s.ToString();
     }
 
+    public async Task<string?> PresentPaywallAsync(object? platformContext, string? offeringIdentifier, string? requiredEntitlementIdentifier, bool displayCloseButton)
+    {
+        var s = await revenueCatManager.PresentPaywallAsync(
+            offeringIdentifier is null ? null : new NSString(offeringIdentifier),
+            requiredEntitlementIdentifier is null ? null : new NSString(requiredEntitlementIdentifier),
+            displayCloseButton);
+        return s?.ToString();
+    }
+
+    public async Task<string?> PresentCustomerCenterAsync(object? platformContext)
+    {
+        var s = await revenueCatManager.PresentCustomerCenterAsync();
+        return s?.ToString();
+    }
+
     public async Task<string?> GetCustomerInfoAsync(bool force)
     {
         var s = await revenueCatManager.GetCustomerInfoAsync(force);

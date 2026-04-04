@@ -1,3 +1,5 @@
+#nullable enable
+
 using Foundation;
 using System;
 using System.Threading.Tasks;
@@ -43,6 +45,14 @@ namespace RevenueCat
 		[Export("getOffering:callback:")]
 		[Async]
 		void GetOffering(NSString offeringIdentifier, System.Action<NSString?, NSError?> callback);
+
+		[Export("presentPaywall:requiredEntitlementIdentifier:displayCloseButton:callback:")]
+		[Async]
+		void PresentPaywall([NullAllowed] NSString offeringIdentifier, [NullAllowed] NSString requiredEntitlementIdentifier, bool displayCloseButton, System.Action<NSString?, NSError?> callback);
+
+		[Export("presentCustomerCenter:")]
+		[Async]
+		void PresentCustomerCenter(System.Action<NSString?, NSError?> callback);
 		
 		[Export("setEmail:")]
 		void SetEmail(NSString email);

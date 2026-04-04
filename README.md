@@ -39,6 +39,35 @@ You can optionally set additional options:
  - `bool debugLog` to enable more debug logging at hte native RevenueCat SDK level 
  - `Action<CustomerInfoRequest> customerInfoUpdatedCallback` to have a custom callback invoked when the customer info is updated or refreshed (resulting from an API call, or from the native platform stores raising events through the RevenueCat SDK).
 
+### RevenueCat UI (optional)
+
+If you want RevenueCat's native paywall and customer center UIs, add the optional `Plugin.RevenueCat.UI` package and register it alongside the base plugin:
+
+```csharp
+builder
+	.UseMauiApp<App>()
+	.UseRevenueCat(o => o
+		.WithAndroidApiKey("goog_[YOUR_GOOGLE_CLIENT_KEY]")
+		.WithAppleApiKey("appl_[YOUR_APPLE_CLIENT_KEY]"))
+	.UseRevenueCatUI();
+```
+
+Then inject `IRevenueCatUIManager` and present the native UI:
+
+```csharp
+public class MyViewModel(IRevenueCatUIManager revenueCatUI)
+{
+	public Task ShowPaywallAsync() =>
+		revenueCatUI.PresentPaywallAsync();
+
+	public Task ShowPremiumPaywallAsync() =>
+		revenueCatUI.PresentPaywallIfNeededAsync("pro");
+
+	public Task ShowCustomerCenterAsync() =>
+		revenueCatUI.PresentCustomerCenterAsync();
+}
+```
+
 ### CustomerInfoRequest Updates
 
 The `CustomerInfoRequest` object is the main model type which you will use in your app.  This type contains a list of 'Entitlements' and their details which belong to the given user.

@@ -58,6 +58,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Plugin.RevenueCat\Plugin.RevenueCat.csproj" />
+		<ProjectReference Include="..\Plugin.RevenueCat.UI\Plugin.RevenueCat.UI.csproj" />
 	</ItemGroup>
 
 	<Target Name="Pack"></Target>

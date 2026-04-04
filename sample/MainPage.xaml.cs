@@ -1,6 +1,7 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Microsoft.Maui.Platform;
 using Plugin.RevenueCat;
+using Plugin.RevenueCat.UI;
 
 namespace MauiSample;
 
@@ -8,12 +9,14 @@ namespace MauiSample;
 public partial class MainPage : ContentPage
 {
 	readonly IRevenueCatManager revenueCatManager;
+	readonly IRevenueCatUIManager revenueCatUIManager;
 
-	public MainPage(IRevenueCatManager revenueCatManager)
+	public MainPage(IRevenueCatManager revenueCatManager, IRevenueCatUIManager revenueCatUIManager)
 	{
 		InitializeComponent();
 
 		this.revenueCatManager = revenueCatManager;
+		this.revenueCatUIManager = revenueCatUIManager;
 
 		this.revenueCatManager.CustomerInfoUpdated += RevenueCatManager_CustomerInfoUpdated;
 	}
@@ -136,6 +139,38 @@ public partial class MainPage : ContentPage
 
 		var priceString = $"{title} - {description} - {price} {currency}";
 		await this.DisplayAlert($"Offering: {rcOfferingId.Text}", priceString, "OK");
+	}
+
+	private async void ShowPaywall_Clicked(object? sender, EventArgs e)
+	{
+		var result = await revenueCatUIManager.PresentPaywallAsync(new PaywallPresentationOptions
+		{
+			OfferingIdentifier = rcOfferingId.Text,
+			DisplayCloseButton = true,
+		});
+
+		if (result == null)
+		{
+			await DisplayAlert("Paywall", "The paywall could not be shown.", "OK");
+			return;
+		}
+
+		var message = result.ErrorMessage ?? "The paywall flow finished successfully.";
+		await DisplayAlert("Paywall", $"{result.ResultType}: {message}", "OK");
+	}
+
+	private async void ShowCustomerCenter_Clicked(object? sender, EventArgs e)
+	{
+		var result = await revenueCatUIManager.PresentCustomerCenterAsync();
+
+		if (result == null)
+		{
+			await DisplayAlert("Customer Center", "The customer center could not be shown.", "OK");
+			return;
+		}
+
+		var message = result.ErrorMessage ?? result.Action ?? "Dismissed";
+		await DisplayAlert("Customer Center", $"{result.ResultType}: {message}", "OK");
 	}
 }
 

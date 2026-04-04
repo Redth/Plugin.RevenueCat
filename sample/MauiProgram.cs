@@ -1,5 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Plugin.RevenueCat;
+using Plugin.RevenueCat.UI;
 
 namespace MauiSample;
 
@@ -18,7 +19,8 @@ public static class MauiProgram
 			.UseRevenueCat(o => o
 				.WithAndroidApiKey("goog_[YOUR_GOOGLE_CLIENT_KEY]")
 				.WithAppleApiKey("appl_[YOUR_APPLE_CLIENT_KEY]")
-				.WithDebug(true));
+				.WithDebug(true))
+			.UseRevenueCatUI();
 
 		builder.Services.AddTransient<MainPage>();
 
