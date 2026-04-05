@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net10.0-android36.0</TargetFramework>
+		<SupportedOSPlatformVersion>24</SupportedOSPlatformVersion>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<IsTrimmable>true</IsTrimmable>
+		<EnableVersioning>true</EnableVersioning>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<PackageId>Plugin.RevenueCat.Android.UI.Binding</PackageId>
+		<Title>RevenueCat UI for .NET MAUI (Android Binding)</Title>
+		<PackageDescription>This package contains Android binding types for the optional RevenueCat UI support and is not intended to be referenced directly.</PackageDescription>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<RevenueCatSdkVersion>9.29.0</RevenueCatSdkVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<AndroidGradleProject Include="../native/build.gradle.kts">
+			<ModuleName>revenuecatuibinding</ModuleName>
+			<OutputPath>$(MSBuildThisFileDirectory)..\..\artifacts\grdl\rcuibnd\</OutputPath>
+		</AndroidGradleProject>
+	</ItemGroup>
+
+	<ItemGroup>
+		<AndroidMavenLibrary Include="com.revenuecat.purchases:purchases" Version="$(RevenueCatSdkVersion)" Bind="false" Pack="True" VerifyDependencies="False" />
+		<AndroidMavenLibrary Include="com.revenuecat.purchases:purchases-ui" Version="$(RevenueCatSdkVersion)" Bind="false" Pack="True" VerifyDependencies="False" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" />
+		<PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData.Core" />
+		<PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" />
+		<PackageReference Include="Xamarin.AndroidX.Lifecycle.Common" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<AndroidIgnoredJavaDependency Include="androidx.lifecycle:lifecycle-common:2.5.0" />
+		<AndroidIgnoredJavaDependency Include="androidx.lifecycle:lifecycle-runtime:2.5.0" />
+		<AndroidIgnoredJavaDependency Include="androidx.lifecycle:lifecycle-runtime-ktx:2.5.0" />
+		<AndroidIgnoredJavaDependency Include="androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.0" />
+		<AndroidIgnoredJavaDependency Include="androidx.annotation:annotation:1.6.0" />
+		<AndroidIgnoredJavaDependency Include="androidx.fragment:fragment-ktx:1.6.1" />
+		<AndroidIgnoredJavaDependency Include="androidx.browser:browser:1.8.0" />
+		<AndroidIgnoredJavaDependency Include="androidx.window:window:1.1.0" />
+		<AndroidIgnoredJavaDependency Include="androidx.window:window-core:1.1.0" />
+	</ItemGroup>
+</Project>

@@ -1,4 +1,4 @@
-package com.revenuecat.revenuecatbinding;
+package com.revenuecat.revenuecatuibinding;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -19,11 +19,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 final class RevenueCatUIPresenter {
-    static final String EXTRA_MODE = "com.revenuecat.revenuecatbinding.mode";
-    static final String EXTRA_REQUEST_ID = "com.revenuecat.revenuecatbinding.request_id";
-    static final String EXTRA_OFFERING_IDENTIFIER = "com.revenuecat.revenuecatbinding.offering_identifier";
-    static final String EXTRA_REQUIRED_ENTITLEMENT_IDENTIFIER = "com.revenuecat.revenuecatbinding.required_entitlement_identifier";
-    static final String EXTRA_DISPLAY_CLOSE_BUTTON = "com.revenuecat.revenuecatbinding.display_close_button";
+    static final String EXTRA_MODE = "com.revenuecat.revenuecatuibinding.mode";
+    static final String EXTRA_REQUEST_ID = "com.revenuecat.revenuecatuibinding.request_id";
+    static final String EXTRA_OFFERING_IDENTIFIER = "com.revenuecat.revenuecatuibinding.offering_identifier";
+    static final String EXTRA_REQUIRED_ENTITLEMENT_IDENTIFIER = "com.revenuecat.revenuecatuibinding.required_entitlement_identifier";
+    static final String EXTRA_DISPLAY_CLOSE_BUTTON = "com.revenuecat.revenuecatuibinding.display_close_button";
 
     static final String MODE_PAYWALL = "paywall";
     static final String MODE_CUSTOMER_CENTER = "customer_center";

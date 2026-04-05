@@ -1,4 +1,4 @@
-package com.revenuecat.revenuecatbinding;
+package com.revenuecat.revenuecatuibinding;
 
 import android.os.Bundle;
 

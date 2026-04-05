@@ -20,3 +20,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "RevenueCatBinding"
 include(":revenuecatbinding")
+include(":revenuecatuibinding")

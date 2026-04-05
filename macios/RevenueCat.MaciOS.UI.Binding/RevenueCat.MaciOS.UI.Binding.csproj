@@ -6,36 +6,29 @@
 		<IsBindingProject>true</IsBindingProject>
 		<IsTrimmable>true</IsTrimmable>
 		<EnableVersioning>true</EnableVersioning>
-		<!-- Zip the RevenueCat.MaciOS.Binding.resources side car -->
 		<CompressBindingResourcePackage>true</CompressBindingResourcePackage>
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<PackageId>Plugin.RevenueCat.MaciOS.Binding</PackageId>
-		<Title>RevenueCat for .NET MAUI (Mac/iOS Binding)</Title>
-		<PackageDescription>This package contains Mac/iOS Binding types for Plugin.RevenueCat and is not intended to be referenced directly.</PackageDescription>
+		<PackageId>Plugin.RevenueCat.MaciOS.UI.Binding</PackageId>
+		<Title>RevenueCat UI for .NET MAUI (Mac/iOS Binding)</Title>
+		<PackageDescription>This package contains Mac/iOS binding types for the optional RevenueCat UI support and is not intended to be referenced directly.</PackageDescription>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<ObjcBindingApiDefinition Include="ApiDefinition.cs" />
-		<ObjcBindingCoreSource Include="StructsAndEnums.cs" />
 	</ItemGroup>
 
-	<!-- Reference to Xcode project -->
 	<ItemGroup>
-		<XcodeProject Include="../native/RevenueCatBinding/RevenueCatBinding.xcodeproj">
-			<SchemeName>RevenueCatBinding</SchemeName>
-			<!-- Metadata applicable to @(NativeReference) will be used if set, otherwise the following defaults will be used:
-			<Kind>Framework</Kind>
-			<SmartLink>true</SmartLink>
-			-->
+		<XcodeProject Include="../native/RevenueCatUIBinding/RevenueCatUIBinding.xcodeproj">
+			<SchemeName>RevenueCatUIBinding</SchemeName>
 		</XcodeProject>
 
-		<NativeReference Include="../native/bin/deps/RevenueCat.xcframework">
+		<NativeReference Include="../native/bin/deps/RevenueCatUI.xcframework">
 			<Kind>Framework</Kind>
 			<SmartLink>true</SmartLink>
 			<ForceLoad>true</ForceLoad>
-			<Frameworks></Frameworks>
+			<Frameworks>RevenueCat</Frameworks>
 			<Visible>true</Visible>
 		</NativeReference>
 	</ItemGroup>
@@ -91,19 +84,16 @@
                         node.ParentNode.RemoveChild(node);
                     }
 
-                    // Convert the XmlDocument into an XmlReader
                     using (System.Xml.XmlReader xmlReader = new System.Xml.XmlNodeReader(doc))
                     {
-                        // Create the XDocument from the XmlReader
-                        var xDoc = System.Xml.Linq.XDocument.Load(xmlReader); 
-                        // Modify the InternalSubset:
+                        var xDoc = System.Xml.Linq.XDocument.Load(xmlReader);
                         if (xDoc.DocumentType != null)
                         {
                             xDoc.DocumentType.InternalSubset = null;
                         }
-                        // Save the XDocument
                         xDoc.Save(PlistFile);
                     }
+
                     Log.LogMessage($"Removed {nodesToRemove.Count} dict(s) from AvailableLibraries with prefix '{prefix}'.");
                     return true;
                 }
@@ -118,17 +108,20 @@
 			</Code>
 		</Task>
 	</UsingTask>
-	
+
 	<Target Name="DownloadNativeDependencies" BeforeTargets="Build" Condition="'$(DesignTimeBuild)' != 'true'">
 		<PropertyGroup>
 			<RevenueCatSdkVersion>5.67.1</RevenueCatSdkVersion>
-
 			<RevenueCatSdkUrl>https://github.com/RevenueCat/purchases-ios/releases/download/$(RevenueCatSdkVersion)/RevenueCat.xcframework.zip</RevenueCatSdkUrl>
-			
+			<RevenueCatUISdkUrl>https://github.com/RevenueCat/purchases-ios/releases/download/$(RevenueCatSdkVersion)/RevenueCatUI.xcframework.zip</RevenueCatUISdkUrl>
+
 			<_RevenueCatDownloadPath>$([System.IO.Path]::GetFullPath($(MSBuildProjectDirectory)))/../native/bin/deps</_RevenueCatDownloadPath>
 			<_RevenueCatXcFrameworkPath>$(_RevenueCatDownloadPath)/RevenueCat.xcframework</_RevenueCatXcFrameworkPath>
 			<_RevenueCatFrameworkPListFilePath>$(_RevenueCatXcFrameworkPath)/Info.plist</_RevenueCatFrameworkPListFilePath>
+			<_RevenueCatUIXcFrameworkPath>$(_RevenueCatDownloadPath)/RevenueCatUI.xcframework</_RevenueCatUIXcFrameworkPath>
+			<_RevenueCatUIFrameworkPListFilePath>$(_RevenueCatUIXcFrameworkPath)/Info.plist</_RevenueCatUIFrameworkPListFilePath>
 			<_RevenueCatStampFilePath>$(_RevenueCatDownloadPath)/RevenueCat.$(RevenueCatSdkVersion).stamp</_RevenueCatStampFilePath>
+			<_RevenueCatUIStampFilePath>$(_RevenueCatDownloadPath)/RevenueCatUI.$(RevenueCatSdkVersion).stamp</_RevenueCatUIStampFilePath>
 		</PropertyGroup>
 
 		<DownloadFile
@@ -138,38 +131,50 @@
 			<Output TaskParameter="DownloadedFile" ItemName="RevenueCatSdkArchives" />
 		</DownloadFile>
 
+		<DownloadFile
+			SourceUrl="$(RevenueCatUISdkUrl)"
+			DestinationFolder="$([System.IO.Path]::GetFullPath($(MSBuildProjectDirectory)/../native/bin/deps))"
+			Condition="!Exists('$(_RevenueCatUIStampFilePath)')">
+			<Output TaskParameter="DownloadedFile" ItemName="RevenueCatUISdkArchives" />
+		</DownloadFile>
+
 		<Exec Command="unzip -q -o -d $(_RevenueCatDownloadPath) @(RevenueCatSdkArchives)" Condition="'@(RevenueCatSdkArchives)' != ''" />
-		
-		
+		<Exec Command="unzip -q -o -d $(_RevenueCatDownloadPath) @(RevenueCatUISdkArchives)" Condition="'@(RevenueCatUISdkArchives)' != ''" />
+
 		<ItemGroup>
 			<_RevenueCatUnwantedPlatforms Include="xros-arm64" />
 			<_RevenueCatUnwantedPlatforms Include="xros-arm64_x86_64-simulator" />
 			<_RevenueCatUnwantedPlatforms Include="watchos-arm64_arm64_32_armv7k" />
 			<_RevenueCatUnwantedPlatforms Include="watchos-arm64_i386_x86_64-simulator" />
 		</ItemGroup>
-		
+
 		<Exec Command="codesign --deep --remove-signature $(_RevenueCatXcFrameworkPath)" ContinueOnError="true" Condition="'@(RevenueCatSdkArchives)' != ''" />
-		
-		<!-- Remove vision and watchos to save space -->
+		<Exec Command="codesign --deep --remove-signature $(_RevenueCatUIXcFrameworkPath)" ContinueOnError="true" Condition="'@(RevenueCatUISdkArchives)' != ''" />
+
 		<RemoveDir Directories="$(_RevenueCatXcFrameworkPath)/%(_RevenueCatUnwantedPlatforms.Identity)" Condition="'@(RevenueCatSdkArchives)' != ''" />
-		
+		<RemoveDir Directories="$(_RevenueCatUIXcFrameworkPath)/%(_RevenueCatUnwantedPlatforms.Identity)" Condition="'@(RevenueCatUISdkArchives)' != ''" />
+
 		<ItemGroup>
 			<_RevenueCatCodeSignatureDirs Include="$(_RevenueCatXcFrameworkPath)/_CodeSignature" />
-			<_RevenueCatCodeSignatureDirs
-				Include="$(_RevenueCatXcFrameworkPath)/ios-arm64_x86_64-simulator/RevenueCat.framework/_CodeSignature" />
-			<_RevenueCatCodeSignatureDirs
-				Include="$(_RevenueCatXcFrameworkPath)/tvos-arm64_x86_64-simulator/RevenueCat.framework/_CodeSignature" />
+			<_RevenueCatCodeSignatureDirs Include="$(_RevenueCatXcFrameworkPath)/ios-arm64_x86_64-simulator/RevenueCat.framework/_CodeSignature" />
+			<_RevenueCatCodeSignatureDirs Include="$(_RevenueCatXcFrameworkPath)/tvos-arm64_x86_64-simulator/RevenueCat.framework/_CodeSignature" />
+			<_RevenueCatCodeSignatureDirs Include="$(_RevenueCatUIXcFrameworkPath)/_CodeSignature" />
+			<_RevenueCatCodeSignatureDirs Include="$(_RevenueCatUIXcFrameworkPath)/ios-arm64_x86_64-simulator/RevenueCatUI.framework/_CodeSignature" />
 		</ItemGroup>
 
-		<!-- Remove _CodeSignature directory -->
-		<RemoveDir Directories="%(_RevenueCatCodeSignatureDirs.Identity)" ContinueOnError="true" Condition="'@(RevenueCatSdkArchives)' != ''" />
+		<RemoveDir Directories="%(_RevenueCatCodeSignatureDirs.Identity)" ContinueOnError="true" Condition="'@(RevenueCatSdkArchives)' != '' or '@(RevenueCatUISdkArchives)' != ''" />
 
 		<RevenueCatRemoveLibraryIdentifier
 			PlistFile="$(_RevenueCatFrameworkPListFilePath)"
 			LibraryIdentifierPrefix="%(_RevenueCatUnwantedPlatforms.Identity)"
 			Condition="'@(RevenueCatSdkArchives)' != ''" />
 
-		<Touch Files="$(_RevenueCatStampFilePath)" AlwaysCreate="true" Condition="'@(RevenueCatSdkArchives)' != ''" />
+		<RevenueCatRemoveLibraryIdentifier
+			PlistFile="$(_RevenueCatUIFrameworkPListFilePath)"
+			LibraryIdentifierPrefix="%(_RevenueCatUnwantedPlatforms.Identity)"
+			Condition="'@(RevenueCatUISdkArchives)' != ''" />
 
+		<Touch Files="$(_RevenueCatStampFilePath)" AlwaysCreate="true" Condition="'@(RevenueCatSdkArchives)' != ''" />
+		<Touch Files="$(_RevenueCatUIStampFilePath)" AlwaysCreate="true" Condition="'@(RevenueCatUISdkArchives)' != ''" />
 	</Target>
 </Project>

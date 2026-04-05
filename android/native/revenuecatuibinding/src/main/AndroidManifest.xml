@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application>
         <activity
-            android:name="com.revenuecat.revenuecatbinding.RevenueCatUIActivity"
+            android:name="com.revenuecat.revenuecatuibinding.RevenueCatUIActivity"
             android:exported="false"
             android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
     </application>

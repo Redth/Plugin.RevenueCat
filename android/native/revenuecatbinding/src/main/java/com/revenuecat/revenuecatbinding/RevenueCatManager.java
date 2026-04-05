@@ -188,24 +188,6 @@ public class RevenueCatManager
         return future;
     }
 
-    public static CompletableFuture<String> presentPaywall(
-            @Nullable Activity activity,
-            @Nullable String offeringIdentifier,
-            @Nullable String requiredEntitlementIdentifier,
-            boolean displayCloseButton)
-    {
-        return RevenueCatUIPresenter.presentPaywall(
-                activity,
-                offeringIdentifier,
-                requiredEntitlementIdentifier,
-                displayCloseButton);
-    }
-
-    public static CompletableFuture<String> presentCustomerCenter(@Nullable Activity activity)
-    {
-        return RevenueCatUIPresenter.presentCustomerCenter(activity);
-    }
-
     public static CompletableFuture<String> purchase(Activity activity, String offeringIdentifier, String packageIdentifier)
     {
         CompletableFuture<String> future = new CompletableFuture<>();

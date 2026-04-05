@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.newbinding"
+    namespace = "com.revenuecat.revenuecatuibinding"
     compileSdk = 36
 
     defaultConfig {
@@ -26,14 +26,7 @@ android {
 }
 
 dependencies {
-
-    // Add package dependency for binding library
-    // Uncomment line below and replace {dependency.name.goes.here} with your dependency
-    // implementation("{dependency.name.goes.here}")
-
     implementation("com.revenuecat.purchases:purchases:9.29.0")
-    implementation("com.revenuecat.purchases:purchases-store-amazon:9.29.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.7.3")
+    implementation("com.revenuecat.purchases:purchases-ui:9.29.0")
     implementation("com.google.code.gson:gson:2.12.0")
-
 }

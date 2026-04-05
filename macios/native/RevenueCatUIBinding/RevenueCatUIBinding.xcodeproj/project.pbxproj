@@ -8,15 +8,17 @@
 
 /* Begin PBXBuildFile section */
 		64506EB02E16F730008BCA49 /* RevenueCat.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 646070982D42CC940036C905 /* RevenueCat.xcframework */; };
+		64506EB12E16F730008BCA49 /* RevenueCatUI.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 646070992D42CC940036C905 /* RevenueCatUI.xcframework */; };
 		83E34F572C21CB2B008AA950 /* RevenueCat.h in Headers */ = {isa = PBXBuildFile; fileRef = 83E34F562C21CB2B008AA950 /* RevenueCat.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		83E34F5E2C21CC53008AA950 /* RevenueCatBinding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E34F5D2C21CC53008AA950 /* RevenueCatBinding.swift */; };
+		83E34F5E2C21CC53008AA950 /* RevenueCatUIBinding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E34F5D2C21CC53008AA950 /* RevenueCatUIBinding.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		646070982D42CC940036C905 /* RevenueCat.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = RevenueCat.xcframework; path = ../bin/deps/RevenueCat.xcframework; sourceTree = "<group>"; };
-		83E34F532C21CB2B008AA950 /* RevenueCatBinding.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RevenueCatBinding.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		646070992D42CC940036C905 /* RevenueCatUI.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = RevenueCatUI.xcframework; path = ../bin/deps/RevenueCatUI.xcframework; sourceTree = "<group>"; };
+		83E34F532C21CB2B008AA950 /* RevenueCatUIBinding.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RevenueCatUIBinding.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		83E34F562C21CB2B008AA950 /* RevenueCat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RevenueCat.h; sourceTree = "<group>"; };
-		83E34F5D2C21CC53008AA950 /* RevenueCatBinding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevenueCatBinding.swift; sourceTree = "<group>"; };
+		83E34F5D2C21CC53008AA950 /* RevenueCatUIBinding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevenueCatUIBinding.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -25,6 +27,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				64506EB02E16F730008BCA49 /* RevenueCat.xcframework in Frameworks */,
+				64506EB12E16F730008BCA49 /* RevenueCatUI.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -35,6 +38,7 @@
 			isa = PBXGroup;
 			children = (
 				646070982D42CC940036C905 /* RevenueCat.xcframework */,
+				646070992D42CC940036C905 /* RevenueCatUI.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -42,7 +46,7 @@
 		83E34F492C21CB2B008AA950 = {
 			isa = PBXGroup;
 			children = (
-				83E34F552C21CB2B008AA950 /* RevenueCatBinding */,
+				83E34F552C21CB2B008AA950 /* RevenueCatUIBinding */,
 				646070972D42CC940036C905 /* Frameworks */,
 				83E34F542C21CB2B008AA950 /* Products */,
 			);
@@ -51,18 +55,18 @@
 		83E34F542C21CB2B008AA950 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				83E34F532C21CB2B008AA950 /* RevenueCatBinding.framework */,
+				83E34F532C21CB2B008AA950 /* RevenueCatUIBinding.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		83E34F552C21CB2B008AA950 /* RevenueCatBinding */ = {
+		83E34F552C21CB2B008AA950 /* RevenueCatUIBinding */ = {
 			isa = PBXGroup;
 			children = (
 				83E34F562C21CB2B008AA950 /* RevenueCat.h */,
-				83E34F5D2C21CC53008AA950 /* RevenueCatBinding.swift */,
+				83E34F5D2C21CC53008AA950 /* RevenueCatUIBinding.swift */,
 			);
-			path = RevenueCatBinding;
+			path = RevenueCatUIBinding;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -79,9 +83,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		83E34F522C21CB2B008AA950 /* RevenueCatBinding */ = {
+		83E34F522C21CB2B008AA950 /* RevenueCatUIBinding */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 83E34F5A2C21CB2B008AA950 /* Build configuration list for PBXNativeTarget "RevenueCatBinding" */;
+			buildConfigurationList = 83E34F5A2C21CB2B008AA950 /* Build configuration list for PBXNativeTarget "RevenueCatUIBinding" */;
 			buildPhases = (
 				83E34F4E2C21CB2B008AA950 /* Headers */,
 				83E34F4F2C21CB2B008AA950 /* Sources */,
@@ -92,9 +96,9 @@
 			);
 			dependencies = (
 			);
-			name = RevenueCatBinding;
+			name = RevenueCatUIBinding;
 			productName = NewBinding;
-			productReference = 83E34F532C21CB2B008AA950 /* RevenueCatBinding.framework */;
+			productReference = 83E34F532C21CB2B008AA950 /* RevenueCatUIBinding.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
@@ -112,7 +116,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 83E34F4D2C21CB2B008AA950 /* Build configuration list for PBXProject "RevenueCatBinding" */;
+			buildConfigurationList = 83E34F4D2C21CB2B008AA950 /* Build configuration list for PBXProject "RevenueCatUIBinding" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -127,7 +131,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				83E34F522C21CB2B008AA950 /* RevenueCatBinding */,
+				83E34F522C21CB2B008AA950 /* RevenueCatUIBinding */,
 			);
 		};
 /* End PBXProject section */
@@ -147,7 +151,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				83E34F5E2C21CC53008AA950 /* RevenueCatBinding.swift in Sources */,
+				83E34F5E2C21CC53008AA950 /* RevenueCatUIBinding.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -364,7 +368,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		83E34F4D2C21CB2B008AA950 /* Build configuration list for PBXProject "RevenueCatBinding" */ = {
+		83E34F4D2C21CB2B008AA950 /* Build configuration list for PBXProject "RevenueCatUIBinding" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83E34F582C21CB2B008AA950 /* Debug */,
@@ -373,7 +377,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		83E34F5A2C21CB2B008AA950 /* Build configuration list for PBXNativeTarget "RevenueCatBinding" */ = {
+		83E34F5A2C21CB2B008AA950 /* Build configuration list for PBXNativeTarget "RevenueCatUIBinding" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83E34F5B2C21CB2B008AA950 /* Debug */,

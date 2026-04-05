@@ -18,10 +18,6 @@ public interface IRevenueCatPlatformImplementation
 
 	Task<string?> GetOfferingAsync(string offeringIdentifier);
 
-	Task<string?> PresentPaywallAsync(object? platformContext, string? offeringIdentifier, string? requiredEntitlementIdentifier, bool displayCloseButton);
-
-	Task<string?> PresentCustomerCenterAsync(object? platformContext);
-
 	Task<string?> RestoreAsync();
 	
 	Task<string?> SyncPurchasesAsync();

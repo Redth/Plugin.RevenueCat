@@ -1,12 +1,11 @@
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using Plugin.RevenueCat;
 
 namespace Plugin.RevenueCat.UI;
 
-public class RevenueCatUIManager(IRevenueCatPlatformImplementation platformImplementation, ILoggerFactory? loggerFactory = null) : IRevenueCatUIManager
+internal class RevenueCatUIManager(IRevenueCatUIPlatformImplementation platformImplementation, ILoggerFactory? loggerFactory = null) : IRevenueCatUIManager
 {
-	private readonly IRevenueCatPlatformImplementation platformImplementation = platformImplementation;
+	private readonly IRevenueCatUIPlatformImplementation platformImplementation = platformImplementation;
 	private readonly ILogger logger = loggerFactory?.CreateLogger<RevenueCatUIManager>()
 		?? Microsoft.Extensions.Logging.Abstractions.NullLogger<RevenueCatUIManager>.Instance;
 

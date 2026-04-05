@@ -26,6 +26,14 @@
 		<PackageReference Include="Microsoft.Maui.Controls" />
 	</ItemGroup>
 
+	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios' or $([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
+		<ProjectReference Include="..\macios\RevenueCat.MaciOS.UI.Binding\RevenueCat.MaciOS.UI.Binding.csproj" />
+	</ItemGroup>
+
+	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+		<ProjectReference Include="..\android\RevenueCat.Android.UI.Binding\RevenueCat.Android.UI.Binding.csproj" />
+	</ItemGroup>
+
 	<ItemGroup>
 		<ProjectReference Include="..\Plugin.RevenueCat\Plugin.RevenueCat.csproj" />
 	</ItemGroup>

@@ -98,22 +98,6 @@ public class RevenueCatAndroid : Java.Lang.Object, IRevenueCatPlatformImplementa
 		return s?.ToString();
 	}
 
-	public async Task<string?> PresentPaywallAsync(object? platformContext, string? offeringIdentifier, string? requiredEntitlementIdentifier, bool displayCloseButton)
-	{
-		var s = await global::RevenueCat.RevenueCatManager.PresentPaywall(
-			platformContext as Activity,
-			offeringIdentifier,
-			requiredEntitlementIdentifier,
-			displayCloseButton)!.AsTask<Java.Lang.String>();
-		return s?.ToString();
-	}
-
-	public async Task<string?> PresentCustomerCenterAsync(object? platformContext)
-	{
-		var s = await global::RevenueCat.RevenueCatManager.PresentCustomerCenter(platformContext as Activity)!.AsTask<Java.Lang.String>();
-		return s?.ToString();
-	}
-	
 	public async Task SyncOfferingsAndAttributesIfNeeded()
 		=> await global::RevenueCat.RevenueCatManager.SyncAttributesAndOfferingsIfNeeded()!.AsTask<Java.Lang.Boolean>().ConfigureAwait(false);
 
