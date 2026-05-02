@@ -4,7 +4,7 @@
 
 RevenueCat Paywalls V2 are remote UI definitions. The native RevenueCatUI SDKs render those definitions with platform-native UI frameworks, but binding those UI SDKs would significantly increase dependency and maintenance complexity, especially on Android. This repository can instead parse the paywall component payload and render a useful subset with .NET MAUI controls.
 
-The initial goal is an experimental MAUI renderer that can be placed in a `ContentPage` and render a dashboard-created paywall made from common V2 components, while continuing to use the existing slim RevenueCat bindings for purchase execution.
+The initial goal is an experimental MAUI renderer that can be placed in a `ContentPage` and render a dashboard-created paywall made from common V2 components. Purchase, restore, dismiss, and navigation actions stay host-driven so apps can decide whether to call the existing slim RevenueCat bindings, a server flow, or a mocked handler in samples/tests.
 
 ## Data acquisition paths
 
@@ -52,11 +52,11 @@ RevenueCat's V2 OpenAPI is complete for the paywall management envelope, but not
   - `dist/types/component.d.ts`
   - `dist/types/components/*.d.ts`
 
-The current parser should preserve unknown component data and render a `fallback` component when provided.
+The current parser preserves unknown component data and the renderer uses `fallback` when provided for unknown or currently unsupported known components. This keeps newer RevenueCat component payloads forward-compatible while the MAUI renderer catches up.
 
 ## Library shape
 
-Add a new package project:
+The repository now includes the experimental package project:
 
 - `Plugin.RevenueCat.Paywalls`
 - MAUI platform targets for rendering controls
@@ -65,18 +65,59 @@ Add a new package project:
 References:
 
 - `Plugin.RevenueCat.Core` for parsed models and JSON serializers.
-- `Plugin.RevenueCat` only for an optional action-handler adapter to the existing `IRevenueCatManager`.
+- No direct dependency on `Plugin.RevenueCat`; host apps bridge action events to RevenueCat purchase/restore APIs when desired.
 
 The core rendering API should be host-driven:
 
 - `RevenueCatPaywallView : ContentView`
+- `RcPaywallView : RevenueCatPaywallView` as a short XAML alias
 - `IPaywallRenderer`
 - `PaywallRenderRequest`
 - `IPaywallActionHandler`
 - `IPaywallVariableProvider`
 - `IPaywallAssetResolver`
 
+`RevenueCatPaywallView` can be driven at different levels:
+
+- bind `PaywallData`, `UiConfig`, `Packages`, and `OfferingIdentifier` directly.
+- bind `PaywallOffering` for a single runtime/offline offering.
+- bind `PaywallOfferings` and let the control use the current offering.
+
+If no explicit `IPaywallActionHandler` is supplied, the control raises public events:
+
+- `PurchaseRequested`
+- `RestoreRequested`
+- `DismissRequested`
+- `NavigationRequested`
+
 The renderer should normalize and style the paywall before creating MAUI controls. This mirrors RevenueCatUI: validate/localize/style first, then render.
+
+## Standalone gallery sample
+
+The repository now includes `sample-paywalls/PaywallGallerySample.csproj`, a standalone MAUI app that references only `Plugin.RevenueCat.Paywalls`. It does not initialize the RevenueCat SDK, which keeps visual iteration and manual validation isolated from store configuration.
+
+The gallery starts at `PaywallGalleryPage`, lists offline fixtures, and opens `PaywallPreviewPage` with an embedded `RcPaywallView`. The preview page wires the paywall action events to an on-page event log so purchase/restore/navigation behavior can be validated without live credentials.
+
+The current fixture set covers:
+
+- basic subscription flow
+- media/header imagery
+- package selection and default selected package
+- restore/navigation actions and fallback components
+- badge overlays
+- rounded cards, borders, pills, and shadows
+- light/dark gradients and color aliases
+- checklist rows, two-column benefit cards, bottom-sheet style layouts, lifetime offers, trial/story fallbacks, and comparison cards
+
+The sample includes deterministic local SVG assets under `sample-paywalls/Resources/Images/` and raw paywall JSON fixtures under `sample-paywalls/Resources/Raw/paywalls/`.
+
+DevFlow is installed through the repo tool manifest and enabled in the sample under `#if DEBUG` with `builder.AddMauiDevFlowAgent()`. Mac Catalyst debug builds include the local server entitlement needed by the DevFlow agent. Useful validation commands:
+
+```bash
+/usr/local/share/dotnet/dotnet build sample-paywalls/PaywallGallerySample.csproj -f net10.0-maccatalyst -p:RuntimeIdentifier=maccatalyst-arm64 -t:Run
+/usr/local/share/dotnet/dotnet tool run maui -- devflow wait --project sample-paywalls/PaywallGallerySample.csproj --timeout 45
+/usr/local/share/dotnet/dotnet tool run maui -- devflow ui screenshot --output artifacts/paywall-gallery.png --overwrite
+```
 
 ## Component mapping
 
@@ -96,10 +137,10 @@ The renderer should normalize and style the paywall before creating MAUI control
 | `sticky_footer` / `footer` | Bottom row pinned outside body scroll | Yes |
 | `carousel` | `CarouselView` | Later |
 | `tabs` / tab controls | selected content view + state | Later |
-| `timeline` | custom `Grid`/`GraphicsView` connector rendering | Later |
+| `timeline` | currently uses `fallback`; later custom `Grid`/`GraphicsView` connector rendering | Later |
 | `countdown` | timer-driven labels | Later |
 | `video` | media control dependency | Later |
-| unknown | fallback component or invisible placeholder | Yes |
+| unknown/unsupported | fallback component or invisible placeholder | Yes |
 
 ## Future custom layout option
 
@@ -115,22 +156,25 @@ This should be a later phase after the standard-layout MVP renders real fixtures
 
 ## Shared property mapping
 
-The first implementation should support:
+The first implementation supports:
 
 - RGBA hex colors and color aliases.
 - Light/dark color schemes.
+- linear and radial gradient brushes.
 - basic `fit`, `fill`, and `fixed` sizing.
 - padding/margin with leading/trailing mapping.
 - vertical/horizontal/z-layer layout.
 - text alignment, font size names, and basic font weight.
 - simple image fit modes.
-- basic border/background/stroke visuals.
+- local file and remote image/icon sources.
+- border/background/stroke visuals.
+- rounded rectangle and pill shapes.
+- shadows.
+- badge overlays.
 
 Deferred:
 
 - custom remote fonts.
-- radial/linear gradients beyond a reasonable fallback.
-- complex shadows and badges.
 - advanced conditional overrides.
 - video backgrounds.
 - pixel-perfect safe-area/hero media behavior.
@@ -144,7 +188,7 @@ The renderer needs local state for:
 - current locale.
 - current app theme.
 
-Actions should be delegated to the host:
+Actions are delegated to the host through either an explicit `IPaywallActionHandler` or the control's default events:
 
 - purchase.
 - restore.
@@ -152,8 +196,6 @@ Actions should be delegated to the host:
 - URL navigation.
 - customer center.
 - unknown/custom actions.
-
-The library can include an optional `RevenueCatManagerPaywallActionHandler` adapter that calls `IRevenueCatManager.PurchaseAsync` and `RestoreAsync`.
 
 ## Variables
 
@@ -183,11 +225,12 @@ Use offline tests that do not require RevenueCat credentials:
 - locale fallback.
 - variable substitution.
 - unknown component fallback.
+- unsupported known component fallback.
 - package default selection.
 - basic component-to-view-node mapping.
 
-For MAUI controls, validate at least one platform build and keep most behavior in testable pure preprocessing helpers.
+For MAUI controls, validate at least one platform build and keep most behavior in testable pure preprocessing helpers. The standalone gallery should also validate its raw fixture corpus with JSON parsing and build on Mac Catalyst/Android when renderer or sample XAML changes.
 
 ## MVP scope
 
-The MVP is successful when a sanitized fixture with stack/text/image/icon/package/purchase-button/header/sticky-footer renders in a MAUI page, package selection changes UI state, and purchase taps are delegated through the action handler.
+The MVP is successful when sanitized fixtures with stack/text/image/icon/package/purchase-button/header/sticky-footer render in a MAUI page, package selection changes UI state, purchase taps are delegated through the action handler/events, and the offline gallery can be used for manual visual comparison without RevenueCat SDK initialization.

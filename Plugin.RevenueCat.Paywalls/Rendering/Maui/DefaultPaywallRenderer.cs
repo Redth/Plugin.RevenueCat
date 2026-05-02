@@ -2,6 +2,7 @@
 
 using System.Text.Json;
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.Controls.Shapes;
 using Microsoft.Maui.Graphics;
 using Plugin.RevenueCat.Models;
 
@@ -79,6 +80,7 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 			PaywallPurchaseButtonComponent purchaseButton => RenderPurchaseButton(purchaseButton, request),
 			PaywallHeaderComponent header when header.Stack is not null => RenderStack(header.Stack, request),
 			PaywallStickyFooterComponent footer when footer.Stack is not null => RenderStack(footer.Stack, request),
+			{ Fallback: { } componentFallback } => RenderComponent(componentFallback, request),
 			_ => new ContentView { IsVisible = false }
 		};
 	}
@@ -91,15 +93,25 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		}
 
 		var layout = CreateStackLayout(component);
-		ApplyBoxStyles(layout, component.Padding, component.Margin, component.BackgroundColor ?? component.Background, request.UiConfig);
-		PaywallMauiStyleResolver.ApplySize(layout, component.Size);
 
 		foreach (var child in component.Components)
 		{
 			layout.Children.Add(RenderComponent(child, request));
 		}
 
-		return layout;
+		var view = WrapContainer(
+			layout,
+			component.Padding,
+			component.Margin,
+			component.BackgroundColor ?? component.Background,
+			component.Shape,
+			component.Border,
+			component.Shadow,
+			request.UiConfig);
+		view = ApplyBadge(view, component.Badge, request);
+		PaywallMauiStyleResolver.ApplySize(view, component.Size);
+
+		return view;
 	}
 
 	Layout CreateStackLayout(PaywallStackComponent component)
@@ -184,13 +196,21 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 
 		if (!string.IsNullOrWhiteSpace(source))
 		{
-			image.Source = ImageSource.FromUri(new Uri(source));
+			image.Source = CreateImageSource(source);
 		}
 
-		ApplyBoxStyles(image, component.Padding, component.Margin, null, request.UiConfig);
-		PaywallMauiStyleResolver.ApplySize(image, component.Size);
+		var view = WrapContainer(
+			image,
+			component.Padding,
+			component.Margin,
+			null,
+			component.MaskShape,
+			component.Border,
+			component.Shadow,
+			request.UiConfig);
+		PaywallMauiStyleResolver.ApplySize(view, component.Size);
 
-		return image;
+		return view;
 	}
 
 	View RenderIcon(PaywallIconComponent component)
@@ -200,12 +220,10 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 			Aspect = Aspect.AspectFit
 		};
 
-		if (component.Formats.TryGetValue("webp", out var webp))
+		var asset = GetIconAsset(component);
+		if (asset is not null)
 		{
-			var iconUrl = Uri.TryCreate(webp, UriKind.Absolute, out _)
-				? webp
-				: $"{component.BaseUrl?.TrimEnd('/')}/{webp.TrimStart('/')}";
-			image.Source = ImageSource.FromUri(new Uri(iconUrl));
+			image.Source = CreateImageSource(asset);
 		}
 
 		PaywallMauiStyleResolver.ApplySize(image, component.Size);
@@ -261,6 +279,9 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		{
 			border.Stroke = Colors.DeepSkyBlue;
 			border.StrokeThickness = 2;
+			border.StrokeShape = content is Border { StrokeShape: { } strokeShape }
+				? strokeShape
+				: new RoundRectangle { CornerRadius = new CornerRadius(18) };
 		}
 
 		return border;
@@ -322,6 +343,120 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		}
 
 		return null;
+	}
+
+	static ImageSource CreateImageSource(string source) =>
+		Uri.TryCreate(source, UriKind.Absolute, out var uri)
+			? ImageSource.FromUri(uri)
+			: ImageSource.FromFile(source);
+
+	static string? GetIconAsset(PaywallIconComponent component)
+	{
+		foreach (var format in new[] { "webp", "png", "jpeg", "jpg", "svg" })
+		{
+			if (component.Formats.TryGetValue(format, out var asset) && !string.IsNullOrWhiteSpace(asset))
+			{
+				if (Uri.TryCreate(asset, UriKind.Absolute, out _))
+				{
+					return asset;
+				}
+
+				return string.IsNullOrWhiteSpace(component.BaseUrl)
+					? asset
+					: $"{component.BaseUrl.TrimEnd('/')}/{asset.TrimStart('/')}";
+			}
+		}
+
+		return null;
+	}
+
+	View ApplyBadge(View content, JsonElement? badge, PaywallRenderRequest request)
+	{
+		if (badge is null or { ValueKind: JsonValueKind.Null or JsonValueKind.Undefined } ||
+			badge.Value.ValueKind != JsonValueKind.Object ||
+			!badge.Value.TryGetProperty("stack", out var stack) ||
+			stack.ValueKind != JsonValueKind.Object)
+		{
+			return content;
+		}
+
+		var badgeStack = stack.Deserialize(ModelSerializerContext.Default.PaywallStackComponent);
+		if (badgeStack is null)
+		{
+			return content;
+		}
+
+		var grid = new Grid { Margin = content.Margin };
+		content.Margin = default;
+		grid.Children.Add(content);
+
+		var badgeView = RenderStack(badgeStack, request);
+		var alignment = badge.Value.TryGetProperty("alignment", out var alignmentElement) &&
+			alignmentElement.ValueKind == JsonValueKind.String
+				? alignmentElement.GetString()
+				: "top_trailing";
+		ApplyBadgeAlignment(badgeView, alignment);
+		grid.Children.Add(badgeView);
+
+		return grid;
+	}
+
+	static void ApplyBadgeAlignment(View view, string? alignment)
+	{
+		view.HorizontalOptions = alignment switch
+		{
+			"top_leading" or "bottom_leading" or "leading" => LayoutOptions.Start,
+			"top_trailing" or "bottom_trailing" or "trailing" => LayoutOptions.End,
+			_ => LayoutOptions.Center
+		};
+		view.VerticalOptions = alignment switch
+		{
+			"bottom_leading" or "bottom_trailing" or "bottom" => LayoutOptions.End,
+			"top_leading" or "top_trailing" or "top" => LayoutOptions.Start,
+			_ => LayoutOptions.Center
+		};
+	}
+
+	static View WrapContainer(
+		View content,
+		JsonElement? padding,
+		JsonElement? margin,
+		JsonElement? background,
+		JsonElement? shape,
+		JsonElement? border,
+		JsonElement? shadow,
+		PaywallUiConfig? uiConfig)
+	{
+		content.Margin = default;
+
+		if (!PaywallMauiStyleResolver.HasContainerDecoration(shape, border, shadow))
+		{
+			ApplyBoxStyles(content, padding, margin, background, uiConfig);
+			return content;
+		}
+
+		var container = new Border
+		{
+			Content = content,
+			Padding = PaywallMauiStyleResolver.ResolveThickness(padding),
+			Margin = PaywallMauiStyleResolver.ResolveThickness(margin),
+			Background = PaywallMauiStyleResolver.ResolveBackground(background, uiConfig),
+			StrokeShape = PaywallMauiStyleResolver.ResolveStrokeShape(shape),
+			Stroke = PaywallMauiStyleResolver.ResolveBorderBrush(border, uiConfig),
+			StrokeThickness = PaywallMauiStyleResolver.ResolveBorderWidth(border)
+		};
+		var resolvedShadow = PaywallMauiStyleResolver.ResolveShadow(shadow, uiConfig);
+		if (resolvedShadow is not null)
+		{
+			container.Shadow = resolvedShadow;
+		}
+
+		if (container.StrokeThickness <= 0)
+		{
+			container.Stroke = null;
+		}
+
+		return container;
 	}
 
 	static void ApplyBoxStyles(View view, JsonElement? padding, JsonElement? margin, JsonElement? background, PaywallUiConfig? uiConfig)

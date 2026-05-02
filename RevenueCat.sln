@@ -19,6 +19,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.RevenueCat.Api", "Pl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.RevenueCat.Paywalls", "Plugin.RevenueCat.Paywalls\Plugin.RevenueCat.Paywalls.csproj", "{26B0A367-F0DE-4DC8-8099-49CD1043E512}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample-paywalls", "sample-paywalls", "{98E928E0-E4F0-7E26-6444-404484755138}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaywallGallerySample", "sample-paywalls\PaywallGallerySample.csproj", "{30C4BEF1-2562-448B-842E-1D10DC1459F3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -126,9 +130,24 @@ Global
 		{26B0A367-F0DE-4DC8-8099-49CD1043E512}.Release|x64.Build.0 = Release|Any CPU
 		{26B0A367-F0DE-4DC8-8099-49CD1043E512}.Release|x86.ActiveCfg = Release|Any CPU
 		{26B0A367-F0DE-4DC8-8099-49CD1043E512}.Release|x86.Build.0 = Release|Any CPU
+		{30C4BEF1-2562-448B-842E-1D10DC1459F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30C4BEF1-2562-448B-842E-1D10DC1459F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30C4BEF1-2562-448B-842E-1D10DC1459F3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{30C4BEF1-2562-448B-842E-1D10DC1459F3}.Debug|x64.Build.0 = Debug|Any CPU
+		{30C4BEF1-2562-448B-842E-1D10DC1459F3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{30C4BEF1-2562-448B-842E-1D10DC1459F3}.Debug|x86.Build.0 = Debug|Any CPU
+		{30C4BEF1-2562-448B-842E-1D10DC1459F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30C4BEF1-2562-448B-842E-1D10DC1459F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30C4BEF1-2562-448B-842E-1D10DC1459F3}.Release|x64.ActiveCfg = Release|Any CPU
+		{30C4BEF1-2562-448B-842E-1D10DC1459F3}.Release|x64.Build.0 = Release|Any CPU
+		{30C4BEF1-2562-448B-842E-1D10DC1459F3}.Release|x86.ActiveCfg = Release|Any CPU
+		{30C4BEF1-2562-448B-842E-1D10DC1459F3}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{30C4BEF1-2562-448B-842E-1D10DC1459F3} = {98E928E0-E4F0-7E26-6444-404484755138}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9C0022B9-70F5-4410-8025-3886C897E16F}

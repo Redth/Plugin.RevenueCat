@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:PaywallGallerySample"
+             x:Class="PaywallGallerySample.PaywallGalleryPage"
+             x:DataType="local:PaywallGalleryPage"
+             Title="Paywall Gallery">
+    <Grid RowDefinitions="Auto,*"
+          Padding="20,16"
+          RowSpacing="16">
+        <VerticalStackLayout Spacing="8">
+            <Label Text="RevenueCat Paywall Gallery"
+                   FontSize="28"
+                   FontAttributes="Bold" />
+            <Label Text="Offline fixtures for validating the MAUI paywall renderer without initializing the RevenueCat SDK."
+                   FontSize="15"
+                   TextColor="{AppThemeBinding Light=#5f6368, Dark=#c7c7c7}" />
+        </VerticalStackLayout>
+
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding Examples}"
+                        SelectionMode="Single"
+                        SelectionChanged="OnSelectionChanged"
+                        EmptyView="Loading paywall examples...">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="local:PaywallExample">
+                    <Border Margin="0,0,0,12"
+                            Padding="16"
+                            Stroke="#d9dce3"
+                            StrokeThickness="1"
+                            BackgroundColor="{AppThemeBinding Light=#ffffff, Dark=#1f1f1f}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="18" />
+                        </Border.StrokeShape>
+                        <Grid ColumnDefinitions="*,Auto"
+                              ColumnSpacing="12">
+                            <VerticalStackLayout Spacing="6">
+                                <Label Text="{Binding Title}"
+                                       FontSize="18"
+                                       FontAttributes="Bold" />
+                                <Label Text="{Binding Description}"
+                                       FontSize="14"
+                                       TextColor="{AppThemeBinding Light=#5f6368, Dark=#c7c7c7}" />
+                                <Label Text="{Binding ComponentSummary}"
+                                       FontSize="12"
+                                       TextColor="{AppThemeBinding Light=#7a7f88, Dark=#aaa}" />
+                            </VerticalStackLayout>
+                             <Button Grid.Column="1"
+                                     Text="Preview"
+                                     AutomationId="{Binding AutomationId}"
+                                     Clicked="OnPreviewClicked"
+                                     Padding="12,6"
+                                     FontSize="12"
+                                    VerticalOptions="Center" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

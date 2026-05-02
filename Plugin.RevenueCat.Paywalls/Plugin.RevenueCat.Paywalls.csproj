@@ -23,7 +23,6 @@
 
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) != ''">
 		<PackageReference Include="Microsoft.Maui.Controls" />
-		<ProjectReference Include="..\Plugin.RevenueCat\Plugin.RevenueCat.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -33,6 +32,5 @@
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == ''">
 		<Compile Remove="Controls/**/*.cs" />
 		<Compile Remove="Rendering/Maui/**/*.cs" />
-		<Compile Remove="RevenueCatManagerPaywallActionHandler.cs" />
 	</ItemGroup>
 </Project>

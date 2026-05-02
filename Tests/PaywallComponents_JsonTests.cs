@@ -82,6 +82,36 @@ namespace Tests
 		}
 
 		[TestMethod]
+		public void Known_Component_Deserializes_Fallback_For_Unsupported_Rendering()
+		{
+			const string json = """
+			{
+			  "type": "timeline",
+			  "id": "timeline",
+			  "items": [],
+			  "fallback": {
+			    "type": "text",
+			    "id": "timeline-fallback",
+			    "text_lid": "timeline_fallback_lid",
+			    "color": { "light": { "type": "hex", "value": "#000000ff" } }
+			  }
+			}
+			""";
+
+			var component = JsonSerializer.Deserialize(json, ModelSerializerContext.Default.PaywallComponent);
+
+			Assert.IsNotNull(component);
+			Assert.IsTrue(component is PaywallTimelineComponent);
+			if (component.Fallback is not PaywallTextComponent fallback)
+			{
+				Assert.Fail("Expected the known component fallback to deserialize as a text component.");
+				return;
+			}
+
+			Assert.AreEqual("timeline_fallback_lid", fallback.TextLocalizationId);
+		}
+
+		[TestMethod]
 		public void Components_Localizations_Allows_Empty_Array_From_RevenueCat_Fixtures()
 		{
 			const string json = """

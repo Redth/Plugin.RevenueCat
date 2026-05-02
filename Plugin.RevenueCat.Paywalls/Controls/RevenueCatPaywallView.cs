@@ -9,6 +9,7 @@ namespace Plugin.RevenueCat.Paywalls;
 public class RevenueCatPaywallView : ContentView
 {
 	readonly IPaywallRenderer renderer;
+	readonly IPaywallActionHandler eventActionHandler;
 	string? selectedPackageIdentifier;
 
 	public RevenueCatPaywallView()
@@ -19,7 +20,30 @@ public class RevenueCatPaywallView : ContentView
 	public RevenueCatPaywallView(IPaywallRenderer renderer)
 	{
 		this.renderer = renderer;
+		eventActionHandler = new EventPaywallActionHandler(this);
 	}
+
+	public event EventHandler<PaywallPurchaseRequestedEventArgs>? PurchaseRequested;
+
+	public event EventHandler<PaywallRestoreRequestedEventArgs>? RestoreRequested;
+
+	public event EventHandler<PaywallDismissRequestedEventArgs>? DismissRequested;
+
+	public event EventHandler<PaywallNavigationRequestedEventArgs>? NavigationRequested;
+
+	public static readonly BindableProperty PaywallOfferingsProperty = BindableProperty.Create(
+		nameof(PaywallOfferings),
+		typeof(PaywallOfferingsResponse),
+		typeof(RevenueCatPaywallView),
+		default(PaywallOfferingsResponse),
+		propertyChanged: OnPaywallOfferingsChanged);
+
+	public static readonly BindableProperty PaywallOfferingProperty = BindableProperty.Create(
+		nameof(PaywallOffering),
+		typeof(PaywallOffering),
+		typeof(RevenueCatPaywallView),
+		default(PaywallOffering),
+		propertyChanged: OnPaywallOfferingChanged);
 
 	public static readonly BindableProperty PaywallDataProperty = BindableProperty.Create(
 		nameof(PaywallData),
@@ -49,6 +73,13 @@ public class RevenueCatPaywallView : ContentView
 		default(string),
 		propertyChanged: OnRenderPropertyChanged);
 
+	public static readonly BindableProperty ApplicationNameProperty = BindableProperty.Create(
+		nameof(ApplicationName),
+		typeof(string),
+		typeof(RevenueCatPaywallView),
+		default(string),
+		propertyChanged: OnRenderPropertyChanged);
+
 	public static readonly BindableProperty OfferingIdentifierProperty = BindableProperty.Create(
 		nameof(OfferingIdentifier),
 		typeof(string),
@@ -66,7 +97,27 @@ public class RevenueCatPaywallView : ContentView
 		nameof(ActionHandler),
 		typeof(IPaywallActionHandler),
 		typeof(RevenueCatPaywallView),
-		default(IPaywallActionHandler));
+		default(IPaywallActionHandler),
+		propertyChanged: OnRenderPropertyChanged);
+
+	public static readonly BindableProperty VariableProviderProperty = BindableProperty.Create(
+		nameof(VariableProvider),
+		typeof(IPaywallVariableProvider),
+		typeof(RevenueCatPaywallView),
+		default(IPaywallVariableProvider),
+		propertyChanged: OnRenderPropertyChanged);
+
+	public PaywallOfferingsResponse? PaywallOfferings
+	{
+		get => (PaywallOfferingsResponse?)GetValue(PaywallOfferingsProperty);
+		set => SetValue(PaywallOfferingsProperty, value);
+	}
+
+	public PaywallOffering? PaywallOffering
+	{
+		get => (PaywallOffering?)GetValue(PaywallOfferingProperty);
+		set => SetValue(PaywallOfferingProperty, value);
+	}
 
 	public PaywallComponentsData? PaywallData
 	{
@@ -92,6 +143,12 @@ public class RevenueCatPaywallView : ContentView
 		set => SetValue(LocaleProperty, value);
 	}
 
+	public string? ApplicationName
+	{
+		get => (string?)GetValue(ApplicationNameProperty);
+		set => SetValue(ApplicationNameProperty, value);
+	}
+
 	public string? OfferingIdentifier
 	{
 		get => (string?)GetValue(OfferingIdentifierProperty);
@@ -110,9 +167,16 @@ public class RevenueCatPaywallView : ContentView
 		set => SetValue(ActionHandlerProperty, value);
 	}
 
+	public IPaywallVariableProvider? VariableProvider
+	{
+		get => (IPaywallVariableProvider?)GetValue(VariableProviderProperty);
+		set => SetValue(VariableProviderProperty, value);
+	}
+
 	public void Render()
 	{
-		selectedPackageIdentifier ??= Packages.FirstOrDefault()?.Identifier;
+		selectedPackageIdentifier ??= FindDefaultSelectedPackageIdentifier(PaywallData) ?? Packages.FirstOrDefault()?.Identifier;
+		var actionHandler = ActionHandler ?? eventActionHandler;
 
 		Content = renderer.Render(new PaywallRenderRequest
 		{
@@ -120,10 +184,12 @@ public class RevenueCatPaywallView : ContentView
 			UiConfig = UiConfig,
 			Packages = Packages,
 			Locale = Locale,
+			ApplicationName = ApplicationName,
 			OfferingIdentifier = OfferingIdentifier,
 			SelectedPackageIdentifier = selectedPackageIdentifier,
 			PlatformContext = PlatformContext,
-			ActionHandler = ActionHandler,
+			ActionHandler = actionHandler,
+			VariableProvider = VariableProvider,
 			PackageSelected = packageIdentifier =>
 			{
 				selectedPackageIdentifier = packageIdentifier;
@@ -132,11 +198,124 @@ public class RevenueCatPaywallView : ContentView
 		});
 	}
 
+	protected virtual void OnPurchaseRequested(PaywallPurchaseRequestedEventArgs e) =>
+		PurchaseRequested?.Invoke(this, e);
+
+	protected virtual void OnRestoreRequested(PaywallRestoreRequestedEventArgs e) =>
+		RestoreRequested?.Invoke(this, e);
+
+	protected virtual void OnDismissRequested(PaywallDismissRequestedEventArgs e) =>
+		DismissRequested?.Invoke(this, e);
+
+	protected virtual void OnNavigationRequested(PaywallNavigationRequestedEventArgs e) =>
+		NavigationRequested?.Invoke(this, e);
+
+	static void OnPaywallOfferingsChanged(BindableObject bindable, object oldValue, object newValue)
+	{
+		if (bindable is RevenueCatPaywallView view && newValue is PaywallOfferingsResponse response)
+		{
+			view.UiConfig = response.UiConfig;
+			view.PaywallOffering = response.CurrentOffering ?? response.Offerings.FirstOrDefault();
+		}
+	}
+
+	static void OnPaywallOfferingChanged(BindableObject bindable, object oldValue, object newValue)
+	{
+		if (bindable is RevenueCatPaywallView view && newValue is PaywallOffering offering)
+		{
+			var paywallData = offering.PaywallComponents ?? offering.DraftPaywallComponents;
+			view.selectedPackageIdentifier = FindDefaultSelectedPackageIdentifier(paywallData);
+			view.OfferingIdentifier = offering.Identifier;
+			view.PaywallData = paywallData;
+		}
+	}
+
+	static string? FindDefaultSelectedPackageIdentifier(PaywallComponentsData? paywallData)
+	{
+		var config = paywallData?.ComponentsConfig;
+		if (config?.Base is null)
+		{
+			return null;
+		}
+
+		return FindDefaultSelectedPackageIdentifier(config.Base.Header)
+			?? FindDefaultSelectedPackageIdentifier(config.Base.Stack)
+			?? FindDefaultSelectedPackageIdentifier(config.Base.StickyFooter);
+	}
+
+	static string? FindDefaultSelectedPackageIdentifier(PaywallComponent? component)
+	{
+		return component switch
+		{
+			PaywallPackageComponent { IsSelectedByDefault: true, PackageId: { Length: > 0 } packageId } => packageId,
+			PaywallPackageComponent package => FindDefaultSelectedPackageIdentifier(package.Stack),
+			PaywallStackComponent stack => FindDefaultSelectedPackageIdentifier(stack.Components),
+			PaywallButtonComponent button => FindDefaultSelectedPackageIdentifier(button.Stack),
+			PaywallHeaderComponent header => FindDefaultSelectedPackageIdentifier(header.Stack),
+			PaywallStickyFooterComponent footer => FindDefaultSelectedPackageIdentifier(footer.Stack),
+			PaywallCarouselComponent carousel => FindDefaultSelectedPackageIdentifier(carousel.Pages),
+			PaywallTabsComponent tabs => FindDefaultSelectedPackageIdentifier(tabs.Tabs),
+			PaywallTabComponent tab => FindDefaultSelectedPackageIdentifier(tab.Stack),
+			PaywallTabControlButtonComponent tabButton => FindDefaultSelectedPackageIdentifier(tabButton.Stack),
+			PaywallUnknownComponent unknown => FindDefaultSelectedPackageIdentifier(unknown.Fallback),
+			_ => null
+		};
+	}
+
+	static string? FindDefaultSelectedPackageIdentifier<TComponent>(IEnumerable<TComponent> components)
+		where TComponent : PaywallComponent
+	{
+		foreach (var component in components)
+		{
+			var packageId = FindDefaultSelectedPackageIdentifier(component);
+			if (!string.IsNullOrWhiteSpace(packageId))
+			{
+				return packageId;
+			}
+		}
+
+		return null;
+	}
+
 	static void OnRenderPropertyChanged(BindableObject bindable, object oldValue, object newValue)
 	{
 		if (bindable is RevenueCatPaywallView view)
 		{
 			view.Render();
+		}
+	}
+
+	sealed class EventPaywallActionHandler : IPaywallActionHandler
+	{
+		readonly RevenueCatPaywallView owner;
+
+		public EventPaywallActionHandler(RevenueCatPaywallView owner)
+		{
+			this.owner = owner;
+		}
+
+		public Task<CustomerInfo?> PurchaseAsync(PaywallPurchaseRequest request, CancellationToken cancellationToken = default)
+		{
+			owner.OnPurchaseRequested(new PaywallPurchaseRequestedEventArgs(request));
+			return Task.FromResult<CustomerInfo?>(null);
+		}
+
+		public Task<CustomerInfo?> RestoreAsync(CancellationToken cancellationToken = default)
+		{
+			owner.OnRestoreRequested(new PaywallRestoreRequestedEventArgs());
+			return Task.FromResult<CustomerInfo?>(null);
+		}
+
+		public Task DismissAsync(CancellationToken cancellationToken = default)
+		{
+			owner.OnDismissRequested(new PaywallDismissRequestedEventArgs());
+			return Task.CompletedTask;
+		}
+
+		public Task NavigateAsync(PaywallNavigationRequest request, CancellationToken cancellationToken = default)
+		{
+			owner.OnNavigationRequested(new PaywallNavigationRequestedEventArgs(request));
+			return Task.CompletedTask;
 		}
 	}
 }
