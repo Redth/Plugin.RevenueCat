@@ -58,6 +58,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Plugin.RevenueCat\Plugin.RevenueCat.csproj" />
+		<ProjectReference Include="..\Plugin.RevenueCat.Paywalls\Plugin.RevenueCat.Paywalls.csproj" />
 	</ItemGroup>
 
 	<Target Name="Pack"></Target>

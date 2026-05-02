@@ -50,4 +50,24 @@ public interface IRevenueCatApiV2
 	/// The management URL may be <c>null</c> if the store doesn't provide one.
 	/// </returns>
 	Task<PagedList<Subscription>> GetSubscriptions(string project_id, string customer_id);
+
+	/// <summary>
+	/// Gets the paywalls configured for a project.
+	/// </summary>
+	/// <param name="project_id">The RevenueCat project ID.</param>
+	/// <param name="expandOffering">If <c>true</c>, expands the offering associated with each paywall.</param>
+	/// <param name="limit">Optional page size.</param>
+	/// <param name="startingAfter">Optional cursor for pagination.</param>
+	/// <returns>A paged list of paywalls.</returns>
+	Task<PagedList<Paywall>> GetPaywalls(string project_id, bool expandOffering = false, int? limit = null, string? startingAfter = null);
+
+	/// <summary>
+	/// Gets a single paywall by ID.
+	/// </summary>
+	/// <param name="project_id">The RevenueCat project ID.</param>
+	/// <param name="paywall_id">The RevenueCat paywall ID.</param>
+	/// <param name="expandComponents">If <c>true</c>, expands published and draft component configurations.</param>
+	/// <param name="expandOffering">If <c>true</c>, expands the associated offering.</param>
+	/// <returns>The paywall details.</returns>
+	Task<Paywall> GetPaywall(string project_id, string paywall_id, bool expandComponents = true, bool expandOffering = false);
 }

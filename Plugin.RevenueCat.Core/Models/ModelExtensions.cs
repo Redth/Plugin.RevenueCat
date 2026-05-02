@@ -21,9 +21,14 @@ public static class ModelExtensions
 
 	public static Offering? ToOffering(this string? json) => json is null ? default : JsonSerializer.Deserialize(json, ModelSerializerContext.Default.Offering);
 
+	public static PaywallOfferingsResponse? ToPaywallOfferingsResponse(this string? json) =>
+		json is null ? default : JsonSerializer.Deserialize(json, ModelSerializerContext.Default.PaywallOfferingsResponse);
+
 	public static string ToJson(this CustomerInfo self) => JsonSerializer.Serialize(self, ModelSerializerContext.Default.CustomerInfo);
 
 	public static string ToJson(this Offering self) => JsonSerializer.Serialize(self, ModelSerializerContext.Default.Offering);
+
+	public static string ToJson(this PaywallOfferingsResponse self) => JsonSerializer.Serialize(self, ModelSerializerContext.Default.PaywallOfferingsResponse);
 
 	public static readonly JsonSerializerOptions Settings = ModelSerializerContext.Default.Options;
 }

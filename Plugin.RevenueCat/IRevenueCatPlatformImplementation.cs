@@ -12,6 +12,8 @@ public interface IRevenueCatPlatformImplementation
 
 	Task<string?> LoginAsync(string userId);
 
+	Task<string?> GetAppUserIdAsync();
+
 	Task<string?> GetCustomerInfoAsync(bool force);
 
 	Task<string?> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier);

@@ -29,6 +29,8 @@ import com.revenuecat.purchases.interfaces.SyncPurchasesCallback;
 import com.revenuecat.purchases.models.StoreProduct;
 import com.revenuecat.purchases.models.StoreTransaction;
 import com.revenuecat.purchases.models.Period;
+import com.revenuecat.purchases.paywalls.PaywallData;
+import com.revenuecat.purchases.paywalls.components.common.PaywallComponentsData;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
@@ -37,6 +39,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.HashMap;
+
+import kotlinx.serialization.KSerializer;
+import kotlinx.serialization.json.Json;
 
 public class RevenueCatManager
 {
@@ -80,6 +85,10 @@ public class RevenueCatManager
         return future;
     }
 
+    public static String getAppUserId() {
+        return Purchases.getSharedInstance().getAppUserID();
+    }
+
     public static CompletableFuture<String> getCustomerInfo(boolean force) {
         CompletableFuture<String> future = new CompletableFuture<>();
 
@@ -114,12 +123,32 @@ public class RevenueCatManager
                 else
                     offering = offerings.getCurrent();
 
+                if (offering == null) {
+                    future.completeExceptionally(new Exception("Offering not found"));
+                    return;
+                }
+
+                Gson gson = new Gson();
                 Map<String, Object> offeringInfo = new HashMap<>();
                 offeringInfo.put("id", offering.getIdentifier());
                 offeringInfo.put("identifier", offering.getIdentifier());
                 offeringInfo.put("description", offering.getServerDescription());
 
                 offeringInfo.put("metadata", offering.getMetadata());
+
+                if (offering.getWebCheckoutURL() != null) {
+                    offeringInfo.put("web_checkout_url", offering.getWebCheckoutURL().toString());
+                }
+
+                putSerializedJsonValue(gson, offeringInfo, "paywall", PaywallData.Companion.serializer(), offering.getPaywall());
+                if (offering.getPaywallComponents() != null) {
+                    putSerializedJsonValue(
+                        gson,
+                        offeringInfo,
+                        "paywall_components",
+                        PaywallComponentsData.Companion.serializer(),
+                        offering.getPaywallComponents().getData());
+                }
 
                 List<Map<String, Object>> packageInfos = new ArrayList<>();
 
@@ -129,6 +158,9 @@ public class RevenueCatManager
                     packageInfo.put("identifier", pkg.getIdentifier());
                     packageInfo.put("type", pkg.getPackageType().getIdentifier());
 
+                    if (pkg.getWebCheckoutURL() != null) {
+                        packageInfo.put("web_checkout_url", pkg.getWebCheckoutURL().toString());
+                    }
 
 
                     StoreProduct storeProduct = pkg.getProduct();
@@ -174,7 +206,6 @@ public class RevenueCatManager
 
                 offeringInfo.put("packages", packageInfos);
 
-                Gson gson = new Gson();
                 String json = gson.toJson(offeringInfo);
                 future.complete(json);
             }
@@ -186,6 +217,18 @@ public class RevenueCatManager
         });
 
         return future;
+    }
+
+    private static <T> void putSerializedJsonValue(
+        Gson gson,
+        Map<String, Object> map,
+        String key,
+        KSerializer<T> serializer,
+        T value) {
+        if (value != null) {
+            String json = Json.Default.encodeToString(serializer, value);
+            map.put(key, gson.fromJson(json, Object.class));
+        }
     }
 
     public static CompletableFuture<String> purchase(Activity activity, String offeringIdentifier, String packageIdentifier)
@@ -342,4 +385,3 @@ public class RevenueCatManager
 		return future;
 	}
 }
-

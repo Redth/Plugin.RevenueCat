@@ -65,4 +65,63 @@ public class RevenueCatApiV2 : IRevenueCatApiV2
 		var result = await response.Content.ReadFromJsonAsync(ApiV2SerializerContext.Default.PagedListSubscription);
 		return result ?? throw new InvalidOperationException("Failed to deserialize response");
 	}
+
+	public async Task<PagedList<Paywall>> GetPaywalls(string project_id, bool expandOffering = false, int? limit = null, string? startingAfter = null)
+	{
+		var query = new List<string>();
+
+		if (expandOffering)
+		{
+			query.Add("expand=items.offering");
+		}
+
+		if (limit is not null)
+		{
+			query.Add($"limit={limit.Value}");
+		}
+
+		if (!string.IsNullOrWhiteSpace(startingAfter))
+		{
+			query.Add($"starting_after={Uri.EscapeDataString(startingAfter)}");
+		}
+
+		var url = $"projects/{Uri.EscapeDataString(project_id)}/paywalls";
+		if (query.Count > 0)
+		{
+			url += "?" + string.Join("&", query);
+		}
+
+		var response = await _httpClient.GetAsync(url);
+		response.EnsureSuccessStatusCode();
+
+		var result = await response.Content.ReadFromJsonAsync(ApiV2SerializerContext.Default.PagedListPaywall);
+		return result ?? throw new InvalidOperationException("Failed to deserialize response");
+	}
+
+	public async Task<Paywall> GetPaywall(string project_id, string paywall_id, bool expandComponents = true, bool expandOffering = false)
+	{
+		var expand = new List<string>();
+
+		if (expandComponents)
+		{
+			expand.Add("components");
+		}
+
+		if (expandOffering)
+		{
+			expand.Add("offering");
+		}
+
+		var url = $"projects/{Uri.EscapeDataString(project_id)}/paywalls/{Uri.EscapeDataString(paywall_id)}";
+		if (expand.Count > 0)
+		{
+			url += "?expand=" + string.Join(",", expand);
+		}
+
+		var response = await _httpClient.GetAsync(url);
+		response.EnsureSuccessStatusCode();
+
+		var result = await response.Content.ReadFromJsonAsync(ApiV2SerializerContext.Default.Paywall);
+		return result ?? throw new InvalidOperationException("Failed to deserialize response");
+	}
 }

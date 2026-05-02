@@ -41,6 +41,11 @@
                 HorizontalOptions="Fill" />
 
             <Button
+                Text="Show Fixture Paywall"
+                Clicked="ShowFixturePaywall_Clicked"
+                HorizontalOptions="Fill" />
+
+            <Button
                 Text="Purchase"
                 SemanticProperties.Hint="Navigates to getting started documentation"
                 Clicked="Purchase_Clicked"

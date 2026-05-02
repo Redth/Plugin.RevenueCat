@@ -38,6 +38,9 @@ public class RevenueCatApple : IRevenueCatPlatformImplementation
         return s.ToString();
     }
 
+    public Task<string?> GetAppUserIdAsync()
+	    => Task.FromResult(revenueCatManager.GetAppUserId()?.ToString());
+
     public async Task<string?> RestoreAsync()
     {
         var s = await revenueCatManager.RestoreAsync();
