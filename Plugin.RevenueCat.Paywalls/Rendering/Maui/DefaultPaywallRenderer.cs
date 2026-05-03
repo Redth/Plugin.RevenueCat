@@ -12,6 +12,7 @@ namespace Plugin.RevenueCat.Paywalls.Rendering.Maui;
 public sealed class DefaultPaywallRenderer : IPaywallRenderer
 {
 	const double DefaultPackageSelectionStrokeThickness = 2;
+	const uint TabTransitionDuration = 140;
 
 	public View Render(PaywallRenderRequest request)
 	{
@@ -516,11 +517,16 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 
 		void SelectTab(string tabId)
 		{
+			if (string.Equals(selectedTabId, tabId, StringComparison.Ordinal))
+			{
+				return;
+			}
+
 			selectedTabId = tabId;
-			Refresh();
+			Refresh(animateContent: true);
 		}
 
-		void Refresh()
+		void Refresh(bool animateContent = false)
 		{
 			controlHost.Content = TryGetTabsControlStack(component.Control) is { } controlStack
 				? RenderStack(
@@ -539,9 +545,17 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 
 			var tab = component.Tabs.FirstOrDefault(t => string.Equals(t.Id, selectedTabId, StringComparison.Ordinal))
 				?? component.Tabs.First();
-			tabHost.Content = tab.Stack is null
+			var tabContent = tab.Stack is null
 				? new ContentView { IsVisible = false }
 				: RenderStack(tab.Stack, request, packageContextIdentifier, null, null, variables);
+			if (animateContent)
+			{
+				AnimateContentSwap(tabHost, tabContent);
+			}
+			else
+			{
+				tabHost.Content = tabContent;
+			}
 		}
 
 		Refresh();
@@ -557,6 +571,43 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 			request.UiConfig);
 		PaywallMauiStyleResolver.ApplySize(view, component.Size);
 		return view;
+	}
+
+	static void AnimateContentSwap(ContentView host, View newContent)
+	{
+		var oldContent = host.Content as View;
+		if (oldContent is null)
+		{
+			host.Content = newContent;
+			return;
+		}
+
+		var transition = new Grid();
+		oldContent.Opacity = 1;
+		newContent.Opacity = 0;
+		newContent.TranslationY = 8;
+		host.Content = null;
+		transition.Children.Add(oldContent);
+		transition.Children.Add(newContent);
+		host.Content = transition;
+
+		_ = RunContentSwapAnimation(host, transition, oldContent, newContent);
+	}
+
+	static async Task RunContentSwapAnimation(ContentView host, Grid transition, View oldContent, View newContent)
+	{
+		await Task.WhenAll(
+			oldContent.FadeToAsync(0, TabTransitionDuration, Easing.CubicOut),
+			newContent.FadeToAsync(1, TabTransitionDuration, Easing.CubicOut),
+			newContent.TranslateToAsync(0, 0, TabTransitionDuration, Easing.CubicOut));
+
+		if (ReferenceEquals(host.Content, transition))
+		{
+			transition.Children.Clear();
+			newContent.Opacity = 1;
+			newContent.TranslationY = 0;
+			host.Content = newContent;
+		}
 	}
 
 	View RenderTabControlButton(
