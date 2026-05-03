@@ -74,8 +74,8 @@ public static class PaywallExampleLoader
 			"paywalls/carousel_onboarding.json"),
 		new(
 			"Tabbed plans",
-			"Tabs with tab-control buttons and per-tab package cards.",
-			"tabs, tab_control_button, package selection",
+			"Tabs with a toggle control and per-tab package cards.",
+			"tabs, tab_control_toggle, package selection",
 			"paywalls/tabbed_plans.json"),
 		new(
 			"Timeline countdown",

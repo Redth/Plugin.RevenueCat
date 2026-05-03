@@ -3,6 +3,7 @@
 using System.Text.Json;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.Shapes;
+using Microsoft.Maui.Dispatching;
 using Microsoft.Maui.Graphics;
 using Plugin.RevenueCat.Models;
 
@@ -70,32 +71,33 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		string? packageContextIdentifier = null,
 		Action<string>? tabSelected = null,
 		string? selectedTabId = null,
-		IReadOnlyDictionary<string, string>? variables = null)
+		IReadOnlyDictionary<string, string>? variables = null,
+		IReadOnlyList<string>? tabIds = null)
 	{
 		if (component is PaywallUnknownComponent { Fallback: { } fallback })
 		{
-			return RenderComponent(fallback, request, packageContextIdentifier, tabSelected, selectedTabId, variables);
+			return RenderComponent(fallback, request, packageContextIdentifier, tabSelected, selectedTabId, variables, tabIds);
 		}
 
 		return component switch
 		{
-			PaywallStackComponent stack => RenderStack(stack, request, packageContextIdentifier, tabSelected, selectedTabId, variables),
+			PaywallStackComponent stack => RenderStack(stack, request, packageContextIdentifier, tabSelected, selectedTabId, variables, tabIds),
 			PaywallTextComponent text => RenderText(text, request, packageContextIdentifier, variables),
 			PaywallImageComponent image => RenderImage(image, request),
 			PaywallIconComponent icon => RenderIcon(icon),
-			PaywallButtonComponent button => RenderButton(button, request, packageContextIdentifier, tabSelected, selectedTabId, variables),
-			PaywallPackageComponent package => RenderPackage(package, request, tabSelected, selectedTabId, variables),
-			PaywallPurchaseButtonComponent purchaseButton => RenderPurchaseButton(purchaseButton, request, packageContextIdentifier, tabSelected, selectedTabId, variables),
-			PaywallHeaderComponent header when header.Stack is not null => RenderStack(header.Stack, request, packageContextIdentifier, tabSelected, selectedTabId, variables),
-			PaywallStickyFooterComponent footer when footer.Stack is not null => RenderStack(footer.Stack, request, packageContextIdentifier, tabSelected, selectedTabId, variables),
-			PaywallCarouselComponent carousel => RenderCarousel(carousel, request, packageContextIdentifier, tabSelected, selectedTabId, variables),
+			PaywallButtonComponent button => RenderButton(button, request, packageContextIdentifier, tabSelected, selectedTabId, variables, tabIds),
+			PaywallPackageComponent package => RenderPackage(package, request, tabSelected, selectedTabId, variables, tabIds),
+			PaywallPurchaseButtonComponent purchaseButton => RenderPurchaseButton(purchaseButton, request, packageContextIdentifier, tabSelected, selectedTabId, variables, tabIds),
+			PaywallHeaderComponent header when header.Stack is not null => RenderStack(header.Stack, request, packageContextIdentifier, tabSelected, selectedTabId, variables, tabIds),
+			PaywallStickyFooterComponent footer when footer.Stack is not null => RenderStack(footer.Stack, request, packageContextIdentifier, tabSelected, selectedTabId, variables, tabIds),
+			PaywallCarouselComponent carousel => RenderCarousel(carousel, request, packageContextIdentifier, tabSelected, selectedTabId, variables, tabIds),
 			PaywallTabsComponent tabs => RenderTabs(tabs, request, packageContextIdentifier, variables),
-			PaywallTabControlButtonComponent tabButton => RenderTabControlButton(tabButton, request, packageContextIdentifier, tabSelected, selectedTabId, variables),
-			PaywallTabControlToggleComponent toggle => RenderTabControlToggle(toggle, tabSelected),
-			PaywallTimelineComponent timeline => RenderTimeline(timeline, request, packageContextIdentifier, tabSelected, selectedTabId, variables),
-			PaywallCountdownComponent countdown => RenderCountdown(countdown, request, packageContextIdentifier, tabSelected, selectedTabId, variables),
-			PaywallVideoComponent video => RenderVideo(video, request, packageContextIdentifier, tabSelected, selectedTabId, variables),
-			{ Fallback: { } componentFallback } => RenderComponent(componentFallback, request, packageContextIdentifier, tabSelected, selectedTabId, variables),
+			PaywallTabControlButtonComponent tabButton => RenderTabControlButton(tabButton, request, packageContextIdentifier, tabSelected, selectedTabId, variables, tabIds),
+			PaywallTabControlToggleComponent toggle => RenderTabControlToggle(toggle, request, tabSelected, selectedTabId, tabIds),
+			PaywallTimelineComponent timeline => RenderTimeline(timeline, request, packageContextIdentifier, tabSelected, selectedTabId, variables, tabIds),
+			PaywallCountdownComponent countdown => RenderCountdown(countdown, request, packageContextIdentifier, tabSelected, selectedTabId, variables, tabIds),
+			PaywallVideoComponent video => RenderVideo(video, request, packageContextIdentifier, tabSelected, selectedTabId, variables, tabIds),
+			{ Fallback: { } componentFallback } => RenderComponent(componentFallback, request, packageContextIdentifier, tabSelected, selectedTabId, variables, tabIds),
 			_ => new ContentView { IsVisible = false }
 		};
 	}
@@ -106,7 +108,8 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		string? packageContextIdentifier = null,
 		Action<string>? tabSelected = null,
 		string? selectedTabId = null,
-		IReadOnlyDictionary<string, string>? variables = null)
+		IReadOnlyDictionary<string, string>? variables = null,
+		IReadOnlyList<string>? tabIds = null)
 	{
 		if (component.Visible == false)
 		{
@@ -125,7 +128,7 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 			var child = component.Components[i];
 			AddStackChild(
 				layout,
-				RenderComponent(child, request, packageContextIdentifier, tabSelected, selectedTabId, variables),
+				RenderComponent(child, request, packageContextIdentifier, tabSelected, selectedTabId, variables, tabIds),
 				component,
 				i);
 		}
@@ -139,7 +142,7 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 			component.Border,
 			component.Shadow,
 			request.UiConfig);
-		view = ApplyBadge(view, component.Badge, request, packageContextIdentifier, tabSelected, selectedTabId, variables);
+		view = ApplyBadge(view, component.Badge, request, packageContextIdentifier, tabSelected, selectedTabId, variables, tabIds);
 		PaywallMauiStyleResolver.ApplySize(view, component.Size);
 
 		return view;
@@ -300,11 +303,12 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		string? packageContextIdentifier = null,
 		Action<string>? tabSelected = null,
 		string? selectedTabId = null,
-		IReadOnlyDictionary<string, string>? variables = null)
+		IReadOnlyDictionary<string, string>? variables = null,
+		IReadOnlyList<string>? tabIds = null)
 	{
 		var content = component.Stack is null
 			? new Label { Text = component.Action?.Type ?? "Button" }
-			: RenderStack(component.Stack, request, packageContextIdentifier, tabSelected, selectedTabId, variables);
+			: RenderStack(component.Stack, request, packageContextIdentifier, tabSelected, selectedTabId, variables, tabIds);
 
 		var button = WrapTappable(content, async () =>
 		{
@@ -335,11 +339,12 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		PaywallRenderRequest request,
 		Action<string>? tabSelected = null,
 		string? selectedTabId = null,
-		IReadOnlyDictionary<string, string>? variables = null)
+		IReadOnlyDictionary<string, string>? variables = null,
+		IReadOnlyList<string>? tabIds = null)
 	{
 		var content = component.Stack is null
 			? new Label { Text = component.PackageId }
-			: RenderStack(component.Stack, request, component.PackageId, tabSelected, selectedTabId, variables);
+			: RenderStack(component.Stack, request, component.PackageId, tabSelected, selectedTabId, variables, tabIds);
 		var packageView = MakePackageTappable(content, () =>
 		{
 			if (!string.IsNullOrWhiteSpace(component.PackageId))
@@ -365,11 +370,12 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		string? packageContextIdentifier = null,
 		Action<string>? tabSelected = null,
 		string? selectedTabId = null,
-		IReadOnlyDictionary<string, string>? variables = null)
+		IReadOnlyDictionary<string, string>? variables = null,
+		IReadOnlyList<string>? tabIds = null)
 	{
 		var content = component.Stack is null
 			? new Label { Text = "Purchase" }
-			: RenderStack(component.Stack, request, packageContextIdentifier, tabSelected, selectedTabId, variables);
+			: RenderStack(component.Stack, request, packageContextIdentifier, tabSelected, selectedTabId, variables, tabIds);
 
 		return WrapTappable(content, async () =>
 		{
@@ -392,7 +398,8 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		string? packageContextIdentifier,
 		Action<string>? tabSelected,
 		string? selectedTabId,
-		IReadOnlyDictionary<string, string>? variables)
+		IReadOnlyDictionary<string, string>? variables,
+		IReadOnlyList<string>? tabIds)
 	{
 		if (component.Visible == false || component.Pages.Count == 0)
 		{
@@ -400,7 +407,7 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		}
 
 		var pageViews = component.Pages
-			.Select(page => RenderStack(page, request, packageContextIdentifier, tabSelected, selectedTabId, variables))
+			.Select(page => RenderStack(page, request, packageContextIdentifier, tabSelected, selectedTabId, variables, tabIds))
 			.ToArray();
 
 		var carousel = new CarouselView
@@ -435,6 +442,7 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 				ItemSpacing = pageSpacing
 			};
 		}
+		StartCarouselAutoAdvance(carousel, component.AutoAdvance, pageViews.Length, component.Loop);
 
 		View content = carousel;
 		if (component.PageControl is { ValueKind: JsonValueKind.Object } pageControl)
@@ -515,7 +523,18 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		void Refresh()
 		{
 			controlHost.Content = TryGetTabsControlStack(component.Control) is { } controlStack
-				? RenderStack(controlStack, request, packageContextIdentifier, SelectTab, selectedTabId, variables)
+				? RenderStack(
+					controlStack,
+					request,
+					packageContextIdentifier,
+					SelectTab,
+					selectedTabId,
+					variables,
+					component.Tabs
+						.Select(tab => tab.Id)
+						.Where(static id => !string.IsNullOrWhiteSpace(id))
+						.Select(static id => id!)
+						.ToArray())
 				: CreateDefaultTabControl(component.Tabs, selectedTabId, SelectTab);
 
 			var tab = component.Tabs.FirstOrDefault(t => string.Equals(t.Id, selectedTabId, StringComparison.Ordinal))
@@ -546,11 +565,12 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		string? packageContextIdentifier,
 		Action<string>? tabSelected,
 		string? selectedTabId,
-		IReadOnlyDictionary<string, string>? variables)
+		IReadOnlyDictionary<string, string>? variables,
+		IReadOnlyList<string>? tabIds)
 	{
 		var content = component.Stack is null
 			? new Label { Text = component.TabId }
-			: RenderStack(component.Stack, request, packageContextIdentifier, tabSelected, selectedTabId, variables);
+			: RenderStack(component.Stack, request, packageContextIdentifier, tabSelected, selectedTabId, variables, tabIds);
 		var button = WrapTappable(content, () =>
 		{
 			if (!string.IsNullOrWhiteSpace(component.TabId))
@@ -570,13 +590,35 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		return button;
 	}
 
-	static View RenderTabControlToggle(PaywallTabControlToggleComponent component, Action<string>? tabSelected)
+	static View RenderTabControlToggle(
+		PaywallTabControlToggleComponent component,
+		PaywallRenderRequest request,
+		Action<string>? tabSelected,
+		string? selectedTabId,
+		IReadOnlyList<string>? tabIds)
 	{
-		return new Switch
+		var tabIdList = tabIds ?? Array.Empty<string>();
+		var offTabId = tabIdList.Count > 0 ? tabIdList[0] : null;
+		var onTabId = tabIdList.Count > 1 ? tabIdList[1] : offTabId;
+		var isToggled = selectedTabId is null
+			? component.DefaultValue == true
+			: string.Equals(selectedTabId, onTabId, StringComparison.Ordinal);
+		var toggle = new Switch
 		{
-			IsToggled = component.DefaultValue == true,
+			IsToggled = isToggled,
 			HorizontalOptions = LayoutOptions.Center
 		};
+		ApplyToggleColors(toggle, component, request.UiConfig, isToggled);
+		toggle.Toggled += (_, args) =>
+		{
+			ApplyToggleColors(toggle, component, request.UiConfig, args.Value);
+			var tabId = args.Value ? onTabId : offTabId;
+			if (!string.IsNullOrWhiteSpace(tabId))
+			{
+				tabSelected?.Invoke(tabId);
+			}
+		};
+		return toggle;
 	}
 
 	View RenderTimeline(
@@ -585,7 +627,8 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		string? packageContextIdentifier,
 		Action<string>? tabSelected,
 		string? selectedTabId,
-		IReadOnlyDictionary<string, string>? variables)
+		IReadOnlyDictionary<string, string>? variables,
+		IReadOnlyList<string>? tabIds)
 	{
 		if (component.Visible == false || component.Items.Count == 0)
 		{
@@ -597,9 +640,18 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 			Spacing = component.ItemSpacing ?? 12
 		};
 
-		foreach (var item in component.Items)
+		for (var i = 0; i < component.Items.Count; i++)
 		{
-			var row = RenderTimelineItem(item, request, packageContextIdentifier, tabSelected, selectedTabId, variables, component);
+			var row = RenderTimelineItem(
+				component.Items[i],
+				request,
+				packageContextIdentifier,
+				tabSelected,
+				selectedTabId,
+				variables,
+				tabIds,
+				component,
+				i == component.Items.Count - 1);
 			if (row is not null)
 			{
 				layout.Children.Add(row);
@@ -617,9 +669,40 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		string? packageContextIdentifier,
 		Action<string>? tabSelected,
 		string? selectedTabId,
-		IReadOnlyDictionary<string, string>? variables)
+		IReadOnlyDictionary<string, string>? variables,
+		IReadOnlyList<string>? tabIds)
 	{
-		var remaining = ResolveCountdownRemaining(component.Style);
+		var host = new ContentView();
+
+		void Refresh()
+		{
+			var remaining = ResolveCountdownRemaining(component.Style);
+			host.Content = RenderCountdownContent(
+				component,
+				request,
+				packageContextIdentifier,
+				tabSelected,
+				selectedTabId,
+				variables,
+				tabIds,
+				remaining);
+		}
+
+		Refresh();
+		StartCountdownRefresh(host, component.Style, Refresh);
+		return host;
+	}
+
+	View RenderCountdownContent(
+		PaywallCountdownComponent component,
+		PaywallRenderRequest request,
+		string? packageContextIdentifier,
+		Action<string>? tabSelected,
+		string? selectedTabId,
+		IReadOnlyDictionary<string, string>? variables,
+		IReadOnlyList<string>? tabIds,
+		TimeSpan remaining)
+	{
 		var stack = remaining <= TimeSpan.Zero
 			? component.EndStack ?? component.Fallback as PaywallStackComponent
 			: component.CountdownStack ?? component.Fallback as PaywallStackComponent;
@@ -634,7 +717,7 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		}
 
 		var countdownVariables = CreateCountdownVariables(remaining, component.CountFrom, variables);
-		return RenderStack(stack, request, packageContextIdentifier, tabSelected, selectedTabId, countdownVariables);
+		return RenderStack(stack, request, packageContextIdentifier, tabSelected, selectedTabId, countdownVariables, tabIds);
 	}
 
 	View RenderVideo(
@@ -643,11 +726,12 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		string? packageContextIdentifier,
 		Action<string>? tabSelected,
 		string? selectedTabId,
-		IReadOnlyDictionary<string, string>? variables)
+		IReadOnlyDictionary<string, string>? variables,
+		IReadOnlyList<string>? tabIds)
 	{
 		if (component.Fallback is not null)
 		{
-			return RenderComponent(component.Fallback, request, packageContextIdentifier, tabSelected, selectedTabId, variables);
+			return RenderComponent(component.Fallback, request, packageContextIdentifier, tabSelected, selectedTabId, variables, tabIds);
 		}
 
 		var source = PaywallMauiStyleResolver.ResolveImageUrl(component.Source);
@@ -691,6 +775,155 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		}
 
 		return indicator;
+	}
+
+	static void StartCarouselAutoAdvance(CarouselView carousel, JsonElement? autoAdvance, int pageCount, bool loop)
+	{
+		if (pageCount <= 1 || ResolveAutoAdvanceInterval(autoAdvance) is not { } interval)
+		{
+			return;
+		}
+
+		IDispatcherTimer? timer = null;
+
+		void Stop()
+		{
+			timer?.Stop();
+			timer = null;
+		}
+
+		void Start()
+		{
+			if (timer is not null || carousel.Handler is null)
+			{
+				return;
+			}
+
+			timer = carousel.Dispatcher.CreateTimer();
+			timer.Interval = interval;
+			timer.Tick += (_, _) =>
+			{
+				if (carousel.Handler is null)
+				{
+					Stop();
+					return;
+				}
+
+				var next = carousel.Position + 1;
+				if (next >= pageCount)
+				{
+					if (!loop)
+					{
+						Stop();
+						return;
+					}
+
+					next = 0;
+				}
+
+				carousel.ScrollTo(next, position: ScrollToPosition.Center, animate: true);
+				carousel.Position = next;
+			};
+			timer.Start();
+		}
+
+		carousel.HandlerChanged += (_, _) => Start();
+		carousel.HandlerChanging += (_, _) => Stop();
+		if (carousel.Handler is not null)
+		{
+			Start();
+		}
+	}
+
+	static TimeSpan? ResolveAutoAdvanceInterval(JsonElement? autoAdvance)
+	{
+		if (autoAdvance is null or { ValueKind: JsonValueKind.Null or JsonValueKind.Undefined } ||
+			autoAdvance.Value.ValueKind != JsonValueKind.Object)
+		{
+			return null;
+		}
+
+		var milliseconds = GetDouble(autoAdvance.Value, "ms_time_per_page");
+		if (milliseconds <= 0)
+		{
+			milliseconds = GetDouble(autoAdvance.Value, "msTimePerPage");
+		}
+
+		return milliseconds <= 0 ? null : TimeSpan.FromMilliseconds(milliseconds);
+	}
+
+	static void StartCountdownRefresh(ContentView host, JsonElement? style, Action refresh)
+	{
+		if (ResolveCountdownRemaining(style) <= TimeSpan.Zero)
+		{
+			return;
+		}
+
+		IDispatcherTimer? timer = null;
+
+		void Stop()
+		{
+			timer?.Stop();
+			timer = null;
+		}
+
+		void Start()
+		{
+			if (timer is not null || host.Handler is null)
+			{
+				return;
+			}
+
+			timer = host.Dispatcher.CreateTimer();
+			timer.Interval = TimeSpan.FromSeconds(1);
+			timer.Tick += (_, _) =>
+			{
+				refresh();
+				if (ResolveCountdownRemaining(style) <= TimeSpan.Zero)
+				{
+					Stop();
+				}
+			};
+			timer.Start();
+		}
+
+		host.HandlerChanged += (_, _) => Start();
+		host.HandlerChanging += (_, _) => Stop();
+		if (host.Handler is not null)
+		{
+			Start();
+		}
+	}
+
+	static void ApplyToggleColors(
+		Switch toggle,
+		PaywallTabControlToggleComponent component,
+		PaywallUiConfig? uiConfig,
+		bool isToggled)
+	{
+		var thumbColor = PaywallMauiStyleResolver.ResolveColor(
+			isToggled ? component.ThumbColorOn : component.ThumbColorOff,
+			uiConfig);
+		if (thumbColor is not null)
+		{
+			toggle.ThumbColor = thumbColor;
+		}
+
+		var onColor = PaywallMauiStyleResolver.ResolveColor(component.TrackColorOn, uiConfig);
+		if (onColor is not null)
+		{
+			toggle.OnColor = onColor;
+		}
+
+		var offColor = PaywallMauiStyleResolver.ResolveColor(component.TrackColorOff, uiConfig);
+		if (!isToggled && offColor is not null)
+		{
+			toggle.BackgroundColor = offColor;
+		}
+		else
+		{
+			toggle.BackgroundColor = null;
+		}
 	}
 
 	static Color? ResolveIndicatorColor(JsonElement indicator, PaywallUiConfig? uiConfig)
@@ -766,9 +999,12 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		Action<string>? tabSelected,
 		string? selectedTabId,
 		IReadOnlyDictionary<string, string>? variables,
-		PaywallTimelineComponent component)
+		IReadOnlyList<string>? tabIds,
+		PaywallTimelineComponent component,
+		bool isLast)
 	{
 		if (item.ValueKind != JsonValueKind.Object ||
+			item.TryGetProperty("visible", out var visibleElement) && visibleElement.ValueKind == JsonValueKind.False ||
 			!item.TryGetProperty("title", out var titleElement) ||
 			!item.TryGetProperty("icon", out var iconElement))
 		{
@@ -792,9 +1028,8 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 			}
 		};
 
-		var iconView = RenderIcon(icon);
-		iconView.VerticalOptions = LayoutOptions.Start;
-		row.Children.Add(iconView);
+		var timelineMarker = CreateTimelineMarker(item, icon, request.UiConfig, component, isLast);
+		row.Children.Add(timelineMarker);
 
 		var textStack = new VerticalStackLayout
 		{
@@ -813,6 +1048,79 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		Grid.SetColumn(textStack, 1);
 		row.Children.Add(textStack);
 		return row;
+	}
+
+	View CreateTimelineMarker(
+		JsonElement item,
+		PaywallIconComponent icon,
+		PaywallUiConfig? uiConfig,
+		PaywallTimelineComponent component,
+		bool isLast)
+	{
+		var marker = new Grid
+		{
+			RowDefinitions =
+			{
+				new RowDefinition(GridLength.Auto),
+				new RowDefinition(GridLength.Star)
+			},
+			HorizontalOptions = LayoutOptions.Center,
+			VerticalOptions = LayoutOptions.Fill
+		};
+
+		var iconView = RenderIcon(icon);
+		iconView.VerticalOptions = component.IconAlignment == "title_and_description"
+			? LayoutOptions.Center
+			: LayoutOptions.Start;
+		marker.Children.Add(iconView);
+
+		if (!isLast && CreateTimelineConnector(item, uiConfig) is { } connector)
+		{
+			Grid.SetRow(connector, 1);
+			marker.Children.Add(connector);
+		}
+
+		return marker;
+	}
+
+	View? CreateTimelineConnector(JsonElement item, PaywallUiConfig? uiConfig)
+	{
+		JsonElement? connectorElement = item.TryGetProperty("connector", out var connector) &&
+			connector.ValueKind == JsonValueKind.Object
+				? connector
+				: null;
+		if (connectorElement is { } explicitConnector &&
+			explicitConnector.TryGetProperty("visible", out var visible) &&
+			visible.ValueKind == JsonValueKind.False)
+		{
+			return null;
+		}
+
+		var width = connectorElement is { } connectorObject
+			? GetDouble(connectorObject, "width")
+			: 2;
+		if (width <= 0)
+		{
+			width = 2;
+		}
+
+		var color = connectorElement is { } colorConnector &&
+			colorConnector.TryGetProperty("color", out var colorElement)
+				? PaywallMauiStyleResolver.ResolveColor(colorElement, uiConfig)
+				: Color.FromArgb("#cbd5e1");
+		var margin = connectorElement is { } marginConnector &&
+			marginConnector.TryGetProperty("margin", out var marginElement)
+				? PaywallMauiStyleResolver.ResolveThickness(marginElement)
+				: new Thickness(0, 4, 0, 0);
+
+		return new BoxView
+		{
+			WidthRequest = width,
+			Margin = margin,
+			Color = color ?? Color.FromArgb("#cbd5e1"),
+			HorizontalOptions = LayoutOptions.Center,
+			VerticalOptions = LayoutOptions.Fill
+		};
 	}
 
 	static TimeSpan ResolveCountdownRemaining(JsonElement? style)
@@ -1000,7 +1308,8 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		string? packageContextIdentifier,
 		Action<string>? tabSelected,
 		string? selectedTabId,
-		IReadOnlyDictionary<string, string>? variables)
+		IReadOnlyDictionary<string, string>? variables,
+		IReadOnlyList<string>? tabIds)
 	{
 		if (badge is null or { ValueKind: JsonValueKind.Null or JsonValueKind.Undefined } ||
 			badge.Value.ValueKind != JsonValueKind.Object ||
@@ -1020,7 +1329,7 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		content.Margin = default;
 		grid.Children.Add(content);
 
-		var badgeView = RenderStack(badgeStack, request, packageContextIdentifier, tabSelected, selectedTabId, variables);
+		var badgeView = RenderStack(badgeStack, request, packageContextIdentifier, tabSelected, selectedTabId, variables, tabIds);
 		var alignment = badge.Value.TryGetProperty("alignment", out var alignmentElement) &&
 			alignmentElement.ValueKind == JsonValueKind.String
 				? alignmentElement.GetString()

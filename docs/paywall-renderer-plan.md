@@ -108,9 +108,9 @@ The current fixture set covers:
 - rounded cards, borders, pills, and shadows
 - light/dark gradients and color aliases
 - checklist rows, two-column benefit cards, bottom-sheet style layouts, lifetime offers, trial/story fallbacks, and comparison cards
-- carousel onboarding with page peek/spacing and page indicators
-- tabbed plan content with tab-control buttons
-- timeline rows, countdown variables, and video fallback behavior
+- carousel onboarding with page peek/spacing, page indicators, and auto-advance
+- tabbed plan content with tab-control buttons/toggle controls
+- timeline rows/connectors, live countdown variables, and video fallback behavior
 
 The sample includes deterministic local SVG assets under `sample-paywalls/Resources/Images/` and raw paywall JSON fixtures under `sample-paywalls/Resources/Raw/paywalls/`. The SVG files are also packaged as raw app assets so the renderer exercises the SkiaSharp SVG path instead of relying on MAUI's generated PNG image assets.
 
@@ -140,11 +140,11 @@ DevFlow is installed through the repo tool manifest and enabled in the sample un
 | `purchase_button` | Tappable nested stack that calls purchase action | Yes |
 | `header` | Top row/overlay | Yes |
 | `sticky_footer` / `footer` | Bottom row pinned outside body scroll | Yes |
-| `carousel` | `CarouselView` with page peek, spacing, loop, initial position, and `IndicatorView` page control | Partial |
+| `carousel` | `CarouselView` with page peek, spacing, loop, initial position, auto-advance, and `IndicatorView` page control | Partial |
 | `tabs` / tab-control buttons | selected content view + local tab state | Partial |
-| `tab_control_toggle` | placeholder `Switch` | Partial |
-| `timeline` | vertical rows with icon/title/description | Partial |
-| `countdown` | one-shot countdown variable resolution and countdown/end stack selection | Partial |
+| `tab_control_toggle` | `Switch` mapped to the first/second tab IDs in a two-tab control | Partial |
+| `timeline` | vertical rows with icon/title/description and connector lines | Partial |
+| `countdown` | timer-refreshed countdown variable resolution and countdown/end stack selection | Partial |
 | `video` | renders fallback component or placeholder | Partial |
 | unknown/unsupported | fallback component or invisible placeholder | Yes |
 
@@ -178,6 +178,10 @@ The first implementation supports:
 - shadows.
 - badge overlays.
 - carousel page controls.
+- carousel auto-advance.
+- tab toggle selection for two-tab controls.
+- timeline connector lines.
+- live countdown refresh and end-stack swap.
 - package-local variable resolution so package cards can show their own prices while standalone purchase buttons use the selected package.
 
 Deferred:
@@ -186,10 +190,8 @@ Deferred:
 - advanced conditional overrides.
 - video backgrounds.
 - pixel-perfect safe-area/hero media behavior.
-- timeline connector drawing.
-- live countdown timer updates and disposal.
-- carousel auto-advance.
-- tab toggle semantics.
+- richer carousel transitions such as fade.
+- full tab-toggle styling parity on platforms where native `Switch` does not expose both on/off track colors.
 
 ## State and actions
 

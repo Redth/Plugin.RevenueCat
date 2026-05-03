@@ -355,6 +355,18 @@ public sealed partial class PaywallTabControlToggleComponent : PaywallComponent
 {
 	[JsonPropertyName("default_value")]
 	public bool? DefaultValue { get; set; }
+
+	[JsonPropertyName("thumb_color_on")]
+	public JsonElement? ThumbColorOn { get; set; }
+
+	[JsonPropertyName("thumb_color_off")]
+	public JsonElement? ThumbColorOff { get; set; }
+
+	[JsonPropertyName("track_color_on")]
+	public JsonElement? TrackColorOn { get; set; }
+
+	[JsonPropertyName("track_color_off")]
+	public JsonElement? TrackColorOff { get; set; }
 }
 
 public sealed partial class PaywallTimelineComponent : PaywallComponent

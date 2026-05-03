@@ -159,6 +159,8 @@ namespace Tests
 			Assert.IsNotNull(carousel);
 			Assert.AreEqual(2, carousel.Pages.Count);
 			Assert.AreEqual(18, carousel.PagePeek);
+			Assert.IsNotNull(carousel.AutoAdvance);
+			Assert.AreEqual(2500, carousel.AutoAdvance.Value.GetProperty("ms_time_per_page").GetInt32());
 
 			var tabs = File.ReadAllText(Path.Combine(paywallDirectory, "tabbed_plans.json")).ToPaywallOfferingsResponse()
 				?.CurrentOffering?.PaywallComponents?.ComponentsConfig?.Base?.Stack?.Components
@@ -167,12 +169,23 @@ namespace Tests
 			Assert.IsNotNull(tabs);
 			Assert.AreEqual("annual", tabs.DefaultTabId);
 			Assert.AreEqual(2, tabs.Tabs.Count);
+			Assert.IsNotNull(tabs.Control);
+			var tabsControlStack = tabs.Control.Value.GetProperty("stack")
+				.Deserialize(ModelSerializerContext.Default.PaywallStackComponent);
+			Assert.IsNotNull(tabsControlStack);
+			var toggle = tabsControlStack.Components.OfType<PaywallTabControlToggleComponent>().SingleOrDefault();
+			Assert.IsNotNull(toggle);
+			Assert.IsNotNull(toggle.TrackColorOn);
 
 			var timelineComponents = File.ReadAllText(Path.Combine(paywallDirectory, "timeline_countdown.json")).ToPaywallOfferingsResponse()
 				?.CurrentOffering?.PaywallComponents?.ComponentsConfig?.Base?.Stack?.Components;
 			Assert.IsNotNull(timelineComponents);
-			Assert.IsTrue(timelineComponents.OfType<PaywallTimelineComponent>().Any());
-			Assert.IsTrue(timelineComponents.OfType<PaywallCountdownComponent>().Any());
+			var timeline = timelineComponents.OfType<PaywallTimelineComponent>().SingleOrDefault();
+			Assert.IsNotNull(timeline);
+			Assert.IsTrue(timeline.Items[0].TryGetProperty("connector", out _));
+			var countdown = timelineComponents.OfType<PaywallCountdownComponent>().SingleOrDefault();
+			Assert.IsNotNull(countdown);
+			Assert.IsNotNull(countdown.EndStack);
 			Assert.IsTrue(timelineComponents.OfType<PaywallVideoComponent>().Any());
 		}
 	}

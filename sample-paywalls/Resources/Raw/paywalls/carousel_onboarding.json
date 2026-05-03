@@ -28,6 +28,7 @@
                   "page_peek": 18,
                   "initial_page_index": 0,
                   "loop": true,
+                  "auto_advance": { "ms_time_per_page": 2500, "ms_transition_time": 300, "transition_type": "slide" },
                   "size": { "height": { "type": "fixed", "value": 250 } },
                   "page_control": {
                     "position": "bottom",
