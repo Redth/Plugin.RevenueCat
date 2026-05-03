@@ -603,21 +603,50 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		var isToggled = selectedTabId is null
 			? component.DefaultValue == true
 			: string.Equals(selectedTabId, onTabId, StringComparison.Ordinal);
-		var toggle = new Switch
+
+		var track = new Border
 		{
-			IsToggled = isToggled,
-			HorizontalOptions = LayoutOptions.Center
+			WidthRequest = 64,
+			HeightRequest = 32,
+			StrokeThickness = 0,
+			StrokeShape = new RoundRectangle { CornerRadius = new CornerRadius(16) }
 		};
-		ApplyToggleColors(toggle, component, request.UiConfig, isToggled);
-		toggle.Toggled += (_, args) =>
+		var thumb = new Border
 		{
-			ApplyToggleColors(toggle, component, request.UiConfig, args.Value);
-			var tabId = args.Value ? onTabId : offTabId;
+			WidthRequest = 28,
+			HeightRequest = 28,
+			Margin = 2,
+			StrokeThickness = 0,
+			StrokeShape = new RoundRectangle { CornerRadius = new CornerRadius(14) },
+			VerticalOptions = LayoutOptions.Center
+		};
+		var toggle = new Grid
+		{
+			WidthRequest = 64,
+			HeightRequest = 32,
+			HorizontalOptions = LayoutOptions.Center,
+			VerticalOptions = LayoutOptions.Center,
+			Children =
+			{
+				track,
+				thumb
+			}
+		};
+
+		var currentValue = isToggled;
+		ApplyToggleState(track, thumb, component, request.UiConfig, currentValue);
+		AddTapGesture(toggle, () =>
+		{
+			currentValue = !currentValue;
+			ApplyToggleState(track, thumb, component, request.UiConfig, currentValue);
+			var tabId = currentValue ? onTabId : offTabId;
 			if (!string.IsNullOrWhiteSpace(tabId))
 			{
 				tabSelected?.Invoke(tabId);
 			}
-		};
+
+			return Task.CompletedTask;
+		});
 		return toggle;
 	}
 
@@ -895,35 +924,25 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		}
 	}
 
-	static void ApplyToggleColors(
-		Switch toggle,
+	static void ApplyToggleState(
+		Border track,
+		Border thumb,
 		PaywallTabControlToggleComponent component,
 		PaywallUiConfig? uiConfig,
 		bool isToggled)
 	{
+		var trackColor = PaywallMauiStyleResolver.ResolveColor(
+				isToggled ? component.TrackColorOn : component.TrackColorOff,
+				uiConfig)
+			?? (isToggled ? Colors.DeepSkyBlue : Colors.LightGray);
 		var thumbColor = PaywallMauiStyleResolver.ResolveColor(
-			isToggled ? component.ThumbColorOn : component.ThumbColorOff,
-			uiConfig);
-		if (thumbColor is not null)
-		{
-			toggle.ThumbColor = thumbColor;
-		}
+				isToggled ? component.ThumbColorOn : component.ThumbColorOff,
+				uiConfig)
+			?? Colors.White;
 
-		var onColor = PaywallMauiStyleResolver.ResolveColor(component.TrackColorOn, uiConfig);
-		if (onColor is not null)
-		{
-			toggle.OnColor = onColor;
-		}
-
-		var offColor = PaywallMauiStyleResolver.ResolveColor(component.TrackColorOff, uiConfig);
-		if (!isToggled && offColor is not null)
-		{
-			toggle.BackgroundColor = offColor;
-		}
-		else
-		{
-			toggle.BackgroundColor = null;
-		}
+		track.Background = new SolidColorBrush(trackColor);
+		thumb.Background = new SolidColorBrush(thumbColor);
+		thumb.HorizontalOptions = isToggled ? LayoutOptions.End : LayoutOptions.Start;
 	}
 
 	static Color? ResolveIndicatorColor(JsonElement indicator, PaywallUiConfig? uiConfig)
