@@ -8,8 +8,6 @@ namespace Plugin.RevenueCat.Paywalls;
 
 public class RevenueCatPaywallView : ContentView
 {
-	const uint SelectionTransitionDuration = 120;
-
 	readonly IPaywallRenderer renderer;
 	readonly IPaywallActionHandler eventActionHandler;
 	string? selectedPackageIdentifier;
@@ -177,15 +175,10 @@ public class RevenueCatPaywallView : ContentView
 
 	public void Render()
 	{
-		Render(animated: false);
-	}
-
-	void Render(bool animated)
-	{
 		selectedPackageIdentifier ??= FindDefaultSelectedPackageIdentifier(PaywallData) ?? Packages.FirstOrDefault()?.Identifier;
 		var actionHandler = ActionHandler ?? eventActionHandler;
 
-		var renderedContent = renderer.Render(new PaywallRenderRequest
+		Content = renderer.Render(new PaywallRenderRequest
 		{
 			PaywallData = PaywallData,
 			UiConfig = UiConfig,
@@ -200,55 +193,9 @@ public class RevenueCatPaywallView : ContentView
 			PackageSelected = packageIdentifier =>
 			{
 				selectedPackageIdentifier = packageIdentifier;
-				Render(animated: true);
+				Render();
 			}
 		});
-
-		if (animated)
-		{
-			TransitionContent(renderedContent);
-		}
-		else
-		{
-			Content = renderedContent;
-		}
-	}
-
-	void TransitionContent(View newContent)
-	{
-		var oldContent = Content as View;
-		if (oldContent is null)
-		{
-			Content = newContent;
-			return;
-		}
-
-		var transition = new Grid();
-		oldContent.Opacity = 1;
-		newContent.Opacity = 0;
-		newContent.TranslationY = 6;
-		Content = null;
-		transition.Children.Add(oldContent);
-		transition.Children.Add(newContent);
-		Content = transition;
-
-		_ = RunContentTransitionAsync(transition, oldContent, newContent);
-	}
-
-	async Task RunContentTransitionAsync(Grid transition, View oldContent, View newContent)
-	{
-		await Task.WhenAll(
-			oldContent.FadeToAsync(0, SelectionTransitionDuration, Easing.CubicOut),
-			newContent.FadeToAsync(1, SelectionTransitionDuration, Easing.CubicOut),
-			newContent.TranslateToAsync(0, 0, SelectionTransitionDuration, Easing.CubicOut));
-
-		if (ReferenceEquals(Content, transition))
-		{
-			transition.Children.Clear();
-			newContent.Opacity = 1;
-			newContent.TranslationY = 0;
-			Content = newContent;
-		}
 	}
 
 	protected virtual void OnPurchaseRequested(PaywallPurchaseRequestedEventArgs e) =>

@@ -585,7 +585,6 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		var transition = new Grid();
 		oldContent.Opacity = 1;
 		newContent.Opacity = 0;
-		newContent.TranslationY = 8;
 		host.Content = null;
 		transition.Children.Add(oldContent);
 		transition.Children.Add(newContent);
@@ -598,14 +597,12 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 	{
 		await Task.WhenAll(
 			oldContent.FadeToAsync(0, TabTransitionDuration, Easing.CubicOut),
-			newContent.FadeToAsync(1, TabTransitionDuration, Easing.CubicOut),
-			newContent.TranslateToAsync(0, 0, TabTransitionDuration, Easing.CubicOut));
+			newContent.FadeToAsync(1, TabTransitionDuration, Easing.CubicOut));
 
 		if (ReferenceEquals(host.Content, transition))
 		{
 			transition.Children.Clear();
 			newContent.Opacity = 1;
-			newContent.TranslationY = 0;
 			host.Content = newContent;
 		}
 	}
