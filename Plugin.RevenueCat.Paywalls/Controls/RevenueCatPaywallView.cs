@@ -192,6 +192,11 @@ public class RevenueCatPaywallView : ContentView
 			VariableProvider = VariableProvider,
 			PackageSelected = packageIdentifier =>
 			{
+				if (string.Equals(selectedPackageIdentifier, packageIdentifier, StringComparison.Ordinal))
+				{
+					return;
+				}
+
 				selectedPackageIdentifier = packageIdentifier;
 				Render();
 			}
