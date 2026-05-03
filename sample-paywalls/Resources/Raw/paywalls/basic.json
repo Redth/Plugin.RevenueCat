@@ -32,6 +32,7 @@
                     "type": "stack",
                     "spacing": 4,
                     "padding": { "top": 18, "bottom": 18, "leading": 18, "trailing": 18 },
+                    "shape": { "type": "rectangle", "corners": { "all": 20 } },
                     "background_color": { "light": { "type": "hex", "value": "#eff6ffff" } },
                     "components": [
                       { "type": "text", "id": "package-title", "text_lid": "package_title", "font_size": "body_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#111827ff" } } },
@@ -54,6 +55,7 @@
                     "stack": {
                       "type": "stack",
                       "padding": { "top": 15, "bottom": 15, "leading": 20, "trailing": 20 },
+                      "shape": { "type": "pill" },
                       "background_color": { "light": { "type": "hex", "value": "#2563ebff" } },
                       "components": [
                         { "type": "text", "id": "cta", "text_lid": "cta", "font_size": "body_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#ffffffff" } } }

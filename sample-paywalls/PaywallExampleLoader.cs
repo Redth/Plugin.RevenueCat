@@ -66,7 +66,22 @@ public static class PaywallExampleLoader
 			"Premium comparison",
 			"Plan comparison cards with separate monthly and annual CTAs.",
 			"multiple packages, badges, rounded comparison cards",
-			"paywalls/premium_comparison.json")
+			"paywalls/premium_comparison.json"),
+		new(
+			"Carousel onboarding",
+			"Swipeable RevenueCat-style carousel pages with page indicators.",
+			"carousel, page_control, page spacing, package",
+			"paywalls/carousel_onboarding.json"),
+		new(
+			"Tabbed plans",
+			"Tabs with tab-control buttons and per-tab package cards.",
+			"tabs, tab_control_button, package selection",
+			"paywalls/tabbed_plans.json"),
+		new(
+			"Timeline countdown",
+			"Timeline items, countdown variables, and video fallback rendering.",
+			"timeline, countdown, video fallback",
+			"paywalls/timeline_countdown.json")
 	];
 
 	public static async Task<IReadOnlyList<PaywallExample>> LoadAsync()

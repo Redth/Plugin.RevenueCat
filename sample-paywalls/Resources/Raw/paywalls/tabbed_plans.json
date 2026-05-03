@@ -1,0 +1,175 @@
+{
+  "current_offering_id": "tabs",
+  "offerings": [
+    {
+      "identifier": "tabs",
+      "description": "Tabbed plans example",
+      "packages": [
+        { "identifier": "$rc_monthly", "platform_product_identifier": "pro_monthly" },
+        { "identifier": "$rc_annual", "platform_product_identifier": "pro_annual" }
+      ],
+      "paywall_components": {
+        "id": "tabbed_plans_fixture",
+        "template_name": "components",
+        "revision": 1,
+        "components_config": {
+          "base": {
+            "background": { "type": "color", "value": { "light": { "type": "hex", "value": "#fefce8ff" } } },
+            "stack": {
+              "type": "stack",
+              "spacing": 18,
+              "padding": { "top": 34, "bottom": 24, "leading": 18, "trailing": 18 },
+              "components": [
+                { "type": "text", "id": "title", "text_lid": "title", "font_size": "heading_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#422006ff" } } },
+                {
+                  "type": "tabs",
+                  "id": "plan-tabs",
+                  "default_tab_id": "annual",
+                  "control": {
+                    "type": "buttons",
+                    "stack": {
+                      "type": "stack",
+                      "dimension": { "type": "horizontal", "alignment": "center", "distribution": "center" },
+                      "spacing": 10,
+                      "components": [
+                        {
+                          "type": "tab_control_button",
+                          "id": "monthly-tab-button",
+                          "tab_id": "monthly",
+                          "stack": {
+                            "type": "stack",
+                            "padding": { "top": 10, "bottom": 10, "leading": 18, "trailing": 18 },
+                            "shape": { "type": "pill" },
+                            "background_color": { "light": { "type": "hex", "value": "#ffffffff" } },
+                            "components": [
+                              { "type": "text", "id": "monthly-tab-text", "text_lid": "monthly_tab", "font_size": "body_m", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#422006ff" } } }
+                            ]
+                          }
+                        },
+                        {
+                          "type": "tab_control_button",
+                          "id": "annual-tab-button",
+                          "tab_id": "annual",
+                          "stack": {
+                            "type": "stack",
+                            "padding": { "top": 10, "bottom": 10, "leading": 18, "trailing": 18 },
+                            "shape": { "type": "pill" },
+                            "background_color": { "light": { "type": "hex", "value": "#ffffffff" } },
+                            "components": [
+                              { "type": "text", "id": "annual-tab-text", "text_lid": "annual_tab", "font_size": "body_m", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#422006ff" } } }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "tabs": [
+                    {
+                      "type": "tab",
+                      "id": "monthly",
+                      "name": "Monthly",
+                      "stack": {
+                        "type": "stack",
+                        "spacing": 10,
+                        "padding": { "top": 22, "bottom": 22, "leading": 18, "trailing": 18 },
+                        "shape": { "type": "rectangle", "corners": { "all": 26 } },
+                        "background_color": { "light": { "type": "hex", "value": "#ffffffff" } },
+                        "components": [
+                          { "type": "text", "id": "monthly-title", "text_lid": "monthly_title", "font_size": "heading_s", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#422006ff" } } },
+                          { "type": "text", "id": "monthly-copy", "text_lid": "monthly_copy", "font_size": "body_m", "horizontal_alignment": "center", "color": { "light": { "type": "hex", "value": "#854d0eff" } } },
+                          {
+                            "type": "package",
+                            "id": "monthly-package",
+                            "package_id": "$rc_monthly",
+                            "stack": {
+                              "type": "stack",
+                              "padding": { "top": 15, "bottom": 15, "leading": 18, "trailing": 18 },
+                              "shape": { "type": "pill" },
+                              "background_color": { "light": { "type": "hex", "value": "#fef3c7ff" } },
+                              "components": [
+                                { "type": "text", "id": "monthly-package-text", "text_lid": "monthly_package", "font_size": "body_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#92400eff" } } }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "tab",
+                      "id": "annual",
+                      "name": "Annual",
+                      "stack": {
+                        "type": "stack",
+                        "spacing": 10,
+                        "padding": { "top": 22, "bottom": 22, "leading": 18, "trailing": 18 },
+                        "shape": { "type": "rectangle", "corners": { "all": 26 } },
+                        "background_color": { "light": { "type": "linear", "degrees": 135, "points": [ { "color": "#fef3c7ff", "percent": 0 }, { "color": "#fde68aff", "percent": 100 } ] } },
+                        "components": [
+                          { "type": "text", "id": "annual-title", "text_lid": "annual_title", "font_size": "heading_s", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#422006ff" } } },
+                          { "type": "text", "id": "annual-copy", "text_lid": "annual_copy", "font_size": "body_m", "horizontal_alignment": "center", "color": { "light": { "type": "hex", "value": "#854d0eff" } } },
+                          {
+                            "type": "package",
+                            "id": "annual-package",
+                            "package_id": "$rc_annual",
+                            "is_selected_by_default": true,
+                            "stack": {
+                              "type": "stack",
+                              "padding": { "top": 15, "bottom": 15, "leading": 18, "trailing": 18 },
+                              "shape": { "type": "pill" },
+                              "background_color": { "light": { "type": "hex", "value": "#ffffffff" } },
+                              "components": [
+                                { "type": "text", "id": "annual-package-text", "text_lid": "annual_package", "font_size": "body_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#92400eff" } } }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            "sticky_footer": {
+              "type": "footer",
+              "stack": {
+                "type": "stack",
+                "padding": { "top": 14, "bottom": 22, "leading": 24, "trailing": 24 },
+                "components": [
+                  {
+                    "type": "purchase_button",
+                    "id": "purchase",
+                    "stack": {
+                      "type": "stack",
+                      "padding": { "top": 15, "bottom": 15, "leading": 20, "trailing": 20 },
+                      "shape": { "type": "pill" },
+                      "background_color": { "light": { "type": "hex", "value": "#ca8a04ff" } },
+                      "components": [
+                        { "type": "text", "id": "cta", "text_lid": "cta", "font_size": "body_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#ffffffff" } } }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "components_localizations": {
+          "en_US": {
+            "title": "Compare plans by tab",
+            "monthly_tab": "Monthly",
+            "annual_tab": "Annual",
+            "monthly_title": "Stay flexible",
+            "monthly_copy": "A tab page can hold normal stacks and package cards.",
+            "monthly_package": "{{ product_name }} - {{ price }}",
+            "annual_title": "Best long-term value",
+            "annual_copy": "The default tab and selected package can differ from the first tab.",
+            "annual_package": "{{ product_name }} - {{ price }} / {{ sub_period }}",
+            "cta": "Start selected plan"
+          }
+        },
+        "default_locale": "en_US"
+      }
+    }
+  ],
+  "ui_config": { "app": { "colors": {}, "fonts": {} }, "localizations": {}, "variable_config": {}, "custom_variables": {} }
+}

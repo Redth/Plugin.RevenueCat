@@ -32,6 +32,7 @@
                     "type": "stack",
                     "spacing": 3,
                     "padding": { "top": 16, "bottom": 16, "leading": 16, "trailing": 16 },
+                    "shape": { "type": "rectangle", "corners": { "all": 18 } },
                     "background_color": { "light": { "type": "hex", "value": "#f1f5f9ff" } },
                     "components": [
                       { "type": "text", "id": "monthly-title", "text_lid": "monthly_title", "font_size": "body_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#111827ff" } } },
@@ -47,6 +48,7 @@
                     "type": "stack",
                     "spacing": 3,
                     "padding": { "top": 16, "bottom": 16, "leading": 16, "trailing": 16 },
+                    "shape": { "type": "rectangle", "corners": { "all": 18 } },
                     "background_color": { "light": { "type": "hex", "value": "#ecfdf5ff" } },
                     "components": [
                       { "type": "text", "id": "annual-title", "text_lid": "annual_title", "font_size": "body_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#065f46ff" } } },
@@ -62,6 +64,7 @@
                     "type": "stack",
                     "spacing": 3,
                     "padding": { "top": 16, "bottom": 16, "leading": 16, "trailing": 16 },
+                    "shape": { "type": "rectangle", "corners": { "all": 18 } },
                     "background_color": { "light": { "type": "hex", "value": "#fff7edff" } },
                     "components": [
                       { "type": "text", "id": "life-title", "text_lid": "life_title", "font_size": "body_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#9a3412ff" } } },
@@ -83,6 +86,7 @@
                     "stack": {
                       "type": "stack",
                       "padding": { "top": 15, "bottom": 15, "leading": 20, "trailing": 20 },
+                      "shape": { "type": "pill" },
                       "background_color": { "light": { "type": "hex", "value": "#16a34aff" } },
                       "components": [
                         { "type": "text", "id": "cta", "text_lid": "cta", "font_size": "body_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#ffffffff" } } }

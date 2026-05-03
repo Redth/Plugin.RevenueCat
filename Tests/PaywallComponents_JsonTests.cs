@@ -136,5 +136,44 @@ namespace Tests
 			Assert.IsNotNull(paywall);
 			Assert.AreEqual(0, paywall.ComponentsLocalizations.Count);
 		}
+
+		[TestMethod]
+		public void Sample_Paywall_Fixtures_Deserialize_Advanced_Components()
+		{
+			var repoRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
+			var paywallDirectory = Path.Combine(repoRoot, "sample-paywalls", "Resources", "Raw", "paywalls");
+			var fixturePaths = Directory.GetFiles(paywallDirectory, "*.json");
+
+			Assert.IsTrue(fixturePaths.Length >= 15);
+			foreach (var fixturePath in fixturePaths)
+			{
+				var json = File.ReadAllText(fixturePath);
+				var response = json.ToPaywallOfferingsResponse();
+				Assert.IsNotNull(response, $"Fixture failed to parse: {Path.GetFileName(fixturePath)}");
+			}
+
+			var carousel = File.ReadAllText(Path.Combine(paywallDirectory, "carousel_onboarding.json")).ToPaywallOfferingsResponse()
+				?.CurrentOffering?.PaywallComponents?.ComponentsConfig?.Base?.Stack?.Components
+				.OfType<PaywallCarouselComponent>()
+				.SingleOrDefault();
+			Assert.IsNotNull(carousel);
+			Assert.AreEqual(2, carousel.Pages.Count);
+			Assert.AreEqual(18, carousel.PagePeek);
+
+			var tabs = File.ReadAllText(Path.Combine(paywallDirectory, "tabbed_plans.json")).ToPaywallOfferingsResponse()
+				?.CurrentOffering?.PaywallComponents?.ComponentsConfig?.Base?.Stack?.Components
+				.OfType<PaywallTabsComponent>()
+				.SingleOrDefault();
+			Assert.IsNotNull(tabs);
+			Assert.AreEqual("annual", tabs.DefaultTabId);
+			Assert.AreEqual(2, tabs.Tabs.Count);
+
+			var timelineComponents = File.ReadAllText(Path.Combine(paywallDirectory, "timeline_countdown.json")).ToPaywallOfferingsResponse()
+				?.CurrentOffering?.PaywallComponents?.ComponentsConfig?.Base?.Stack?.Components;
+			Assert.IsNotNull(timelineComponents);
+			Assert.IsTrue(timelineComponents.OfType<PaywallTimelineComponent>().Any());
+			Assert.IsTrue(timelineComponents.OfType<PaywallCountdownComponent>().Any());
+			Assert.IsTrue(timelineComponents.OfType<PaywallVideoComponent>().Any());
+		}
 	}
 }

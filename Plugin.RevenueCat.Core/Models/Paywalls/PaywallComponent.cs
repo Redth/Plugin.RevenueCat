@@ -241,12 +241,87 @@ public sealed partial class PaywallStickyFooterComponent : PaywallComponent
 
 public sealed partial class PaywallCarouselComponent : PaywallComponent
 {
+	[JsonPropertyName("visible")]
+	public bool? Visible { get; set; }
+
+	[JsonPropertyName("size")]
+	public JsonElement? Size { get; set; }
+
+	[JsonPropertyName("padding")]
+	public JsonElement? Padding { get; set; }
+
+	[JsonPropertyName("margin")]
+	public JsonElement? Margin { get; set; }
+
+	[JsonPropertyName("background_color")]
+	public JsonElement? BackgroundColor { get; set; }
+
+	[JsonPropertyName("background")]
+	public JsonElement? Background { get; set; }
+
+	[JsonPropertyName("shape")]
+	public JsonElement? Shape { get; set; }
+
+	[JsonPropertyName("border")]
+	public JsonElement? Border { get; set; }
+
+	[JsonPropertyName("shadow")]
+	public JsonElement? Shadow { get; set; }
+
 	[JsonPropertyName("pages")]
 	public List<PaywallStackComponent> Pages { get; set; } = new();
+
+	[JsonPropertyName("page_alignment")]
+	public string? PageAlignment { get; set; }
+
+	[JsonPropertyName("page_spacing")]
+	public int? PageSpacing { get; set; }
+
+	[JsonPropertyName("page_peek")]
+	public int? PagePeek { get; set; }
+
+	[JsonPropertyName("initial_page_index")]
+	public int? InitialPageIndex { get; set; }
+
+	[JsonPropertyName("loop")]
+	public bool Loop { get; set; }
+
+	[JsonPropertyName("auto_advance")]
+	public JsonElement? AutoAdvance { get; set; }
+
+	[JsonPropertyName("page_control")]
+	public JsonElement? PageControl { get; set; }
 }
 
 public sealed partial class PaywallTabsComponent : PaywallComponent
 {
+	[JsonPropertyName("visible")]
+	public bool? Visible { get; set; }
+
+	[JsonPropertyName("size")]
+	public JsonElement? Size { get; set; }
+
+	[JsonPropertyName("padding")]
+	public JsonElement? Padding { get; set; }
+
+	[JsonPropertyName("margin")]
+	public JsonElement? Margin { get; set; }
+
+	[JsonPropertyName("background_color")]
+	public JsonElement? BackgroundColor { get; set; }
+
+	[JsonPropertyName("background")]
+	public JsonElement? Background { get; set; }
+
+	[JsonPropertyName("shape")]
+	public JsonElement? Shape { get; set; }
+
+	[JsonPropertyName("border")]
+	public JsonElement? Border { get; set; }
+
+	[JsonPropertyName("shadow")]
+	public JsonElement? Shadow { get; set; }
+
 	[JsonPropertyName("tabs")]
 	public List<PaywallTabComponent> Tabs { get; set; } = new();
 
@@ -284,6 +359,30 @@ public sealed partial class PaywallTabControlToggleComponent : PaywallComponent
 
 public sealed partial class PaywallTimelineComponent : PaywallComponent
 {
+	[JsonPropertyName("visible")]
+	public bool? Visible { get; set; }
+
+	[JsonPropertyName("icon_alignment")]
+	public string? IconAlignment { get; set; }
+
+	[JsonPropertyName("item_spacing")]
+	public double? ItemSpacing { get; set; }
+
+	[JsonPropertyName("text_spacing")]
+	public double? TextSpacing { get; set; }
+
+	[JsonPropertyName("column_gutter")]
+	public double? ColumnGutter { get; set; }
+
+	[JsonPropertyName("size")]
+	public JsonElement? Size { get; set; }
+
+	[JsonPropertyName("padding")]
+	public JsonElement? Padding { get; set; }
+
+	[JsonPropertyName("margin")]
+	public JsonElement? Margin { get; set; }
+
 	[JsonPropertyName("items")]
 	public List<JsonElement> Items { get; set; } = new();
 }
@@ -296,6 +395,17 @@ public sealed partial class PaywallVideoComponent : PaywallComponent
 
 public sealed partial class PaywallCountdownComponent : PaywallComponent
 {
+	[JsonPropertyName("style")]
+	public JsonElement? Style { get; set; }
+
+	[JsonPropertyName("count_from")]
+	public string? CountFrom { get; set; }
+
+	[JsonPropertyName("countdown_stack")]
+	public PaywallStackComponent? CountdownStack { get; set; }
+
+	[JsonPropertyName("end_stack")]
+	public PaywallStackComponent? EndStack { get; set; }
 }
 
 public sealed partial class PaywallFallbackHeaderComponent : PaywallComponent

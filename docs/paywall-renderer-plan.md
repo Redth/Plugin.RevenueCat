@@ -108,8 +108,13 @@ The current fixture set covers:
 - rounded cards, borders, pills, and shadows
 - light/dark gradients and color aliases
 - checklist rows, two-column benefit cards, bottom-sheet style layouts, lifetime offers, trial/story fallbacks, and comparison cards
+- carousel onboarding with page peek/spacing and page indicators
+- tabbed plan content with tab-control buttons
+- timeline rows, countdown variables, and video fallback behavior
 
-The sample includes deterministic local SVG assets under `sample-paywalls/Resources/Images/` and raw paywall JSON fixtures under `sample-paywalls/Resources/Raw/paywalls/`.
+The sample includes deterministic local SVG assets under `sample-paywalls/Resources/Images/` and raw paywall JSON fixtures under `sample-paywalls/Resources/Raw/paywalls/`. The SVG files are also packaged as raw app assets so the renderer exercises the SkiaSharp SVG path instead of relying on MAUI's generated PNG image assets.
+
+Apps that render paywalls should call `builder.UseRevenueCatPaywalls()` during MAUI startup. This registers SkiaSharp for SVG paywall image/icon rendering.
 
 DevFlow is installed through the repo tool manifest and enabled in the sample under `#if DEBUG` with `builder.AddMauiDevFlowAgent()`. Mac Catalyst debug builds include the local server entitlement needed by the DevFlow agent. Useful validation commands:
 
@@ -121,25 +126,26 @@ DevFlow is installed through the repo tool manifest and enabled in the sample un
 
 ## Component mapping
 
-| RevenueCat component | MAUI mapping | MVP |
+| RevenueCat component | MAUI mapping | Status |
 | --- | --- | --- |
 | root/base | `Grid` with background, scrollable body, optional header, optional sticky footer | Yes |
 | `stack` vertical | `VerticalStackLayout`; later `FlexLayout` for advanced distribution | Yes |
 | `stack` horizontal | `HorizontalStackLayout`; later `FlexLayout` for advanced distribution | Yes |
 | `stack` zlayer | `Grid` with layered children | Yes |
 | `text` | `Label` | Yes |
-| `image` | `Image` in optional `Border` | Yes |
-| `icon` | `Image` from resolved icon URL | Yes |
+| `image` | `Image` or SkiaSharp-backed SVG view in optional `Border` | Yes |
+| `icon` | `Image` or SkiaSharp-backed SVG view from resolved icon URL | Yes |
 | `button` | `Border`/`ContentView` with tap gesture and nested stack | Yes |
 | `package` | Selectable `Border`/`ContentView` with nested stack | Yes |
 | `purchase_button` | Tappable nested stack that calls purchase action | Yes |
 | `header` | Top row/overlay | Yes |
 | `sticky_footer` / `footer` | Bottom row pinned outside body scroll | Yes |
-| `carousel` | `CarouselView` | Later |
-| `tabs` / tab controls | selected content view + state | Later |
-| `timeline` | currently uses `fallback`; later custom `Grid`/`GraphicsView` connector rendering | Later |
-| `countdown` | timer-driven labels | Later |
-| `video` | media control dependency | Later |
+| `carousel` | `CarouselView` with page peek, spacing, loop, initial position, and `IndicatorView` page control | Partial |
+| `tabs` / tab-control buttons | selected content view + local tab state | Partial |
+| `tab_control_toggle` | placeholder `Switch` | Partial |
+| `timeline` | vertical rows with icon/title/description | Partial |
+| `countdown` | one-shot countdown variable resolution and countdown/end stack selection | Partial |
+| `video` | renders fallback component or placeholder | Partial |
 | unknown/unsupported | fallback component or invisible placeholder | Yes |
 
 ## Future custom layout option
@@ -166,11 +172,13 @@ The first implementation supports:
 - vertical/horizontal/z-layer layout.
 - text alignment, font size names, and basic font weight.
 - simple image fit modes.
-- local file and remote image/icon sources.
+- local file and remote image/icon sources, including SVG via SkiaSharp and `Svg.Skia`.
 - border/background/stroke visuals.
 - rounded rectangle and pill shapes.
 - shadows.
 - badge overlays.
+- carousel page controls.
+- package-local variable resolution so package cards can show their own prices while standalone purchase buttons use the selected package.
 
 Deferred:
 
@@ -178,12 +186,17 @@ Deferred:
 - advanced conditional overrides.
 - video backgrounds.
 - pixel-perfect safe-area/hero media behavior.
+- timeline connector drawing.
+- live countdown timer updates and disposal.
+- carousel auto-advance.
+- tab toggle semantics.
 
 ## State and actions
 
 The renderer needs local state for:
 
 - selected package ID.
+- selected tab ID for the currently rendered tabs component.
 - pending purchase/restore state.
 - current locale.
 - current app theme.
@@ -227,6 +240,7 @@ Use offline tests that do not require RevenueCat credentials:
 - unknown component fallback.
 - unsupported known component fallback.
 - package default selection.
+- advanced component fixture parsing.
 - basic component-to-view-node mapping.
 
 For MAUI controls, validate at least one platform build and keep most behavior in testable pure preprocessing helpers. The standalone gallery should also validate its raw fixture corpus with JSON parsing and build on Mac Catalyst/Android when renderer or sample XAML changes.

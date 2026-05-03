@@ -23,6 +23,8 @@
 
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) != ''">
 		<PackageReference Include="Microsoft.Maui.Controls" />
+		<PackageReference Include="SkiaSharp.Views.Maui.Controls" />
+		<PackageReference Include="Svg.Skia" />
 	</ItemGroup>
 
 	<ItemGroup>

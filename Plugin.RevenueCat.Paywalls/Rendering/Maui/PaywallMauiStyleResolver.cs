@@ -218,6 +218,29 @@ static class PaywallMauiStyleResolver
 		_ => TextAlignment.Center
 	};
 
+	public static void ApplyStackLayoutOptions(View view, JsonElement? dimension)
+	{
+		if (dimension is null or { ValueKind: JsonValueKind.Null or JsonValueKind.Undefined } ||
+			dimension.Value.ValueKind != JsonValueKind.Object)
+		{
+			return;
+		}
+
+		var dimensionType = GetType(dimension.Value);
+		var alignment = GetString(dimension.Value, "alignment");
+		var distribution = GetString(dimension.Value, "distribution");
+
+		if (dimensionType == "horizontal")
+		{
+			ApplyHorizontalOption(view, distribution);
+			ApplyVerticalOption(view, alignment);
+			return;
+		}
+
+		ApplyHorizontalOption(view, alignment);
+		ApplyVerticalOption(view, distribution);
+	}
+
 	public static double ResolveFontSize(JsonElement? element)
 	{
 		if (element is null or { ValueKind: JsonValueKind.Null or JsonValueKind.Undefined })
@@ -356,6 +379,10 @@ static class PaywallMauiStyleResolver
 		}
 	}
 
+	public static double? ResolveFixedHeight(JsonElement? element) => ResolveFixedSize(element, "height");
+
+	public static double? ResolveFixedWidth(JsonElement? element) => ResolveFixedSize(element, "width");
+
 	public static bool HasContainerDecoration(JsonElement? shape, JsonElement? border, JsonElement? shadow) =>
 		shape is { ValueKind: JsonValueKind.Object } ||
 		border is { ValueKind: JsonValueKind.Object } ||
@@ -379,6 +406,22 @@ static class PaywallMauiStyleResolver
 		return cornerRadius == default
 			? new Rectangle()
 			: new RoundRectangle { CornerRadius = cornerRadius };
+	}
+
+	public static CornerRadius ResolveCornerRadius(JsonElement? shape)
+	{
+		if (shape is null or { ValueKind: JsonValueKind.Null or JsonValueKind.Undefined } ||
+			shape.Value.ValueKind != JsonValueKind.Object)
+		{
+			return default;
+		}
+
+		if (GetType(shape.Value) == "pill")
+		{
+			return new CornerRadius(999);
+		}
+
+		return ResolveCornerRadius(shape.Value);
 	}
 
 	public static Brush? ResolveBorderBrush(JsonElement? border, PaywallUiConfig? uiConfig)
@@ -455,8 +498,55 @@ static class PaywallMauiStyleResolver
 		}
 	}
 
+	static double? ResolveFixedSize(JsonElement? element, string propertyName)
+	{
+		if (element is null or { ValueKind: JsonValueKind.Null or JsonValueKind.Undefined } ||
+			element.Value.ValueKind != JsonValueKind.Object ||
+			!element.Value.TryGetProperty(propertyName, out var constraint) ||
+			GetType(constraint) != "fixed" ||
+			!constraint.TryGetProperty("value", out var value) ||
+			!value.TryGetDouble(out var fixedSize))
+		{
+			return null;
+		}
+
+		return fixedSize;
+	}
+
 	static double GetDouble(JsonElement element, string propertyName) =>
 		element.TryGetProperty(propertyName, out var value) && value.TryGetDouble(out var number) ? number : 0;
+
+	static string? GetString(JsonElement element, string propertyName) =>
+		element.TryGetProperty(propertyName, out var value) && value.ValueKind == JsonValueKind.String
+			? value.GetString()
+			: null;
+
+	static void ApplyHorizontalOption(View view, string? value)
+	{
+		var option = ResolveLayoutOption(value);
+		if (option is not null)
+		{
+			view.HorizontalOptions = option.Value;
+		}
+	}
+
+	static void ApplyVerticalOption(View view, string? value)
+	{
+		var option = ResolveLayoutOption(value);
+		if (option is not null)
+		{
+			view.VerticalOptions = option.Value;
+		}
+	}
+
+	static LayoutOptions? ResolveLayoutOption(string? value) => value switch
+	{
+		"center" => LayoutOptions.Center,
+		"end" or "trailing" or "bottom" => LayoutOptions.End,
+		"fill" => LayoutOptions.Fill,
+		"start" or "leading" or "top" => LayoutOptions.Start,
+		_ => null
+	};
 
 	static CornerRadius ResolveCornerRadius(JsonElement shape)
 	{
