@@ -11,6 +11,7 @@ public interface IRevenueCatManager
 	void Initialize();
 
 	Task<CustomerInfo?> LoginAsync(string userId);
+	Task<string?> GetAppUserIdAsync();
 	Task<CustomerInfo?> GetCustomerInfoAsync(bool force);
 
 	Task<Offering?> GetOfferingAsync(string offeringIdentifier);
@@ -42,4 +43,3 @@ public interface IRevenueCatManager
 	void SetAttributes(IDictionary<string, string> attributes);
 
 }
-

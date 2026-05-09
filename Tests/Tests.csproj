@@ -26,6 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Plugin.RevenueCat.Api\Plugin.RevenueCat.Api.csproj" />
     <ProjectReference Include="..\Plugin.RevenueCat.Core\Plugin.RevenueCat.Core.csproj" />
+    <ProjectReference Include="..\Plugin.RevenueCat.Paywalls\Plugin.RevenueCat.Paywalls.csproj" />
   </ItemGroup>
 
   <ItemGroup>

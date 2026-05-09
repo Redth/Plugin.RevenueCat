@@ -1,0 +1,152 @@
+{
+  "current_offering_id": "timeline",
+  "offerings": [
+    {
+      "identifier": "timeline",
+      "description": "Timeline countdown example",
+      "packages": [
+        { "identifier": "$rc_three_month", "platform_product_identifier": "pro_three_month" }
+      ],
+      "paywall_components": {
+        "id": "timeline_countdown_fixture",
+        "template_name": "components",
+        "revision": 1,
+        "components_config": {
+          "base": {
+            "background": { "type": "color", "value": { "light": { "type": "hex", "value": "#0f172aff" } } },
+            "stack": {
+              "type": "stack",
+              "spacing": 16,
+              "padding": { "top": 34, "bottom": 24, "leading": 18, "trailing": 18 },
+              "components": [
+                { "type": "text", "id": "title", "text_lid": "title", "font_size": "heading_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#ffffffff" } } },
+                {
+                  "type": "timeline",
+                  "id": "onboarding-timeline",
+                  "item_spacing": 14,
+                  "text_spacing": 4,
+                  "column_gutter": 12,
+                  "items": [
+                    {
+                      "title": { "type": "text", "id": "timeline-one-title", "text_lid": "timeline_1_title", "font_size": "body_l", "font_weight": "bold", "horizontal_alignment": "leading", "color": { "light": { "type": "hex", "value": "#ffffffff" } } },
+                      "description": { "type": "text", "id": "timeline-one-copy", "text_lid": "timeline_1_copy", "font_size": "body_s", "horizontal_alignment": "leading", "color": { "light": { "type": "hex", "value": "#cbd5e1ff" } } },
+                      "icon": { "type": "icon", "id": "timeline-one-icon", "formats": { "svg": "paywall_star.svg" }, "size": { "width": { "type": "fixed", "value": 34 }, "height": { "type": "fixed", "value": 34 } } },
+                      "connector": {
+                        "width": 2,
+                        "color": { "light": { "type": "hex", "value": "#60a5faff" } },
+                        "margin": { "top": 5, "bottom": -2 }
+                      }
+                    },
+                    {
+                      "title": { "type": "text", "id": "timeline-two-title", "text_lid": "timeline_2_title", "font_size": "body_l", "font_weight": "bold", "horizontal_alignment": "leading", "color": { "light": { "type": "hex", "value": "#ffffffff" } } },
+                      "description": { "type": "text", "id": "timeline-two-copy", "text_lid": "timeline_2_copy", "font_size": "body_s", "horizontal_alignment": "leading", "color": { "light": { "type": "hex", "value": "#cbd5e1ff" } } },
+                      "icon": { "type": "icon", "id": "timeline-two-icon", "formats": { "svg": "paywall_check.svg" }, "size": { "width": { "type": "fixed", "value": 34 }, "height": { "type": "fixed", "value": 34 } } }
+                    }
+                  ]
+                },
+                {
+                  "type": "countdown",
+                  "id": "launch-countdown",
+                  "style": { "type": "date", "date": "2030-01-01T00:00:00Z" },
+                  "count_from": "days",
+                  "countdown_stack": {
+                    "type": "stack",
+                    "spacing": 4,
+                    "padding": { "top": 16, "bottom": 16, "leading": 18, "trailing": 18 },
+                    "shape": { "type": "rectangle", "corners": { "all": 22 } },
+                    "background_color": { "light": { "type": "hex", "value": "#1e293bff" } },
+                    "components": [
+                      { "type": "text", "id": "countdown-label", "text_lid": "countdown_label", "font_size": "body_s", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#93c5fdff" } } },
+                      { "type": "text", "id": "countdown-value", "text_lid": "countdown_value", "font_size": "heading_s", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#ffffffff" } } }
+                    ]
+                  },
+                  "end_stack": {
+                    "type": "stack",
+                    "spacing": 4,
+                    "padding": { "top": 16, "bottom": 16, "leading": 18, "trailing": 18 },
+                    "shape": { "type": "rectangle", "corners": { "all": 22 } },
+                    "background_color": { "light": { "type": "hex", "value": "#3f1d1dff" } },
+                    "components": [
+                      { "type": "text", "id": "countdown-ended", "text_lid": "countdown_ended", "font_size": "body_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#fecacaff" } } }
+                    ]
+                  }
+                },
+                {
+                  "type": "video",
+                  "id": "promo-video",
+                  "source": { "url": "https://example.com/revenuecat-paywall-demo.mp4" },
+                  "fallback": {
+                    "type": "stack",
+                    "spacing": 6,
+                    "padding": { "top": 16, "bottom": 16, "leading": 18, "trailing": 18 },
+                    "shape": { "type": "rectangle", "corners": { "all": 22 } },
+                    "background_color": { "light": { "type": "hex", "value": "#172554ff" } },
+                    "components": [
+                      { "type": "text", "id": "video-title", "text_lid": "video_title", "font_size": "body_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#ffffffff" } } },
+                      { "type": "text", "id": "video-copy", "text_lid": "video_copy", "font_size": "body_s", "horizontal_alignment": "center", "color": { "light": { "type": "hex", "value": "#bfdbfeff" } } }
+                    ]
+                  }
+                },
+                {
+                  "type": "package",
+                  "id": "season-pass",
+                  "package_id": "$rc_three_month",
+                  "is_selected_by_default": true,
+                  "stack": {
+                    "type": "stack",
+                    "padding": { "top": 16, "bottom": 16, "leading": 18, "trailing": 18 },
+                    "shape": { "type": "pill" },
+                    "background_color": { "light": { "type": "hex", "value": "#ffffffff" } },
+                    "components": [
+                      { "type": "text", "id": "package", "text_lid": "package", "font_size": "body_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#1d4ed8ff" } } }
+                    ]
+                  }
+                }
+              ]
+            },
+            "sticky_footer": {
+              "type": "footer",
+              "stack": {
+                "type": "stack",
+                "padding": { "top": 14, "bottom": 22, "leading": 24, "trailing": 24 },
+                "components": [
+                  {
+                    "type": "purchase_button",
+                    "id": "purchase",
+                    "stack": {
+                      "type": "stack",
+                      "padding": { "top": 15, "bottom": 15, "leading": 20, "trailing": 20 },
+                      "shape": { "type": "pill" },
+                      "background_color": { "light": { "type": "hex", "value": "#2563ebff" } },
+                      "components": [
+                        { "type": "text", "id": "cta", "text_lid": "cta", "font_size": "body_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#ffffffff" } } }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "components_localizations": {
+          "en_US": {
+            "title": "Your Pro launch path",
+            "timeline_1_title": "Today: unlock workflows",
+            "timeline_1_copy": "Timeline title, description, and icon fields are rendered as structured rows.",
+            "timeline_2_title": "Next: keep momentum",
+            "timeline_2_copy": "Countdown and video fallback components exercise post-MVP schema paths.",
+            "countdown_label": "Launch offer ends in",
+            "countdown_value": "{{ countdown }}",
+            "countdown_ended": "Launch offer ended",
+            "video_title": "Video fallback",
+            "video_copy": "The renderer surfaces the configured fallback until native media playback is implemented.",
+            "package": "{{ product_name }} - {{ price }}",
+            "cta": "Claim launch offer"
+          }
+        },
+        "default_locale": "en_US"
+      }
+    }
+  ],
+  "ui_config": { "app": { "colors": {}, "fonts": {} }, "localizations": {}, "variable_config": {}, "custom_variables": {} }
+}

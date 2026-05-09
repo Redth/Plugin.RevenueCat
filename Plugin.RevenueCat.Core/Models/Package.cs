@@ -17,6 +17,9 @@ public partial class Package
 	[JsonPropertyName("package_type")]
 	[JsonConverter(typeof(JsonStringEnumConverter<PackageType>))]
 	public PackageType PackageType { get; set; } = PackageType.Unknown;
+
+	[JsonPropertyName("web_checkout_url")]
+	public string? WebCheckoutUrl { get; set; }
 	
 	[JsonPropertyName("store_product")]
 	public StoreProduct? StoreProduct { get; set; }

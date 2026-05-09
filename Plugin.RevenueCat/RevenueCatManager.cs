@@ -66,6 +66,9 @@ public class RevenueCatManager : IRevenueCatManager
 	public Task<CustomerInfo?> LoginAsync(string userId)
 		=> Request<CustomerInfo>(nameof(LoginAsync), () => PlatformImplementation.LoginAsync(userId));
 
+	public Task<string?> GetAppUserIdAsync()
+		=> PlatformImplementation.GetAppUserIdAsync();
+
 	public Task<CustomerInfo?> GetCustomerInfoAsync(bool force)
 		=> Request<CustomerInfo>(nameof(GetCustomerInfoAsync), () => PlatformImplementation.GetCustomerInfoAsync(force));
 	
@@ -173,4 +176,3 @@ public class RevenueCatManager : IRevenueCatManager
 		return obj;
 	}
 }
-

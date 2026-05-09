@@ -22,5 +22,58 @@ namespace Tests
 
             Assert.IsNotNull(c);
         }
+
+        [TestMethod]
+        public void Can_Deserialize_Single_Offering_With_Paywall_Fields()
+        {
+            const string json = """
+            {
+              "id": "default",
+              "identifier": "default",
+              "description": "Default offering",
+              "metadata": {
+                "campaign": "spring"
+              },
+              "packages": [],
+              "web_checkout_url": "https://checkout.revenuecat.com/example",
+              "ui_config": {
+                "app": {
+                  "colors": {},
+                  "fonts": {}
+                },
+                "localizations": {},
+                "variable_config": {
+                  "variable_compatibility_map": {},
+                  "function_compatibility_map": {}
+                },
+                "custom_variables": {}
+              },
+              "paywall_components": {
+                "id": "pw1",
+                "template_name": "components",
+                "revision": 1,
+                "components_config": {
+                  "base": {
+                    "stack": {
+                      "type": "stack",
+                      "components": []
+                    }
+                  }
+                },
+                "components_localizations": {},
+                "default_locale": "en_US"
+              }
+            }
+            """;
+
+            var offering = json.ToOffering();
+
+            Assert.IsNotNull(offering);
+            Assert.AreEqual("spring", offering.Metadata["campaign"].GetString());
+            Assert.AreEqual("https://checkout.revenuecat.com/example", offering.WebCheckoutUrl);
+            Assert.IsNotNull(offering.UiConfig);
+            Assert.IsNotNull(offering.PaywallComponents);
+            Assert.AreEqual("pw1", offering.PaywallComponents.Id);
+        }
     }
 }

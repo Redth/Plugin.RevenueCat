@@ -17,6 +17,9 @@ namespace RevenueCat
 		[Async]
 		void Login(string userId, System.Action<NSString?, NSError?> callback);
 
+		[Export("getAppUserId")]
+		NSString? GetAppUserId();
+
 		// GetCustomerInfo method
 		[Export("getCustomerInfo:callback:")]
 		[Async]

@@ -1,0 +1,105 @@
+{
+  "current_offering_id": "actions",
+  "offerings": [
+    {
+      "identifier": "actions",
+      "description": "Actions and fallback example",
+      "packages": [
+        { "identifier": "$rc_weekly", "platform_product_identifier": "pro_weekly" }
+      ],
+      "paywall_components": {
+        "id": "actions_fixture",
+        "template_name": "components",
+        "revision": 1,
+        "components_config": {
+          "base": {
+            "background": { "type": "color", "value": { "light": { "type": "hex", "value": "#f8fafcff" } } },
+            "stack": {
+              "type": "stack",
+              "spacing": 16,
+              "padding": { "top": 40, "bottom": 24, "leading": 24, "trailing": 24 },
+              "components": [
+                { "type": "text", "id": "title", "text_lid": "title", "font_size": "heading_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#111827ff" } } },
+                { "type": "text", "id": "subtitle", "text_lid": "subtitle", "font_size": "body_m", "horizontal_alignment": "center", "color": { "light": { "type": "hex", "value": "#4b5563ff" } } },
+                {
+                  "type": "timeline_preview",
+                  "id": "unsupported-fallback",
+                  "fallback": {
+                    "type": "text",
+                    "id": "fallback-text",
+                    "text_lid": "fallback",
+                    "font_size": "body_l",
+                    "font_weight": "bold",
+                    "color": { "light": { "type": "hex", "value": "#7c3aedff" } }
+                  }
+                },
+                {
+                  "type": "button",
+                  "id": "restore",
+                  "action": { "type": "restore_purchases" },
+                  "stack": {
+                    "type": "stack",
+                    "padding": { "top": 14, "bottom": 14, "leading": 16, "trailing": 16 },
+                    "shape": { "type": "rectangle", "corners": { "all": 16 } },
+                    "background_color": { "light": { "type": "hex", "value": "#e0e7ffff" } },
+                    "components": [
+                      { "type": "text", "id": "restore-text", "text_lid": "restore", "font_size": "body_m", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#3730a3ff" } } }
+                    ]
+                  }
+                },
+                {
+                  "type": "button",
+                  "id": "privacy",
+                  "action": { "type": "navigate_to", "destination": "privacy" },
+                  "stack": {
+                    "type": "stack",
+                    "padding": { "top": 14, "bottom": 14, "leading": 16, "trailing": 16 },
+                    "shape": { "type": "rectangle", "corners": { "all": 16 } },
+                    "background_color": { "light": { "type": "hex", "value": "#f1f5f9ff" } },
+                    "components": [
+                      { "type": "text", "id": "privacy-text", "text_lid": "privacy", "font_size": "body_m", "color": { "light": { "type": "hex", "value": "#334155ff" } } }
+                    ]
+                  }
+                }
+              ]
+            },
+            "sticky_footer": {
+              "type": "footer",
+              "stack": {
+                "type": "stack",
+                "padding": { "top": 16, "bottom": 24, "leading": 24, "trailing": 24 },
+                "components": [
+                  {
+                    "type": "purchase_button",
+                    "id": "purchase",
+                    "stack": {
+                      "type": "stack",
+                      "padding": { "top": 15, "bottom": 15, "leading": 20, "trailing": 20 },
+                      "shape": { "type": "pill" },
+                      "background_color": { "light": { "type": "hex", "value": "#7c3aedff" } },
+                      "components": [
+                        { "type": "text", "id": "cta", "text_lid": "cta", "font_size": "body_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#ffffffff" } } }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "components_localizations": {
+          "en_US": {
+            "title": "Host-controlled actions",
+            "subtitle": "The control raises events instead of buying directly, so this sample has no RevenueCat initialization.",
+            "fallback": "Unknown component rendered its fallback.",
+            "restore": "Restore purchases",
+            "privacy": "Open privacy policy",
+            "cta": "Try weekly for {{ price }}"
+          }
+        },
+        "default_locale": "en_US"
+      }
+    }
+  ],
+  "ui_config": { "app": { "colors": {}, "fonts": {} }, "localizations": {}, "variable_config": {}, "custom_variables": {} }
+}

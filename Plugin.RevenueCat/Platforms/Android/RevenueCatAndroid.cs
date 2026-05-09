@@ -66,6 +66,9 @@ public class RevenueCatAndroid : Java.Lang.Object, IRevenueCatPlatformImplementa
 		return s?.ToString();
 	}
 
+	public Task<string?> GetAppUserIdAsync()
+		=> Task.FromResult(global::RevenueCat.RevenueCatManager.AppUserId);
+
 	public async Task<string?> GetCustomerInfoAsync(bool force)
 	{
 		var s = await global::RevenueCat.RevenueCatManager.GetCustomerInfo(force)!.AsTask<Java.Lang.String>();
