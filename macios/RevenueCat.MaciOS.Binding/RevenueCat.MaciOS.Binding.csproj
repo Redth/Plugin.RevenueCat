@@ -31,7 +31,7 @@
 			-->
 		</XcodeProject>
 
-		<NativeReference Include="../native/bin/deps/RevenueCat/RevenueCat.xcframework">
+		<NativeReference Include="../native/bin/deps/RevenueCat.xcframework">
 			<Kind>Framework</Kind>
 			<SmartLink>true</SmartLink>
 			<ForceLoad>true</ForceLoad>
@@ -121,13 +121,13 @@
 	
 	<Target Name="DownloadNativeDependencies" BeforeTargets="Build" Condition=" '$(IsCrossTargetingBuild)' == 'true' ">
 		<PropertyGroup>
-			<RevenueCatSdkVersion>5.55.2</RevenueCatSdkVersion>
+			<RevenueCatSdkVersion>5.72.0</RevenueCatSdkVersion>
 
 			<RevenueCatSdkUrl>https://github.com/RevenueCat/purchases-ios/releases/download/$(RevenueCatSdkVersion)/RevenueCat.xcframework.zip</RevenueCatSdkUrl>
 			
 			<_RevenueCatDownloadPath>$([System.IO.Path]::GetFullPath($(MSBuildProjectDirectory)))/../native/bin/deps</_RevenueCatDownloadPath>
-			<_RevenueCatFrameworkPListFilePath>$(_RevenueCatDownloadPath)/RevenueCat/RevenueCat.xcframework/Info.plist</_RevenueCatFrameworkPListFilePath>
-			<_RevenueCatXcFrameworkPath>$(_RevenueCatDownloadPath)/RevenueCat/RevenueCat.xcframework</_RevenueCatXcFrameworkPath>
+			<_RevenueCatFrameworkPListFilePath>$(_RevenueCatDownloadPath)/RevenueCat.xcframework/Info.plist</_RevenueCatFrameworkPListFilePath>
+			<_RevenueCatXcFrameworkPath>$(_RevenueCatDownloadPath)/RevenueCat.xcframework</_RevenueCatXcFrameworkPath>
 		</PropertyGroup>
 
 		<DownloadFile SourceUrl="$(RevenueCatSdkUrl)" DestinationFolder="$([System.IO.Path]::GetFullPath($(MSBuildProjectDirectory)/../native/bin/deps))">
@@ -144,7 +144,7 @@
 			<_RevenueCatUnwantedPlatforms Include="watchos-arm64_i386_x86_64-simulator" />
 		</ItemGroup>
 		
-		<Exec Command="codesign --deep --remove-signature $(_RevenueCatDownloadPath)/RevenueCat/RevenueCat.xcframework" />
+		<Exec Command="codesign --deep --remove-signature $(_RevenueCatXcFrameworkPath)" />
 		
 		<!-- Remove vision and watchos to save space -->
 		<RemoveDir Directories="$(_RevenueCatXcFrameworkPath)/%(_RevenueCatUnwantedPlatforms.Identity)" />
