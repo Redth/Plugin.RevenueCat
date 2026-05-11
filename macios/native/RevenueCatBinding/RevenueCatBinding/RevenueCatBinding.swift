@@ -156,7 +156,16 @@ public class RevenueCatManager : NSObject
                 
                 //callback(currentOffering.description as NSString, nil)
             } else {
-                callback(nil, nil)
+                let requestedOffering = offeringId.trimmingCharacters(in: .whitespacesAndNewlines)
+                let message = requestedOffering.isEmpty
+                    ? "No current offering is configured."
+                    : "No offering found for identifier '\(requestedOffering)' and no current offering is configured."
+                let error = NSError(
+                    domain: "RevenueCatManager",
+                    code: 404,
+                    userInfo: [NSLocalizedDescriptionKey: message]
+                )
+                callback(nil, error)
             }
         }
     }

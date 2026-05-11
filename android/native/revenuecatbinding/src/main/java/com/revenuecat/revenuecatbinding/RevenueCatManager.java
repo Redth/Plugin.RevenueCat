@@ -107,12 +107,24 @@ public class RevenueCatManager
         Purchases.getSharedInstance().getOfferings(new ReceiveOfferingsCallback() {
             @Override
             public void onReceived(@NonNull Offerings offerings) {
-                Offering offering;
+                Offering offering = null;
+                String requestedOffering = offeringIdentifier == null ? "" : offeringIdentifier.trim();
 
-                if (offeringIdentifier != null)
+                if (!requestedOffering.isEmpty()) {
                     offering = offerings.get(offeringIdentifier);
-                else
+                }
+
+                if (offering == null) {
                     offering = offerings.getCurrent();
+                }
+
+                if (offering == null) {
+                    String message = requestedOffering.isEmpty()
+                        ? "No current offering is configured."
+                        : "No offering found for identifier '" + requestedOffering + "' and no current offering is configured.";
+                    future.completeExceptionally(new Exception(message));
+                    return;
+                }
 
                 Map<String, Object> offeringInfo = new HashMap<>();
                 offeringInfo.put("id", offering.getIdentifier());
@@ -342,4 +354,3 @@ public class RevenueCatManager
 		return future;
 	}
 }
-
