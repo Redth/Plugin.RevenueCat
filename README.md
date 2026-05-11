@@ -57,8 +57,18 @@ Use the `IRevenueCatManager` instance (resolved through dependency injection) to
 - `Initialize(...)` - this is called for you if you use the `UseRevenueCat()` builder method and calling it again manually has no effect
 - `Task<CustomerInfoRequest?> LoginAsync(string userId)` once you know the user identifier for your purchases, you should call this.  You should avoid calling it unnecessarily as it can cause multiple user account objects to be created if you do.  You should also try to call it as early in the lifecycle of your app as possible.
 - `Task<CustomerInfoRequest?> GetCustomerInfoAsync(bool force)` Call this to get the latest customer info.  If you use `false` for `force`, you may have a cached instance returned from the method.  Use `true` to force updating from the server.  The `CustomerInfoUpdated` event and any callback you specify in the initialization will also be called with the updated info regardless of the `force` value you set here.
-- `Task<Offering?> GetOfferingAsync(string offeringIdentifier)` Gets the offering (and its packages/products) for a given identifier.  Use this to get the information you need to display to the user when deciding on a purchase, such as the packages, prices, etc.
+- `Task<Offering?> GetOfferingAsync(string offeringIdentifier)` Gets the offering (and its packages/products) for a given identifier.  Use this to get the information you need to display to the user when deciding on a purchase, such as the packages, prices, etc.  If no exact match is found, the platform bindings fall back to the current/default offering when one is configured.
 - `Task<CustomerInfoRequest?> RestoreAsync()` - Restores any purchases and returns the customer info which will have the entitlements relevant to the user.
 - `Task<CustomerInfoRequest?> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier)` - Initiates a purchase.  The `platformContext` should be an `Activity` (likely the current one) on Android, and is currently unused on iOS/MacCatalyst.  There's a version of this method you can call which infers the default 'current' activity of your MAUI app automatically.  You also need to pass the `offeringIdentifier` and the `packageIdentifier` the user wants to purchase (if you only have one package, pick the first one).
 - `Task<CustomerInfoRequest?> PurchaseAsync(string offeringIdentifier, string packageIdentifier)` - Same as above, but Initiates a purchase.  The `platformContext` should be an `Activity` (likely the current one) on Android, and is currently unused on iOS/MacCatalyst.  There's a version of this method you can call which infers the default 'current' activity of your MAUI app automatically.  You also need to pass the `offeringIdentifier` and the `packageIdentifier` the user wants to purchase (if you only have one package, pick the first one).
 - `Task<CustomerInfoRequest?> PurchaseAsync(string offeringIdentifier, string packageIdentifier)` - Same as above, but automatically infers the default 'current' activity of your MAUI app automatically.
+
+### Android 15 / 16 KB page-size notes
+
+This binding package does not currently ship native RevenueCat `.so` libraries on Android, so 16 KB Play Console warnings are usually caused by the consuming app's packaged native dependencies or Android build toolchain rather than the RevenueCat wrapper itself.
+
+Current .NET for Android toolchains align Android packages for 16 KB pages by default. If warnings persist in a consuming app, update to a current .NET for Android / .NET MAUI workload, inspect the final APK or AAB, and identify which packaged native library needs an update. For APKs, Android's `zipalign` verification can check shared-library alignment:
+
+```bash
+zipalign -c -P 16 -v 4 path/to/app.apk
+```

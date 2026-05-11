@@ -70,7 +70,10 @@ public class RevenueCatManager : IRevenueCatManager
 		=> Request<CustomerInfo>(nameof(GetCustomerInfoAsync), () => PlatformImplementation.GetCustomerInfoAsync(force));
 	
 	public Task<Offering?> GetOfferingAsync(string offeringIdentifier)
-		=> Request<Offering>(nameof(GetOfferingAsync), () => PlatformImplementation.GetOfferingAsync(offeringIdentifier));
+	{
+		Logger.LogInformation("RevenueCatManager->{Name}: Requesting offering '{OfferingIdentifier}'.", nameof(GetOfferingAsync), offeringIdentifier);
+		return Request<Offering>(nameof(GetOfferingAsync), () => PlatformImplementation.GetOfferingAsync(offeringIdentifier));
+	}
 
 	public Task<CustomerInfo?> RestoreAsync()
 		=> Request<CustomerInfo>(nameof(RestoreAsync), PlatformImplementation.RestoreAsync);
@@ -143,7 +146,14 @@ public class RevenueCatManager : IRevenueCatManager
 	{
 		if (string.IsNullOrEmpty(json))
 		{
-			Logger.LogWarning("RevenueCatManager->{Name}: JSON response is null or empty.", name);
+			if (typeof(TObject) == typeof(Offering))
+			{
+				Logger.LogWarning("RevenueCatManager->{Name}: JSON response is null or empty. Check that the requested offering exists or that a current/default offering is configured in RevenueCat.", name);
+			}
+			else
+			{
+				Logger.LogWarning("RevenueCatManager->{Name}: JSON response is null or empty.", name);
+			}
 			return default;
 		}
 		
@@ -173,4 +183,3 @@ public class RevenueCatManager : IRevenueCatManager
 		return obj;
 	}
 }
-
