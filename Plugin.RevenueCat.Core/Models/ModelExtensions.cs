@@ -21,9 +21,19 @@ public static class ModelExtensions
 
 	public static Offering? ToOffering(this string? json) => json is null ? default : JsonSerializer.Deserialize(json, ModelSerializerContext.Default.Offering);
 
+	public static Offerings? ToOfferings(this string? json) => json is null ? default : JsonSerializer.Deserialize(json, ModelSerializerContext.Default.Offerings);
+
+	public static List<StoreProduct>? ToStoreProducts(this string? json) => json is null ? default : JsonSerializer.Deserialize(json, ModelSerializerContext.Default.ListStoreProduct);
+
+	public static PurchaseResult? ToPurchaseResult(this string? json) => json is null ? default : JsonSerializer.Deserialize(json, ModelSerializerContext.Default.PurchaseResult);
+
 	public static string ToJson(this CustomerInfo self) => JsonSerializer.Serialize(self, ModelSerializerContext.Default.CustomerInfo);
 
 	public static string ToJson(this Offering self) => JsonSerializer.Serialize(self, ModelSerializerContext.Default.Offering);
+
+	public static string ToJson(this Offerings self) => JsonSerializer.Serialize(self, ModelSerializerContext.Default.Offerings);
+
+	public static string ToJson(this PurchaseResult self) => JsonSerializer.Serialize(self, ModelSerializerContext.Default.PurchaseResult);
 
 	public static readonly JsonSerializerOptions Settings = ModelSerializerContext.Default.Options;
 }

@@ -22,6 +22,12 @@ public partial class Offering
 
 	[JsonPropertyName("packages")]
 	public List<Package> Packages { get; set; } = new();
+
+	[JsonPropertyName("metadata")]
+	public Dictionary<string, JsonElement> Metadata { get; set; } = new();
+
+	[JsonExtensionData]
+	public IDictionary<string, JsonElement>? ExtensionData { get; set; }
 }
 #pragma warning restore CS8618
 #pragma warning restore CS8601

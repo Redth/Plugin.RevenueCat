@@ -105,6 +105,55 @@ public class RevenueCatOptionsBuilder
 		AppStore = appStore;
 		return this;
 	}
+
+	public string? ProxyUrl { get; set; }
+	public RevenueCatOptionsBuilder WithProxyUrl(string? proxyUrl)
+	{
+		ProxyUrl = proxyUrl;
+		return this;
+	}
+
+	public RevenueCatPurchasesAreCompletedBy? PurchasesAreCompletedBy { get; set; }
+	public RevenueCatOptionsBuilder WithPurchasesAreCompletedBy(RevenueCatPurchasesAreCompletedBy? purchasesAreCompletedBy)
+	{
+		PurchasesAreCompletedBy = purchasesAreCompletedBy;
+		return this;
+	}
+
+	public RevenueCatEntitlementVerificationMode? EntitlementVerificationMode { get; set; }
+	public RevenueCatOptionsBuilder WithEntitlementVerificationMode(RevenueCatEntitlementVerificationMode? entitlementVerificationMode)
+	{
+		EntitlementVerificationMode = entitlementVerificationMode;
+		return this;
+	}
+
+	public bool? DiagnosticsEnabled { get; set; }
+	public RevenueCatOptionsBuilder WithDiagnosticsEnabled(bool? diagnosticsEnabled)
+	{
+		DiagnosticsEnabled = diagnosticsEnabled;
+		return this;
+	}
+
+	public bool? AutomaticDeviceIdentifierCollectionEnabled { get; set; }
+	public RevenueCatOptionsBuilder WithAutomaticDeviceIdentifierCollectionEnabled(bool? automaticDeviceIdentifierCollectionEnabled)
+	{
+		AutomaticDeviceIdentifierCollectionEnabled = automaticDeviceIdentifierCollectionEnabled;
+		return this;
+	}
+
+	public RevenueCatStoreKitVersion? StoreKitVersion { get; set; }
+	public RevenueCatOptionsBuilder WithStoreKitVersion(RevenueCatStoreKitVersion? storeKitVersion)
+	{
+		StoreKitVersion = storeKitVersion;
+		return this;
+	}
+
+	public bool? PendingTransactionsForPrepaidPlansEnabled { get; set; }
+	public RevenueCatOptionsBuilder WithPendingTransactionsForPrepaidPlansEnabled(bool? pendingTransactionsForPrepaidPlansEnabled)
+	{
+		PendingTransactionsForPrepaidPlansEnabled = pendingTransactionsForPrepaidPlansEnabled;
+		return this;
+	}
 	
 	public Action<CustomerInfo>? CustomerInfoUpdatedCallback { get; set; }
 	public RevenueCatOptionsBuilder WithCallback(Action<CustomerInfo>? callback)
@@ -122,5 +171,14 @@ public class RevenueCatOptionsBuilder
 			Debug,
 			UserId,
 			AppStore,
-			CustomerInfoUpdatedCallback);
+			CustomerInfoUpdatedCallback)
+		{
+			ProxyUrl = ProxyUrl,
+			PurchasesAreCompletedBy = PurchasesAreCompletedBy,
+			EntitlementVerificationMode = EntitlementVerificationMode,
+			DiagnosticsEnabled = DiagnosticsEnabled,
+			AutomaticDeviceIdentifierCollectionEnabled = AutomaticDeviceIdentifierCollectionEnabled,
+			StoreKitVersion = StoreKitVersion,
+			PendingTransactionsForPrepaidPlansEnabled = PendingTransactionsForPrepaidPlansEnabled
+		};
 }

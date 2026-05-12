@@ -8,8 +8,8 @@ namespace Tests;
 [TestClass]
 public static class Hosting
 {
-	public static IServiceProvider ServiceProvider { get; private set; }
-	public static IConfigurationRoot Configuration { get; private set; }
+	public static IServiceProvider ServiceProvider { get; private set; } = null!;
+	public static IConfigurationRoot Configuration { get; private set; } = null!;
 
 	static IServiceCollection services = new ServiceCollection();
 
@@ -54,24 +54,49 @@ public static class Hosting
 		var apiKeyV1 = Configuration["AppSettings:ApiKeyV1"];
 		var apiKeyV2 = Configuration["AppSettings:ApiKeyV2"];
 
-		if (string.IsNullOrEmpty(apiKeyV1))
-			throw new InvalidOperationException("AppSettings:ApiKeyV1 is not configured. Please set it in .env file, user secrets, or environment variables.");
-		
-		if (string.IsNullOrEmpty(apiKeyV2))
-			throw new InvalidOperationException("AppSettings:ApiKeyV2 is not configured. Please set it in .env file, user secrets, or environment variables.");
-
-		services.AddRevenueCatApiV1(new Plugin.RevenueCat.Api.V1.RevenueCatApiV1Settings
+		if (!string.IsNullOrEmpty(apiKeyV1))
+		{
+			services.AddRevenueCatApiV1(new Plugin.RevenueCat.Api.V1.RevenueCatApiV1Settings
 			{
 				ApiKey = apiKeyV1
 			});
-		services.AddRevenueCatApiV2(new Plugin.RevenueCat.Api.V2.RevenueCatApiV2Settings
+		}
+
+		if (!string.IsNullOrEmpty(apiKeyV2))
 		{
-			ApiKey = apiKeyV2
-		});
+			services.AddRevenueCatApiV2(new Plugin.RevenueCat.Api.V2.RevenueCatApiV2Settings
+			{
+				ApiKey = apiKeyV2
+			});
+		}
 
 		ServiceProvider = services.BuildServiceProvider();
 	}
 
+	public static IRevenueCatApiV1 RequireApiV1()
+	{
+		if (string.IsNullOrEmpty(Configuration["AppSettings:ApiKeyV1"]))
+			Assert.Inconclusive("AppSettings:ApiKeyV1 is not configured. Set it in .env, user secrets, or environment variables to run API V1 integration tests.");
+
+		return ServiceProvider.GetRequiredService<IRevenueCatApiV1>();
+	}
+
+	public static IRevenueCatApiV2 RequireApiV2()
+	{
+		if (string.IsNullOrEmpty(Configuration["AppSettings:ApiKeyV2"]))
+			Assert.Inconclusive("AppSettings:ApiKeyV2 is not configured. Set it in .env, user secrets, or environment variables to run API V2 integration tests.");
+
+		return ServiceProvider.GetRequiredService<IRevenueCatApiV2>();
+	}
+
+	public static string RequireSetting(string key)
+	{
+		var value = Configuration[key];
+		if (string.IsNullOrEmpty(value))
+			Assert.Inconclusive($"{key} must be configured to run this integration test.");
+
+		return value;
+	}
 
 	[AssemblyCleanup]
 	public static void AssemblyCleanup()

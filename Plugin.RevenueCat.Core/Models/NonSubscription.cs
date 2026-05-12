@@ -1,24 +1,31 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Plugin.RevenueCat.Models;
 
 public class NonSubscription
 {
 	[JsonPropertyName("display_name")]
-	public string DisplayName { get; set; }
+	public string? DisplayName { get; set; }
 
 	[JsonPropertyName("id")]
-	public string Id { get; set; }
+	public string? Id { get; set; }
 
 	[JsonPropertyName("is_sandbox")]
 	public bool IsSandbox { get; set; }
 
 	[JsonPropertyName("price")]
-	public Price Price { get; set; }
+	public Price? Price { get; set; }
 
 	[JsonPropertyName("store")]
-	public string Store { get; set; }
+	public string? Store { get; set; }
 
 	[JsonPropertyName("purchase_date")]
 	public DateTimeOffset? PurchaseDate { get; set; }
+
+	[JsonPropertyName("store_transaction_id")]
+	public string? StoreTransactionId { get; set; }
+
+	[JsonExtensionData]
+	public IDictionary<string, JsonElement>? ExtensionData { get; set; }
 }

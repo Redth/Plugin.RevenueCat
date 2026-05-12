@@ -8,8 +8,8 @@ namespace Tests
 		public TestContext TestContext { get; set; }
 
 		[TestMethod]
-		[DeploymentItem("data/custoimerinfo_json_android.json")]
-		[DeploymentItem("data/custoimerinfo_json_ios.json")]
+		[DeploymentItem("data/customerinfo_json_android.json")]
+		[DeploymentItem("data/customerinfo_json_ios.json")]
 		[DataRow("android")]
 		[DataRow("ios")]
 		public void Can_Deserialize_Json(string platform)

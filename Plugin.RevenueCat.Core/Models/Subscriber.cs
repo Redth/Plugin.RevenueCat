@@ -7,6 +7,7 @@ namespace Plugin.RevenueCat.Models;
 
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 public partial class Subscriber
@@ -21,13 +22,13 @@ public partial class Subscriber
 	public DateTimeOffset? LastSeen { get; set; }
 
 	[JsonPropertyName("management_url")]
-	public string ManagementUrl { get; set; }
+	public string? ManagementUrl { get; set; }
 
 	[JsonPropertyName("original_app_user_id")]
-	public string OriginalAppUserId { get; set; }
+	public string? OriginalAppUserId { get; set; }
 
 	[JsonPropertyName("original_application_version")]
-	public string OriginalApplicationVersion { get; set; }
+	public string? OriginalApplicationVersion { get; set; }
 
 	[JsonPropertyName("original_purchase_date")]
 	public DateTimeOffset? OriginalPurchaseDate { get; set; }
@@ -37,6 +38,12 @@ public partial class Subscriber
 
 	[JsonPropertyName("non_subscriptions")]
 	public Dictionary<string, List<NonSubscription>> NonSubscriptions { get; set; } = new();
+
+	[JsonPropertyName("other_purchases")]
+	public Dictionary<string, List<NonSubscription>> OtherPurchases { get; set; } = new();
+
+	[JsonExtensionData]
+	public IDictionary<string, JsonElement>? ExtensionData { get; set; }
 }
 #pragma warning restore CS8618
 #pragma warning restore CS8601

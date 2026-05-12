@@ -11,10 +11,8 @@ public sealed class ApiV1Tests
 	[TestMethod]
 	public async Task Get_Or_Create_Customer_Has_Entitlements()
 	{
-		var api = Hosting.ServiceProvider.GetRequiredService<IRevenueCatApiV1>();
-		var customerId = Hosting.Configuration["TestSettings:CustomerId"];
-
-		Assert.IsNotNull(customerId, "TestSettings:CustomerId must be configured");
+		var api = Hosting.RequireApiV1();
+		var customerId = Hosting.RequireSetting("TestSettings:CustomerId");
 
 		var r = await api.GetOrCreateCustomer(customerId);
 
@@ -26,10 +24,8 @@ public sealed class ApiV1Tests
 	[TestMethod]
 	public async Task Get_Offerings()
 	{
-		var api = Hosting.ServiceProvider.GetRequiredService<IRevenueCatApiV1>();
-		var customerId = Hosting.Configuration["TestSettings:CustomerId"];
-
-		Assert.IsNotNull(customerId, "TestSettings:CustomerId must be configured");
+		var api = Hosting.RequireApiV1();
+		var customerId = Hosting.RequireSetting("TestSettings:CustomerId");
 
 		var r = await api.GetOfferings(customerId);
 
@@ -40,10 +36,8 @@ public sealed class ApiV1Tests
 	[TestMethod]
 	public async Task Get_Management_Url()
 	{
-		var api = Hosting.ServiceProvider.GetRequiredService<IRevenueCatApiV1>();
-		var customerId = Hosting.Configuration["TestSettings:CustomerId"];
-
-		Assert.IsNotNull(customerId, "TestSettings:CustomerId must be configured");
+		var api = Hosting.RequireApiV1();
+		var customerId = Hosting.RequireSetting("TestSettings:CustomerId");
 
 		// GetManagementUrl should not throw; it may return null if no management URL exists
 		var managementUrl = await api.GetManagementUrl(customerId);

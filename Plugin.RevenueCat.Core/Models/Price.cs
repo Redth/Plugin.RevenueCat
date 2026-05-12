@@ -9,10 +9,19 @@ using System.Text.Json.Serialization;
 public partial class Price
 {
 	[JsonPropertyName("amount")]
-	public double Amount { get; set; }
+	public double? Amount { get; set; }
 
 	[JsonPropertyName("currency")]
-	public string Currency { get; set; }
+	public string? Currency { get; set; }
+
+	[JsonPropertyName("amount_micros")]
+	public long? AmountMicros { get; set; }
+
+	[JsonPropertyName("currency_code")]
+	public string? CurrencyCode { get; set; }
+
+	[JsonPropertyName("formatted")]
+	public string? Formatted { get; set; }
 }
 #pragma warning restore CS8618
 #pragma warning restore CS8601
