@@ -1,0 +1,21 @@
+{
+  "status": "success",
+  "obfuscated_email": "s***@example.test",
+  "customer_info": {
+    "request_date": "2025-01-15T12:36:00Z",
+    "subscriber": {
+      "entitlements": {
+        "premium": {
+          "identifier": "premium",
+          "expires_date": "2025-02-15T12:36:00Z",
+          "product_identifier": "pro_monthly",
+          "purchase_date": "2025-01-15T12:36:00Z",
+          "is_active": true,
+          "will_renew": true
+        }
+      },
+      "subscriptions": {},
+      "non_subscriptions": {}
+    }
+  }
+}

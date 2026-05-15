@@ -1,0 +1,299 @@
+{
+  "current_offering_id": "default",
+  "current": {
+    "id": "default",
+    "identifier": "default",
+    "description": "Spring Test Offering",
+    "metadata": {
+      "experiment": "spring-2025",
+      "rank": 1,
+      "paywall": "main",
+      "synthetic": true
+    },
+    "packages": [
+      {
+        "id": "$rc_monthly",
+        "identifier": "$rc_monthly",
+        "package_type": "monthly",
+        "store_product": {
+          "identifier": "pro_monthly",
+          "id": "pro_monthly:base-monthly",
+          "name": "pro_monthly",
+          "is_family_shareable": true,
+          "description": "Synthetic monthly premium access",
+          "title": "Premium Monthly",
+          "price_string": "$9.99",
+          "currency_code": "USD",
+          "product_type": "subscription",
+          "product_category": "subscription",
+          "base_plan_id": "base-monthly",
+          "price": {
+            "amount": 9.99,
+            "currency": "USD",
+            "amount_micros": 9990000,
+            "currency_code": "USD",
+            "formatted": "$9.99"
+          },
+          "subscription_period": {
+            "value": 1,
+            "unit": "month"
+          },
+          "introductory_discount": {
+            "identifier": "intro-free-trial",
+            "offer_identifier": "intro",
+            "type": "introductory",
+            "payment_mode": "free_trial",
+            "price": {
+              "amount": 0,
+              "currency": "USD",
+              "amount_micros": 0,
+              "currency_code": "USD",
+              "formatted": "$0.00"
+            },
+            "price_string": "$0.00",
+            "currency_code": "USD",
+            "subscription_period": {
+              "value": 7,
+              "unit": "day"
+            },
+            "number_of_periods": 1
+          },
+          "discounts": [
+            {
+              "identifier": "winback-half-price",
+              "offer_identifier": "winback",
+              "type": "promotional",
+              "payment_mode": "pay_as_you_go",
+              "price": {
+                "amount": 4.99,
+                "currency": "USD",
+                "amount_micros": 4990000,
+                "currency_code": "USD",
+                "formatted": "$4.99"
+              },
+              "price_string": "$4.99",
+              "currency_code": "USD",
+              "subscription_period": {
+                "value": 1,
+                "unit": "month"
+              },
+              "number_of_periods": 3
+            }
+          ],
+          "subscription_options": [
+            {
+              "id": "base-monthly:intro",
+              "product_id": "pro_monthly",
+              "base_plan_id": "base-monthly",
+              "offer_id": "intro",
+              "offer_token": "token-intro-monthly",
+              "tags": [
+                "intro",
+                "trial"
+              ],
+              "is_base_plan": false,
+              "is_prepaid": false,
+              "billing_period": {
+                "value": 1,
+                "unit": "month"
+              },
+              "pricing_phases": [
+                {
+                  "billing_period": {
+                    "value": 7,
+                    "unit": "day"
+                  },
+                  "recurrence_mode": "FINITE_RECURRING",
+                  "billing_cycle_count": 1,
+                  "offer_payment_mode": "FREE_TRIAL",
+                  "price": {
+                    "amount": 0,
+                    "currency": "USD",
+                    "amount_micros": 0,
+                    "currency_code": "USD",
+                    "formatted": "$0.00"
+                  }
+                },
+                {
+                  "billing_period": {
+                    "value": 1,
+                    "unit": "month"
+                  },
+                  "recurrence_mode": "INFINITE_RECURRING",
+                  "billing_cycle_count": 0,
+                  "offer_payment_mode": "FULL_PRICE",
+                  "price": {
+                    "amount": 9.99,
+                    "currency": "USD",
+                    "amount_micros": 9990000,
+                    "currency_code": "USD",
+                    "formatted": "$9.99"
+                  },
+                  "price_per_month": {
+                    "amount": 9.99,
+                    "currency": "USD",
+                    "amount_micros": 9990000,
+                    "currency_code": "USD",
+                    "formatted": "$9.99"
+                  },
+                  "price_per_year": {
+                    "amount": 119.88,
+                    "currency": "USD",
+                    "amount_micros": 119880000,
+                    "currency_code": "USD",
+                    "formatted": "$119.88"
+                  }
+                }
+              ],
+              "free_phase": {
+                "billing_period": {
+                  "value": 7,
+                  "unit": "day"
+                },
+                "recurrence_mode": "FINITE_RECURRING",
+                "billing_cycle_count": 1,
+                "offer_payment_mode": "FREE_TRIAL",
+                "price": {
+                  "amount": 0,
+                  "currency": "USD",
+                  "amount_micros": 0,
+                  "currency_code": "USD",
+                  "formatted": "$0.00"
+                }
+              },
+              "full_price_phase": {
+                "billing_period": {
+                  "value": 1,
+                  "unit": "month"
+                },
+                "recurrence_mode": "INFINITE_RECURRING",
+                "billing_cycle_count": 0,
+                "offer_payment_mode": "FULL_PRICE",
+                "price": {
+                  "amount": 9.99,
+                  "currency": "USD",
+                  "amount_micros": 9990000,
+                  "currency_code": "USD",
+                  "formatted": "$9.99"
+                },
+                "price_per_month": {
+                  "amount": 9.99,
+                  "currency": "USD",
+                  "amount_micros": 9990000,
+                  "currency_code": "USD",
+                  "formatted": "$9.99"
+                },
+                "price_per_year": {
+                  "amount": 119.88,
+                  "currency": "USD",
+                  "amount_micros": 119880000,
+                  "currency_code": "USD",
+                  "formatted": "$119.88"
+                }
+              },
+              "installments_info": {
+                "commitment_payments_count": 3,
+                "renewal_commitment_payments_count": 1
+              },
+              "presented_offering_identifier": "default"
+            }
+          ],
+          "default_subscription_option": {
+            "id": "base-monthly",
+            "product_id": "pro_monthly",
+            "base_plan_id": "base-monthly",
+            "offer_id": null,
+            "offer_token": "token-base-monthly",
+            "tags": [
+              "base",
+              "monthly"
+            ],
+            "is_base_plan": true,
+            "is_prepaid": false,
+            "billing_period": {
+              "value": 1,
+              "unit": "month"
+            },
+            "pricing_phases": [],
+            "installments_info": {
+              "commitment_payments_count": 0,
+              "renewal_commitment_payments_count": 0
+            },
+            "presented_offering_identifier": "default"
+          },
+          "presented_offering_identifier": "default"
+        }
+      },
+      {
+        "id": "$rc_lifetime",
+        "identifier": "$rc_lifetime",
+        "type": "lifetime",
+        "store_product": {
+          "identifier": "lifetime_access",
+          "id": "lifetime_access",
+          "name": "lifetime_access",
+          "is_family_shareable": true,
+          "description": "Synthetic lifetime premium access",
+          "title": "Premium Lifetime",
+          "price_string": "$49.99",
+          "currency_code": "USD",
+          "product_type": "inapp",
+          "product_category": "non_subscription",
+          "price": {
+            "amount": 49.99,
+            "currency": "USD",
+            "amount_micros": 49990000,
+            "currency_code": "USD",
+            "formatted": "$49.99"
+          },
+          "discounts": [],
+          "subscription_options": [],
+          "presented_offering_identifier": "default"
+        }
+      }
+    ]
+  },
+  "all": {
+    "default": {
+      "id": "default",
+      "identifier": "default",
+      "description": "Spring Test Offering",
+      "metadata": {
+        "experiment": "spring-2025",
+        "rank": 1,
+        "paywall": "main",
+        "synthetic": true
+      },
+      "packages": []
+    },
+    "lifetime": {
+      "id": "lifetime",
+      "identifier": "lifetime",
+      "description": "Lifetime Test Offering",
+      "metadata": {
+        "experiment": "lifetime-2025"
+      },
+      "packages": []
+    }
+  },
+  "offerings": [
+    {
+      "id": "default",
+      "identifier": "default",
+      "description": "Spring Test Offering",
+      "metadata": {
+        "experiment": "spring-2025"
+      },
+      "packages": []
+    },
+    {
+      "id": "lifetime",
+      "identifier": "lifetime",
+      "description": "Lifetime Test Offering",
+      "metadata": {
+        "experiment": "lifetime-2025"
+      },
+      "packages": []
+    }
+  ]
+}

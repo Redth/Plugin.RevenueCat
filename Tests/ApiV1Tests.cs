@@ -4,6 +4,8 @@ using Plugin.RevenueCat.Api;
 namespace Tests;
 
 [TestClass]
+[TestCategory("Integration")]
+[TestCategory("RequiresRevenueCatSecrets")]
 public sealed class ApiV1Tests
 {
 	public TestContext TestContext { get; set; }

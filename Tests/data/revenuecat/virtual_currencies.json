@@ -1,0 +1,16 @@
+{
+  "all": {
+    "coins": {
+      "code": "coins",
+      "name": "Coins",
+      "balance": 125,
+      "server_description": "Spendable synthetic coins"
+    },
+    "gems": {
+      "code": "gems",
+      "name": "Gems",
+      "balance": 7,
+      "server_description": "Premium synthetic gems"
+    }
+  }
+}

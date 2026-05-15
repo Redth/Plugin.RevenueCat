@@ -78,6 +78,18 @@ For non-throwing error handling, use the matching `*WithResultAsync` / `*WithOpe
 
 Configuration options are available through `RevenueCatOptionsBuilder` for explicit store selection (`WithAppStore("google" | "amazon" | "test")`), proxy URL, purchases-completed-by mode, entitlement verification mode, diagnostics, automatic device identifier collection, iOS StoreKit version, and Android pending prepaid-plan transactions.
 
+### Smoke validation
+
+The sample app can be smoke-built without live purchases to validate MAUI packaging and binding references:
+
+```bash
+dotnet build ./sample/MauiSample.csproj -f net10.0-android --no-restore
+dotnet build ./sample/MauiSample.csproj -f net10.0-ios --no-restore
+dotnet build ./sample/MauiSample.csproj -f net10.0-maccatalyst --no-restore
+```
+
+These commands only compile/package the sample; real purchase flows still require platform store configuration and test accounts.
+
 ### Android 15 / 16 KB page-size notes
 
 This binding package does not currently ship native RevenueCat `.so` libraries on Android, so 16 KB Play Console warnings are usually caused by the consuming app's packaged native dependencies or Android build toolchain rather than the RevenueCat wrapper itself.

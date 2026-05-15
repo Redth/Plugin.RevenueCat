@@ -30,13 +30,13 @@ public class RevenueCatManager : NSObject
             builder.with(appUserID: userId)
         }
 
-        if let purchasesAreCompletedBy = parsePurchasesAreCompletedBy(purchasesAreCompletedBy) {
-            builder.with(purchasesAreCompletedBy: purchasesAreCompletedBy, storeKitVersion: parseStoreKitVersion(storeKitVersion) ?? .default)
-        } else if let storeKitVersion = parseStoreKitVersion(storeKitVersion) {
+        if let purchasesAreCompletedBy = RevenueCatBindingHelpers.parsePurchasesAreCompletedBy(purchasesAreCompletedBy) {
+            builder.with(purchasesAreCompletedBy: purchasesAreCompletedBy, storeKitVersion: RevenueCatBindingHelpers.parseStoreKitVersion(storeKitVersion) ?? .default)
+        } else if let storeKitVersion = RevenueCatBindingHelpers.parseStoreKitVersion(storeKitVersion) {
             builder.with(storeKitVersion: storeKitVersion)
         }
 
-        if let entitlementVerificationMode = parseEntitlementVerificationMode(entitlementVerificationMode) {
+        if let entitlementVerificationMode = RevenueCatBindingHelpers.parseEntitlementVerificationMode(entitlementVerificationMode) {
             builder.with(entitlementVerificationMode: entitlementVerificationMode)
         }
 
@@ -466,32 +466,26 @@ public class RevenueCatManager : NSObject
 
         Task {
             let result = await Purchases.shared.redeemWebPurchase(redemption)
-            var resultInfo = [String: Any]()
-
             switch result {
             case .success(let customerInfo):
-                resultInfo["status"] = "success"
-                resultInfo["customer_info"] = customerInfo.rawData
+                let resultInfo = RevenueCatBindingHelpers.webPurchaseRedemptionPayload(status: .success, customerInfoRawData: customerInfo.rawData)
                 self.processCustomerInfo(customerInfo: customerInfo, originalError: nil) { _, _ in }
+                self.serializeJson(resultInfo, callback: callback)
             case .error(let error):
                 callback(nil, error as NSError)
-                return
             case .invalidToken:
-                resultInfo["status"] = "invalid_token"
+                self.serializeJson(RevenueCatBindingHelpers.webPurchaseRedemptionPayload(status: .invalidToken), callback: callback)
             case .purchaseBelongsToOtherUser:
-                resultInfo["status"] = "purchase_belongs_to_other_user"
+                self.serializeJson(RevenueCatBindingHelpers.webPurchaseRedemptionPayload(status: .purchaseBelongsToOtherUser), callback: callback)
             case .expired(let obfuscatedEmail):
-                resultInfo["status"] = "expired"
-                resultInfo["obfuscated_email"] = obfuscatedEmail
+                self.serializeJson(RevenueCatBindingHelpers.webPurchaseRedemptionPayload(status: .expired, obfuscatedEmail: obfuscatedEmail), callback: callback)
             }
-
-            self.serializeJson(resultInfo, callback: callback)
         }
     }
 
     private func processPurchaseResult(storeTransaction: StoreTransaction?, customerInfo: CustomerInfo?, originalError: Error?, userCancelled: Bool, callback: @escaping (NSString?, NSError?) -> Void) {
         if userCancelled {
-            serializeJson(["user_cancelled": true], callback: callback)
+            serializeJson(RevenueCatBindingHelpers.purchaseCancelledPayload(), callback: callback)
             return
         }
 
@@ -500,10 +494,7 @@ public class RevenueCatManager : NSObject
             return
         }
 
-        var resultInfo = [String: Any]()
-        resultInfo["user_cancelled"] = false
-        resultInfo["customer_info"] = customerInfo?.rawData
-        resultInfo["store_transaction"] = storeTransaction.map { serializeStoreTransaction($0) }
+        let resultInfo = RevenueCatBindingHelpers.purchaseResultPayload(customerInfoRawData: customerInfo?.rawData, storeTransaction: storeTransaction)
 
         if let customerInfo = customerInfo {
             processCustomerInfo(customerInfo: customerInfo, originalError: nil) { _, _ in }
@@ -569,23 +560,8 @@ public class RevenueCatManager : NSObject
     }
 
     private func parsePurchaseOptions(_ purchaseOptionsJson: NSString?, callback: @escaping (NSString?, NSError?) -> Void) -> [String: Any]? {
-        guard let purchaseOptionsJson = purchaseOptionsJson as String?,
-              !purchaseOptionsJson.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            return [:]
-        }
-
-        guard let data = purchaseOptionsJson.data(using: .utf8) else {
-            callback(nil, NSError(domain: "RevenueCatManager", code: 400, userInfo: [NSLocalizedDescriptionKey: "Purchase options JSON is not valid UTF-8."]))
-            return nil
-        }
-
         do {
-            guard let options = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
-                callback(nil, NSError(domain: "RevenueCatManager", code: 400, userInfo: [NSLocalizedDescriptionKey: "Purchase options JSON must be an object."]))
-                return nil
-            }
-
-            return options
+            return try RevenueCatBindingHelpers.parsePurchaseOptions(purchaseOptionsJson)
         } catch let error as NSError {
             callback(nil, error)
             return nil
@@ -606,13 +582,7 @@ public class RevenueCatManager : NSObject
     }
 
     private func optionString(_ options: [String: Any], keys: [String]) -> String? {
-        for key in keys {
-            if let value = options[key] as? String {
-                return value
-            }
-        }
-
-        return nil
+        return RevenueCatBindingHelpers.optionString(options, keys: keys)
     }
 
     private func serializeOffering(_ offering: Offering) -> [String: Any] {
@@ -703,13 +673,7 @@ public class RevenueCatManager : NSObject
     }
 
     private func serializeStoreTransaction(_ storeTransaction: StoreTransaction) -> [String: Any] {
-        return [
-            "id": storeTransaction.id,
-            "transaction_identifier": storeTransaction.transactionIdentifier,
-            "product_identifier": storeTransaction.productIdentifier,
-            "purchase_date": storeTransaction.purchaseDate.ISO8601Format(),
-            "quantity": storeTransaction.quantity
-        ]
+        return RevenueCatBindingHelpers.serializeStoreTransaction(storeTransaction)
     }
 
     private func serializeVirtualCurrencies(_ virtualCurrencies: VirtualCurrencies) -> [String: Any] {
@@ -732,72 +696,33 @@ public class RevenueCatManager : NSObject
 
     private func serializeJson(_ value: Any, callback: @escaping (NSString?, NSError?) -> Void) {
         do {
-            let jsonData = try JSONSerialization.data(withJSONObject: value, options: [])
-            let jsonStr = NSString(data: jsonData, encoding: String.Encoding.utf8.rawValue)
-            callback(jsonStr, nil)
+            callback(try RevenueCatBindingHelpers.serializeJsonString(value), nil)
         } catch let error as NSError {
             callback(nil, error)
         }
     }
 
     private func packageTypeIdentifier(_ packageType: RevenueCat.PackageType) -> String {
-        switch packageType {
-        case .annual: return "annual"
-        case .monthly: return "monthly"
-        case .weekly: return "weekly"
-        case .custom: return "custom"
-        case .lifetime: return "lifetime"
-        case .sixMonth: return "six_month"
-        case .threeMonth: return "three_month"
-        case .twoMonth: return "two_month"
-        case .unknown: return "unknown"
-        @unknown default: return "unknown"
-        }
+        return RevenueCatBindingHelpers.packageTypeIdentifier(packageType)
     }
 
     private func subscriptionPeriodUnitIdentifier(_ unit: RevenueCat.SubscriptionPeriod.Unit) -> String {
-        switch unit {
-        case .day: return "day"
-        case .year: return "year"
-        case .month: return "month"
-        case .week: return "week"
-        @unknown default: return "unknown"
-        }
+        return RevenueCatBindingHelpers.subscriptionPeriodUnitIdentifier(unit)
     }
 
     private func productTypeIdentifier(_ productType: StoreProduct.ProductType) -> String {
-        switch productType {
-        case .consumable: return "consumable"
-        case .nonConsumable: return "non_consumable"
-        case .nonRenewableSubscription: return "non_renewing_subscription"
-        case .autoRenewableSubscription: return "auto_renewable_subscription"
-        @unknown default: return "unknown"
-        }
+        return RevenueCatBindingHelpers.productTypeIdentifier(productType)
     }
 
     private func productCategoryIdentifier(_ productCategory: StoreProduct.ProductCategory) -> String {
-        switch productCategory {
-        case .subscription: return "subscription"
-        case .nonSubscription: return "non_subscription"
-        @unknown default: return "unknown"
-        }
+        return RevenueCatBindingHelpers.productCategoryIdentifier(productCategory)
     }
 
     private func paymentModeIdentifier(_ paymentMode: StoreProductDiscount.PaymentMode) -> String {
-        switch paymentMode {
-        case .payAsYouGo: return "pay_as_you_go"
-        case .payUpFront: return "pay_up_front"
-        case .freeTrial: return "free_trial"
-        @unknown default: return "unknown"
-        }
+        return RevenueCatBindingHelpers.paymentModeIdentifier(paymentMode)
     }
 
     private func discountTypeIdentifier(_ discountType: StoreProductDiscount.DiscountType) -> String {
-        switch discountType {
-        case .introductory: return "introductory"
-        case .promotional: return "promotional"
-        case .winBack: return "win_back"
-        @unknown default: return "unknown"
-        }
+        return RevenueCatBindingHelpers.discountTypeIdentifier(discountType)
     }
 }

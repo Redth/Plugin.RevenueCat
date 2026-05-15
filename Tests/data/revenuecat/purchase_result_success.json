@@ -1,0 +1,44 @@
+{
+  "user_cancelled": false,
+  "store_transaction": {
+    "id": "transaction-synthetic-001",
+    "transaction_identifier": "txn_purchase_001",
+    "product_identifier": "pro_monthly",
+    "product_identifiers": [
+      "pro_monthly",
+      "base-monthly:intro"
+    ],
+    "purchase_date": "2025-01-15T12:35:00Z",
+    "quantity": 1,
+    "store": "play_store"
+  },
+  "customer_info": {
+    "request_date": "2025-01-15T12:35:01Z",
+    "request_date_ms": 1736944501000,
+    "schema_version": 3,
+    "verification_result": "VERIFIED",
+    "subscriber": {
+      "entitlements": {
+        "premium": {
+          "identifier": "premium",
+          "expires_date": "2025-02-15T12:35:00Z",
+          "product_identifier": "pro_monthly",
+          "purchase_date": "2025-01-15T12:35:00Z",
+          "latest_purchase_date": "2025-01-15T12:35:00Z",
+          "original_purchase_date": "2025-01-15T12:35:00Z",
+          "is_active": true,
+          "will_renew": true,
+          "period_type": "normal",
+          "store": "play_store",
+          "is_sandbox": true,
+          "ownership_type": "PURCHASED",
+          "product_plan_identifier": "base-monthly"
+        }
+      },
+      "subscriptions": {},
+      "non_subscriptions": {},
+      "other_purchases": {},
+      "original_app_user_id": "synthetic-user-001"
+    }
+  }
+}

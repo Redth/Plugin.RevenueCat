@@ -75,12 +75,7 @@ public class RevenueCatManager
 
         PurchasesConfiguration.Builder builder = new PurchasesConfiguration.Builder(context, apiKey);
 
-        if (appStore.equals("amazon"))
-            builder.store(Store.AMAZON);
-        else if (appStore.equals("test"))
-            builder.store(Store.TEST_STORE);
-        else
-            builder.store(Store.PLAY_STORE);
+        builder.store(parseStore(appStore));
 
         if (userId != null) {
             builder.appUserID(userId);
@@ -277,14 +272,7 @@ public class RevenueCatManager
 
     public static CompletableFuture<String> getProducts(String productIdentifiersCsv, @Nullable String productType) {
         CompletableFuture<String> future = new CompletableFuture<>();
-        List<String> productIdentifiers = new ArrayList<>();
-
-        for (String productIdentifier : productIdentifiersCsv.split(",")) {
-            String trimmed = productIdentifier.trim();
-            if (!trimmed.isEmpty()) {
-                productIdentifiers.add(trimmed);
-            }
-        }
+        List<String> productIdentifiers = parseCsvIdentifiers(productIdentifiersCsv);
 
         GetStoreProductsCallback callback = new GetStoreProductsCallback() {
             @Override
@@ -798,7 +786,7 @@ public class RevenueCatManager
 	}
 
     @SuppressWarnings("unchecked")
-    private static Map<String, Object> parsePurchaseOptions(@Nullable String purchaseOptionsJson) {
+    static Map<String, Object> parsePurchaseOptions(@Nullable String purchaseOptionsJson) {
         if (purchaseOptionsJson == null || purchaseOptionsJson.trim().isEmpty()) {
             return new HashMap<>();
         }
@@ -862,7 +850,7 @@ public class RevenueCatManager
         throw new IllegalArgumentException("Subscription option '" + subscriptionOptionId + "' was not found for product '" + storeProduct.getId() + "'.");
     }
 
-    private static StoreReplacementMode parseReplacementMode(String replacementMode) {
+    static StoreReplacementMode parseReplacementMode(String replacementMode) {
         String normalized = replacementMode.trim().toLowerCase()
                 .replace("_", "")
                 .replace("-", "")
@@ -884,12 +872,12 @@ public class RevenueCatManager
         }
     }
 
-    private static String optionString(Map<String, Object> options, String key) {
+    static String optionString(Map<String, Object> options, String key) {
         Object value = options.get(key);
         return value instanceof String ? (String)value : null;
     }
 
-    private static Boolean optionBoolean(Map<String, Object> options, String key) {
+    static Boolean optionBoolean(Map<String, Object> options, String key) {
         Object value = options.get(key);
         if (value instanceof Boolean) {
             return (Boolean)value;
@@ -902,11 +890,11 @@ public class RevenueCatManager
         return null;
     }
 
-    private static boolean hasText(@Nullable String value) {
+    static boolean hasText(@Nullable String value) {
         return value != null && !value.trim().isEmpty();
     }
 
-    private static PurchasesAreCompletedBy parsePurchasesAreCompletedBy(@Nullable String value) {
+    static PurchasesAreCompletedBy parsePurchasesAreCompletedBy(@Nullable String value) {
         String normalized = normalizeOption(value);
         if (normalized.equals("revenuecat")) {
             return PurchasesAreCompletedBy.REVENUECAT;
@@ -919,7 +907,7 @@ public class RevenueCatManager
         return null;
     }
 
-    private static EntitlementVerificationMode parseEntitlementVerificationMode(@Nullable String value) {
+    static EntitlementVerificationMode parseEntitlementVerificationMode(@Nullable String value) {
         String normalized = normalizeOption(value);
         if (normalized.equals("disabled")) {
             return EntitlementVerificationMode.DISABLED;
@@ -932,7 +920,7 @@ public class RevenueCatManager
         return null;
     }
 
-    private static String normalizeOption(@Nullable String value) {
+    static String normalizeOption(@Nullable String value) {
         if (value == null) {
             return "";
         }
@@ -943,7 +931,16 @@ public class RevenueCatManager
                 .replace(" ", "");
     }
 
-    private static ProductType parseProductType(@Nullable String productType) {
+    static Store parseStore(String appStore) {
+        if (appStore.equals("amazon"))
+            return Store.AMAZON;
+        else if (appStore.equals("test"))
+            return Store.TEST_STORE;
+        else
+            return Store.PLAY_STORE;
+    }
+
+    static ProductType parseProductType(@Nullable String productType) {
         if (productType == null || productType.trim().isEmpty()) {
             return null;
         }
@@ -961,16 +958,42 @@ public class RevenueCatManager
         return null;
     }
 
+    static List<String> parseCsvIdentifiers(String identifiersCsv) {
+        List<String> identifiers = new ArrayList<>();
+
+        for (String identifier : identifiersCsv.split(",")) {
+            String trimmed = identifier.trim();
+            if (!trimmed.isEmpty()) {
+                identifiers.add(trimmed);
+            }
+        }
+
+        return identifiers;
+    }
+
     private static Exception purchasesException(PurchasesError purchasesError) {
+        return purchasesException(
+            purchasesError.getCode().name(),
+            purchasesError.getCode().getCode(),
+            purchasesError.getMessage(),
+            purchasesError.getUnderlyingErrorMessage());
+    }
+
+    static final String REVENUECAT_ERROR_PREFIX = "RevenueCatError:";
+
+    static Exception purchasesException(String code, int nativeCode, String message, @Nullable String underlyingMessage) {
+        return new Exception(REVENUECAT_ERROR_PREFIX + new Gson().toJson(serializeRevenueCatError(code, nativeCode, message, underlyingMessage)));
+    }
+
+    static Map<String, Object> serializeRevenueCatError(String code, int nativeCode, String message, @Nullable String underlyingMessage) {
         Map<String, Object> errorInfo = new HashMap<>();
-        errorInfo.put("code", purchasesError.getCode().name());
-        errorInfo.put("native_code", purchasesError.getCode().getCode());
-        errorInfo.put("message", purchasesError.getMessage());
-        errorInfo.put("underlying_message", purchasesError.getUnderlyingErrorMessage());
+        errorInfo.put("code", code);
+        errorInfo.put("native_code", nativeCode);
+        errorInfo.put("message", message);
+        errorInfo.put("underlying_message", underlyingMessage);
         errorInfo.put("domain", "RevenueCat");
         errorInfo.put("source", "android");
-
-        return new Exception("RevenueCatError:" + new Gson().toJson(errorInfo));
+        return errorInfo;
     }
 
     private static Map<String, Object> serializeOffering(Offering offering) {
@@ -1118,7 +1141,7 @@ public class RevenueCatManager
         return priceInfo;
     }
 
-    private static Map<String, Object> serializePurchaseResult(@Nullable StoreTransaction storeTransaction, @Nullable CustomerInfo customerInfo, boolean userCancelled) {
+    static Map<String, Object> serializePurchaseResult(@Nullable StoreTransaction storeTransaction, @Nullable CustomerInfo customerInfo, boolean userCancelled) {
         Map<String, Object> purchaseResultInfo = new HashMap<>();
         purchaseResultInfo.put("user_cancelled", userCancelled);
         purchaseResultInfo.put("customer_info", customerInfo == null ? null : new Gson().fromJson(customerInfo.getRawData().toString(), Object.class));

@@ -37,4 +37,6 @@ dependencies {
 //    implementation("com.revenuecat.purchases:purchases-ui:8.16.0")
     implementation("com.google.code.gson:gson:2.12.0")
 
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("com.google.truth:truth:1.4.4")
 }
