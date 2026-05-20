@@ -5,6 +5,7 @@
 
 namespace Plugin.RevenueCat.Models;
 using System.Text.Json.Serialization;
+using System.Text.Json;
 
 public partial class Package
 {
@@ -17,9 +18,20 @@ public partial class Package
 	[JsonPropertyName("package_type")]
 	[JsonConverter(typeof(JsonStringEnumConverter<PackageType>))]
 	public PackageType PackageType { get; set; } = PackageType.Unknown;
+
+	[JsonPropertyName("type")]
+	[JsonConverter(typeof(JsonStringEnumConverter<PackageType>))]
+	public PackageType Type
+	{
+		get => PackageType;
+		set => PackageType = value;
+	}
 	
 	[JsonPropertyName("store_product")]
 	public StoreProduct? StoreProduct { get; set; }
+
+	[JsonExtensionData]
+	public IDictionary<string, JsonElement>? ExtensionData { get; set; }
 }
 
 #pragma warning restore CS8618

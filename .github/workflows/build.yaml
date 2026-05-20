@@ -42,24 +42,107 @@ jobs:
         dotnet pack -m:1 -c Release -p:PublicRelease=${{ env.NBGV_PublicRelease }} -bl:${{ github.workspace}}/artifacts/Plugin.RevenueCat.Api.binlog ./Plugin.RevenueCat.Api/Plugin.RevenueCat.Api.csproj
         dotnet pack -m:1 -c Release -p:PublicRelease=${{ env.NBGV_PublicRelease }} -bl:${{ github.workspace}}/artifacts/Plugin.RevenueCat.binlog ./Plugin.RevenueCat/Plugin.RevenueCat.csproj
 
-    - name: 🧪 Run Tests
-      run: dotnet test ./Tests/Tests.csproj --configuration Release --logger "trx;LogFileName=test-results.trx"
-      continue-on-error: true
+    - name: 🤖 Android Native Unit Tests
+      working-directory: ./android/native
+      run: ./gradlew :revenuecatbinding:testDebugUnitTest --no-daemon --stacktrace
       env:
-        # Tests require API keys - will be marked as inconclusive if not provided
+        ANDROID_HOME: ${{ env.ANDROID_HOME || env.ANDROID_SDK_ROOT || '/Users/runner/Library/Android/sdk' }}
+        ANDROID_SDK_ROOT: ${{ env.ANDROID_HOME || env.ANDROID_SDK_ROOT || '/Users/runner/Library/Android/sdk' }}
+
+    - name: 🍎 Swift Native Unit Tests
+      working-directory: ./macios/native/RevenueCatBinding
+      run: |
+        set -euo pipefail
+        XCODE_RESULTS_DIR="../../../artifacts/test-results/xcode"
+        XCODE_RESULT_BUNDLE="$XCODE_RESULTS_DIR/RevenueCatBindingTests.xcresult"
+        rm -rf "$XCODE_RESULT_BUNDLE"
+        mkdir -p "$XCODE_RESULTS_DIR"
+        DESTINATION_ID=""
+        while IFS= read -r simulator_line; do
+          if [[ "$simulator_line" =~ \(([0-9A-F-]{36})\) ]]; then
+            DESTINATION_ID="${BASH_REMATCH[1]}"
+            break
+          fi
+        done < <(xcrun simctl list devices available iPhone)
+        if [ -z "$DESTINATION_ID" ]; then
+          echo "No available iPhone simulator destination found."
+          exit 1
+        fi
+        xcodebuild test \
+          -project RevenueCatBinding.xcodeproj \
+          -scheme RevenueCatBinding \
+          -configuration Debug \
+          -destination "platform=iOS Simulator,id=$DESTINATION_ID,arch=$(uname -m)" \
+          -resultBundlePath "$XCODE_RESULT_BUNDLE"
+
+    - name: 🧪 Managed .NET Tests
+      run: >-
+        dotnet test ./Tests/Tests.csproj
+        --configuration Release
+        --filter 'TestCategory!=Integration&TestCategory!=RequiresRevenueCatSecrets'
+        --logger "trx;LogFileName=managed-tests.trx"
+        --results-directory ./artifacts/test-results/dotnet
+
+    - name: 🔐 Check RevenueCat Test Secrets
+      id: revenuecat-test-secrets
+      run: |
+        if [ -n "$APPSETTINGS__APIKEYV1" ] && [ -n "$APPSETTINGS__APIKEYV2" ] && [ -n "$TESTSETTINGS__PROJECTID" ] && [ -n "$TESTSETTINGS__CUSTOMERID" ]; then
+          echo "available=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "available=false" >> "$GITHUB_OUTPUT"
+        fi
+      env:
+        APPSETTINGS__APIKEYV1: ${{ secrets.AppSettings__ApiKeyV1 }}
+        APPSETTINGS__APIKEYV2: ${{ secrets.AppSettings__ApiKeyV2 }}
+        TESTSETTINGS__PROJECTID: ${{ secrets.TestSettings__ProjectId }}
+        TESTSETTINGS__CUSTOMERID: ${{ secrets.TestSettings__CustomerId }}
+
+    - name: 🧪 Live RevenueCat API Tests (Optional)
+      if: steps.revenuecat-test-secrets.outputs.available == 'true'
+      continue-on-error: true
+      run: >-
+        dotnet test ./Tests/Tests.csproj
+        --configuration Release
+        --filter 'TestCategory=RequiresRevenueCatSecrets'
+        --logger "trx;LogFileName=live-revenuecat-tests.trx"
+        --results-directory ./artifacts/test-results/dotnet
+      env:
         AppSettings__ApiKeyV1: ${{ secrets.AppSettings__ApiKeyV1 }}
         AppSettings__ApiKeyV2: ${{ secrets.AppSettings__ApiKeyV2 }}
         TestSettings__ProjectId: ${{ secrets.TestSettings__ProjectId }}
         TestSettings__CustomerId: ${{ secrets.TestSettings__CustomerId }}
 
-    - name: 📊 Test Report
+    - name: 📊 Managed Test Report
       uses: dorny/test-reporter@v2
       if: always()
       with:
-        name: Test Results
-        path: '**/test-results.trx'
+        name: Managed .NET Test Results
+        path: './artifacts/test-results/dotnet/*.trx'
         reporter: dotnet-trx
         fail-on-error: false
+        fail-on-empty: false
+
+    - name: 📊 Android Native Test Report
+      uses: dorny/test-reporter@v2
+      if: always()
+      with:
+        name: Android Native Test Results
+        path: './android/native/revenuecatbinding/build/test-results/testDebugUnitTest/*.xml'
+        reporter: java-junit
+        fail-on-error: false
+        fail-on-empty: false
+
+    - name: ⬆️ Test Artifacts
+      if: always()
+      uses: actions/upload-artifact@v5
+      with:
+        name: Test Artifacts
+        if-no-files-found: warn
+        path: |
+          ./artifacts/test-results/dotnet/*.trx
+          ./android/native/revenuecatbinding/build/test-results/testDebugUnitTest/*.xml
+          ./android/native/revenuecatbinding/build/reports/tests/testDebugUnitTest/**
+          ./artifacts/test-results/xcode/RevenueCatBindingTests.xcresult/**
 
     - name: ⬆️ Packages
       uses: actions/upload-artifact@v5
@@ -91,4 +174,4 @@ jobs:
         uses: actions/setup-dotnet@v5
       - name: 🚢 Push NuGet
         run: |
-          dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_ORG_API_KEY }} --skip-duplicate
+          dotnet nuget push ./*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_ORG_API_KEY }} --skip-duplicate

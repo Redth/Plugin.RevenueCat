@@ -6,6 +6,7 @@
 namespace Plugin.RevenueCat.Models;
 
 using System;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 public partial class Subscription
@@ -20,7 +21,7 @@ public partial class Subscription
 	public string? DisplayName { get; set; }
 
 	[JsonPropertyName("expires_date")]
-	public DateTimeOffset ExpiresDate { get; set; }
+	public DateTimeOffset? ExpiresDate { get; set; }
 
 	[JsonPropertyName("grace_period_expires_date")]
 	public DateTimeOffset? GracePeriodExpiresDate { get; set; }
@@ -29,36 +30,45 @@ public partial class Subscription
 	public bool IsSandbox { get; set; }
 
 	[JsonPropertyName("original_purchase_date")]
-	public DateTimeOffset OriginalPurchaseDate { get; set; }
+	public DateTimeOffset? OriginalPurchaseDate { get; set; }
 
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("ownership_type")]
-	public string OwnershipType { get; set; }
+	public string? OwnershipType { get; set; }
 
 	[JsonPropertyName("period_type")]
-	public string PeriodType { get; set; }
+	public string? PeriodType { get; set; }
 
 	[JsonPropertyName("price")]
-	public Price Price { get; set; }
+	public Price? Price { get; set; }
 
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("product_plan_identifier")]
-	public string ProductPlanIdentifier { get; set; }
+	public string? ProductPlanIdentifier { get; set; }
 
 	[JsonPropertyName("purchase_date")]
-	public DateTimeOffset PurchaseDate { get; set; }
+	public DateTimeOffset? PurchaseDate { get; set; }
 
 	[JsonPropertyName("refunded_at")]
 	public DateTimeOffset? RefundedAt { get; set; }
 
 	[JsonPropertyName("store")]
-	public string Store { get; set; }
+	public string? Store { get; set; }
 
 	[JsonPropertyName("store_transaction_id")]
-	public string StoreTransactionId { get; set; }
+	public string? StoreTransactionId { get; set; }
 
 	[JsonPropertyName("unsubscribe_detected_at")]
 	public DateTimeOffset? UnsubscribeDetectedAt { get; set; }
+
+	[JsonPropertyName("is_active")]
+	public bool? IsActive { get; set; }
+
+	[JsonPropertyName("will_renew")]
+	public bool? WillRenew { get; set; }
+
+	[JsonExtensionData]
+	public IDictionary<string, JsonElement>? ExtensionData { get; set; }
 }
 #pragma warning restore CS8618
 #pragma warning restore CS8601

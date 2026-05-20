@@ -6,13 +6,55 @@
 	objectVersion = 60;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		A1000000000000000000000E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83E34F4A2C21CB2B008AA950 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 83E34F522C21CB2B008AA950;
+			remoteInfo = RevenueCatBinding;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXTargetDependency section */
+		A1000000000000000000000F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 83E34F522C21CB2B008AA950 /* RevenueCatBinding */;
+			targetProxy = A1000000000000000000000E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXBuildFile section */
 		64506EB02E16F730008BCA49 /* RevenueCat.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 646070982D42CC940036C905 /* RevenueCat.xcframework */; };
+		A10000000000000000000002 /* RevenueCatBindingHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000001 /* RevenueCatBindingHelpers.swift */; };
+		A10000000000000000000005 /* RevenueCatBindingHelperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000004 /* RevenueCatBindingHelperTests.swift */; };
+		A10000000000000000000010 /* RevenueCatBinding.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83E34F532C21CB2B008AA950 /* RevenueCatBinding.framework */; };
+		A10000000000000000000011 /* RevenueCat.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 646070982D42CC940036C905 /* RevenueCat.xcframework */; };
+		A10000000000000000000013 /* RevenueCatBinding.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 83E34F532C21CB2B008AA950 /* RevenueCatBinding.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		A10000000000000000000014 /* RevenueCat.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 646070982D42CC940036C905 /* RevenueCat.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		83E34F572C21CB2B008AA950 /* RevenueCat.h in Headers */ = {isa = PBXBuildFile; fileRef = 83E34F562C21CB2B008AA950 /* RevenueCat.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		83E34F5E2C21CC53008AA950 /* RevenueCatBinding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E34F5D2C21CC53008AA950 /* RevenueCatBinding.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		A10000000000000000000012 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				A10000000000000000000013 /* RevenueCatBinding.framework in Embed Frameworks */,
+				A10000000000000000000014 /* RevenueCat.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		A10000000000000000000001 /* RevenueCatBindingHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevenueCatBindingHelpers.swift; sourceTree = "<group>"; };
+		A10000000000000000000004 /* RevenueCatBindingHelperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevenueCatBindingHelperTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000006 /* RevenueCatBindingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RevenueCatBindingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		646070982D42CC940036C905 /* RevenueCat.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = RevenueCat.xcframework; path = ../bin/deps/RevenueCat.xcframework; sourceTree = "<group>"; };
 		83E34F532C21CB2B008AA950 /* RevenueCatBinding.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RevenueCatBinding.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		83E34F562C21CB2B008AA950 /* RevenueCat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RevenueCat.h; sourceTree = "<group>"; };
@@ -20,6 +62,15 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		A10000000000000000000008 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000010 /* RevenueCatBinding.framework in Frameworks */,
+				A10000000000000000000011 /* RevenueCat.xcframework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		83E34F502C21CB2B008AA950 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -43,6 +94,7 @@
 			isa = PBXGroup;
 			children = (
 				83E34F552C21CB2B008AA950 /* RevenueCatBinding */,
+				A10000000000000000000003 /* RevenueCatBindingTests */,
 				646070972D42CC940036C905 /* Frameworks */,
 				83E34F542C21CB2B008AA950 /* Products */,
 			);
@@ -52,6 +104,7 @@
 			isa = PBXGroup;
 			children = (
 				83E34F532C21CB2B008AA950 /* RevenueCatBinding.framework */,
+				A10000000000000000000006 /* RevenueCatBindingTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -61,8 +114,17 @@
 			children = (
 				83E34F562C21CB2B008AA950 /* RevenueCat.h */,
 				83E34F5D2C21CC53008AA950 /* RevenueCatBinding.swift */,
+				A10000000000000000000001 /* RevenueCatBindingHelpers.swift */,
 			);
 			path = RevenueCatBinding;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000003 /* RevenueCatBindingTests */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000004 /* RevenueCatBindingHelperTests.swift */,
+			);
+			path = RevenueCatBindingTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -97,6 +159,25 @@
 			productReference = 83E34F532C21CB2B008AA950 /* RevenueCatBinding.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		A1000000000000000000000A /* RevenueCatBindingTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A1000000000000000000000D /* Build configuration list for PBXNativeTarget "RevenueCatBindingTests" */;
+			buildPhases = (
+				A10000000000000000000007 /* Sources */,
+				A10000000000000000000008 /* Frameworks */,
+				A10000000000000000000009 /* Resources */,
+				A10000000000000000000012 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A1000000000000000000000F /* PBXTargetDependency */,
+			);
+			name = RevenueCatBindingTests;
+			productName = RevenueCatBindingTests;
+			productReference = A10000000000000000000006 /* RevenueCatBindingTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -106,6 +187,10 @@
 				BuildIndependentTargetsInParallel = 1;
 				LastUpgradeCheck = 1530;
 				TargetAttributes = {
+					A1000000000000000000000A = {
+						CreatedOnToolsVersion = 16.1;
+						TestTargetID = 83E34F522C21CB2B008AA950;
+					};
 					83E34F522C21CB2B008AA950 = {
 						CreatedOnToolsVersion = 15.3;
 						LastSwiftMigration = 1530;
@@ -128,12 +213,20 @@
 			projectRoot = "";
 			targets = (
 				83E34F522C21CB2B008AA950 /* RevenueCatBinding */,
+				A1000000000000000000000A /* RevenueCatBindingTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		83E34F512C21CB2B008AA950 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000000000000000000009 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -148,6 +241,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				83E34F5E2C21CC53008AA950 /* RevenueCatBinding.swift in Sources */,
+				A10000000000000000000002 /* RevenueCatBindingHelpers.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000000000000000000007 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000005 /* RevenueCatBindingHelperTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -361,6 +463,54 @@
 			};
 			name = Release;
 		};
+		A1000000000000000000000B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.RevenueCatBindingTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "";
+			};
+			name = Debug;
+		};
+		A1000000000000000000000C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.RevenueCatBindingTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -378,6 +528,15 @@
 			buildConfigurations = (
 				83E34F5B2C21CB2B008AA950 /* Debug */,
 				83E34F5C2C21CB2B008AA950 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A1000000000000000000000D /* Build configuration list for PBXNativeTarget "RevenueCatBindingTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1000000000000000000000B /* Debug */,
+				A1000000000000000000000C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

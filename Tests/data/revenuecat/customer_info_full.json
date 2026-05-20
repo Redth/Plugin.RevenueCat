@@ -1,0 +1,163 @@
+{
+  "request_date": "2025-01-15T12:34:56Z",
+  "request_date_ms": 1736944496000,
+  "schema_version": 3,
+  "verification_result": "VERIFIED",
+  "customer_info_request_date": 1736944496000,
+  "management_url": "https://apps.apple.com/account/subscriptions",
+  "active_subscriptions": [
+    "pro_monthly",
+    "lifetime_access"
+  ],
+  "all_purchased_product_identifiers": [
+    "pro_monthly",
+    "lifetime_access",
+    "tip_jar"
+  ],
+  "all_expiration_dates_by_product": {
+    "pro_monthly": "2025-02-15T12:34:56Z",
+    "lifetime_access": null
+  },
+  "all_purchase_dates_by_product": {
+    "pro_monthly": "2025-01-15T12:00:00Z",
+    "lifetime_access": "2024-06-01T09:00:00Z",
+    "tip_jar": "2024-07-04T18:00:00Z"
+  },
+  "latest_expiration_date": "2025-02-15T12:34:56Z",
+  "subscriber": {
+    "entitlements": {
+      "premium": {
+        "identifier": "premium",
+        "expires_date": "2025-02-15T12:34:56Z",
+        "grace_period_expires_date": null,
+        "product_identifier": "pro_monthly",
+        "purchase_date": "2025-01-15T12:00:00Z",
+        "latest_purchase_date": "2025-01-15T12:00:00Z",
+        "original_purchase_date": "2024-01-15T12:00:00Z",
+        "is_active": true,
+        "will_renew": true,
+        "period_type": "normal",
+        "store": "play_store",
+        "is_sandbox": true,
+        "unsubscribe_detected_at": null,
+        "billing_issue_detected_at": null,
+        "billing_issues_detected_at": null,
+        "ownership_type": "PURCHASED",
+        "product_plan_identifier": "base-monthly"
+      },
+      "lifetime": {
+        "identifier": "lifetime",
+        "expires_date": null,
+        "grace_period_expires_date": null,
+        "product_identifier": "lifetime_access",
+        "purchase_date": "2024-06-01T09:00:00Z",
+        "latest_purchase_date": "2024-06-01T09:00:00Z",
+        "original_purchase_date": "2024-06-01T09:00:00Z",
+        "is_active": true,
+        "will_renew": false,
+        "period_type": "normal",
+        "store": "app_store",
+        "is_sandbox": false,
+        "ownership_type": "PURCHASED"
+      }
+    },
+    "first_seen": "2024-01-01T00:00:00Z",
+    "last_seen": "2025-01-15T12:30:00Z",
+    "management_url": "https://play.google.com/store/account/subscriptions",
+    "original_app_user_id": "synthetic-user-001",
+    "original_application_version": "1.0-test",
+    "original_purchase_date": "2024-01-02T00:00:00Z",
+    "subscriptions": {
+      "pro_monthly": {
+        "auto_resume_date": null,
+        "billing_issues_detected_at": null,
+        "display_name": "Pro Monthly",
+        "expires_date": "2025-02-15T12:34:56Z",
+        "grace_period_expires_date": null,
+        "is_sandbox": true,
+        "original_purchase_date": "2024-01-15T12:00:00Z",
+        "ownership_type": "PURCHASED",
+        "period_type": "normal",
+        "price": {
+          "amount": 9.99,
+          "currency": "USD",
+          "amount_micros": 9990000,
+          "currency_code": "USD",
+          "formatted": "$9.99"
+        },
+        "product_plan_identifier": "base-monthly",
+        "purchase_date": "2025-01-15T12:00:00Z",
+        "refunded_at": null,
+        "store": "play_store",
+        "store_transaction_id": "GPA.synthetic.pro.monthly.001",
+        "unsubscribe_detected_at": null,
+        "is_active": true,
+        "will_renew": true
+      },
+      "lifetime_access": {
+        "auto_resume_date": null,
+        "billing_issues_detected_at": null,
+        "display_name": "Lifetime Access",
+        "expires_date": null,
+        "grace_period_expires_date": null,
+        "is_sandbox": false,
+        "original_purchase_date": "2024-06-01T09:00:00Z",
+        "ownership_type": "PURCHASED",
+        "period_type": "normal",
+        "price": {
+          "amount": 49.99,
+          "currency": "USD",
+          "amount_micros": 49990000,
+          "currency_code": "USD",
+          "formatted": "$49.99"
+        },
+        "product_plan_identifier": null,
+        "purchase_date": "2024-06-01T09:00:00Z",
+        "refunded_at": null,
+        "store": "app_store",
+        "store_transaction_id": "txn_lifetime_001",
+        "unsubscribe_detected_at": null,
+        "is_active": true,
+        "will_renew": false
+      }
+    },
+    "non_subscriptions": {
+      "tip_jar": [
+        {
+          "display_name": "Tip Jar",
+          "id": "tip_jar",
+          "is_sandbox": true,
+          "price": {
+            "amount": 1.99,
+            "currency": "USD",
+            "amount_micros": 1990000,
+            "currency_code": "USD",
+            "formatted": "$1.99"
+          },
+          "store": "app_store",
+          "purchase_date": "2024-07-04T18:00:00Z",
+          "store_transaction_id": "txn_tip_001"
+        }
+      ]
+    },
+    "other_purchases": {
+      "legacy_tip": [
+        {
+          "display_name": "Legacy Tip",
+          "id": "legacy_tip",
+          "is_sandbox": false,
+          "price": {
+            "amount": 0.99,
+            "currency": "USD",
+            "amount_micros": 990000,
+            "currency_code": "USD",
+            "formatted": "$0.99"
+          },
+          "store": "play_store",
+          "purchase_date": "2023-12-31T23:59:00Z",
+          "store_transaction_id": "GPA.synthetic.legacy.tip.001"
+        }
+      ]
+    }
+  }
+}

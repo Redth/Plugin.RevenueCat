@@ -5,6 +5,8 @@ using Plugin.RevenueCat.Api.V2;
 namespace Tests;
 
 [TestClass]
+[TestCategory("Integration")]
+[TestCategory("RequiresRevenueCatSecrets")]
 public sealed class ApiV2Tests
 {
 	public TestContext TestContext { get; set; }
@@ -12,12 +14,9 @@ public sealed class ApiV2Tests
 	[TestMethod]
 	public async Task Get_Customer()
 	{
-		var api = Hosting.ServiceProvider.GetRequiredService<IRevenueCatApiV2>();
-		var projectId = Hosting.Configuration["TestSettings:ProjectId"];
-		var customerId = Hosting.Configuration["TestSettings:CustomerId"];
-
-		Assert.IsNotNull(projectId, "TestSettings:ProjectId must be configured");
-		Assert.IsNotNull(customerId, "TestSettings:CustomerId must be configured");
+		var api = Hosting.RequireApiV2();
+		var projectId = Hosting.RequireSetting("TestSettings:ProjectId");
+		var customerId = Hosting.RequireSetting("TestSettings:CustomerId");
 
 		var customer = await api.GetCustomer(projectId, customerId);
 
@@ -29,12 +28,9 @@ public sealed class ApiV2Tests
 	[TestMethod]
 	public async Task Get_Customer_Has_Active_Entitlements()
 	{
-		var api = Hosting.ServiceProvider.GetRequiredService<IRevenueCatApiV2>();
-		var projectId = Hosting.Configuration["TestSettings:ProjectId"];
-		var customerId = Hosting.Configuration["TestSettings:CustomerId"];
-
-		Assert.IsNotNull(projectId, "TestSettings:ProjectId must be configured");
-		Assert.IsNotNull(customerId, "TestSettings:CustomerId must be configured");
+		var api = Hosting.RequireApiV2();
+		var projectId = Hosting.RequireSetting("TestSettings:ProjectId");
+		var customerId = Hosting.RequireSetting("TestSettings:CustomerId");
 
 		var customer = await api.GetCustomer(projectId, customerId);
 
@@ -46,12 +42,9 @@ public sealed class ApiV2Tests
 	[TestMethod]
 	public async Task Get_Offerings()
 	{
-		var api = Hosting.ServiceProvider.GetRequiredService<IRevenueCatApiV2>();
-		var projectId = Hosting.Configuration["TestSettings:ProjectId"];
-		var customerId = Hosting.Configuration["TestSettings:CustomerId"];
-
-		Assert.IsNotNull(projectId, "TestSettings:ProjectId must be configured");
-		Assert.IsNotNull(customerId, "TestSettings:CustomerId must be configured");
+		var api = Hosting.RequireApiV2();
+		var projectId = Hosting.RequireSetting("TestSettings:ProjectId");
+		var customerId = Hosting.RequireSetting("TestSettings:CustomerId");
 
 		var offerings = await api.GetOfferings(projectId, customerId);
 
@@ -67,12 +60,9 @@ public sealed class ApiV2Tests
 		// customer_information:customers:read_write
 		// If you get a 403 Forbidden error, check your API key permissions in the RevenueCat dashboard.
 		
-		var api = Hosting.ServiceProvider.GetRequiredService<IRevenueCatApiV2>();
-		var projectId = Hosting.Configuration["TestSettings:ProjectId"];
-		var customerId = Hosting.Configuration["TestSettings:CustomerId"];
-
-		Assert.IsNotNull(projectId, "TestSettings:ProjectId must be configured");
-		Assert.IsNotNull(customerId, "TestSettings:CustomerId must be configured");
+		var api = Hosting.RequireApiV2();
+		var projectId = Hosting.RequireSetting("TestSettings:ProjectId");
+		var customerId = Hosting.RequireSetting("TestSettings:CustomerId");
 
 		var attributes = new[]
 		{
@@ -102,12 +92,9 @@ public sealed class ApiV2Tests
 	[TestMethod]
 	public async Task Get_Subscriptions()
 	{
-		var api = Hosting.ServiceProvider.GetRequiredService<IRevenueCatApiV2>();
-		var projectId = Hosting.Configuration["TestSettings:ProjectId"];
-		var customerId = Hosting.Configuration["TestSettings:CustomerId"];
-
-		Assert.IsNotNull(projectId, "TestSettings:ProjectId must be configured");
-		Assert.IsNotNull(customerId, "TestSettings:CustomerId must be configured");
+		var api = Hosting.RequireApiV2();
+		var projectId = Hosting.RequireSetting("TestSettings:ProjectId");
+		var customerId = Hosting.RequireSetting("TestSettings:CustomerId");
 
 		var subscriptions = await api.GetSubscriptions(projectId, customerId);
 
