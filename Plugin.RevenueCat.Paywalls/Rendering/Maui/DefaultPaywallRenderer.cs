@@ -77,7 +77,7 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		IReadOnlyDictionary<string, string>? variables = null,
 		IReadOnlyList<string>? tabIds = null)
 	{
-		if (component is PaywallIconComponent { Visible: false } or PaywallPackageComponent { Visible: false })
+		if (component is PaywallIconComponent { Visible: false })
 		{
 			return new ContentView { IsVisible = false };
 		}
@@ -124,11 +124,6 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		IReadOnlyDictionary<string, string>? variables = null,
 		IReadOnlyList<string>? tabIds = null)
 	{
-		if (component.Visible == false)
-		{
-			return new ContentView { IsVisible = false };
-		}
-
 		var layout = CreateStackLayout(component);
 		PaywallMauiStyleResolver.ApplyStackLayoutOptions(layout, component.Dimension);
 		if (ShouldUseConstrainedHorizontalLayout(component))
@@ -148,15 +143,29 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 
 		var view = WrapContainer(
 			layout,
-			component.Padding,
-			component.Margin,
-			component.BackgroundColor ?? component.Background,
+			request.Semantics.Resolve(component, packageContextIdentifier).Element("padding") ?? component.Padding,
+			request.Semantics.Resolve(component, packageContextIdentifier).Element("margin") ?? component.Margin,
+			request.Semantics.Resolve(component, packageContextIdentifier).Element("background_color") ??
+				request.Semantics.Resolve(component, packageContextIdentifier).Element("background") ??
+				component.BackgroundColor ?? component.Background,
 			component.Shape,
 			component.Border,
 			component.Shadow,
 			request.UiConfig);
 		view = ApplyBadge(view, component.Badge, request, packageContextIdentifier, tabSelected, selectedTabId, variables, tabIds);
 		PaywallMauiStyleResolver.ApplySize(view, component.Size);
+		ObserveSemantics(view, request, () =>
+		{
+			var overrides = request.Semantics.Resolve(component, packageContextIdentifier);
+			view.IsVisible = request.Semantics.IsVisible(component, packageContextIdentifier);
+			var background = overrides.Element("background_color") ?? overrides.Element("background") ??
+				component.BackgroundColor ?? component.Background;
+			ApplySemanticContainerStyles(view,
+				overrides.Element("padding") ?? component.Padding,
+				overrides.Element("margin") ?? component.Margin,
+				background, request.UiConfig);
+			PaywallMauiStyleResolver.ApplySize(view, overrides.Element("size") ?? component.Size);
+		});
 
 		return view;
 	}
@@ -228,14 +237,6 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		string? packageContextIdentifier = null,
 		IReadOnlyDictionary<string, string>? variables = null)
 	{
-		if (component.Visible == false)
-		{
-			return new ContentView { IsVisible = false };
-		}
-
-		var text = PaywallLocalizationResolver.ResolveText(request.PaywallData, request.Locale, component.TextLocalizationId)
-			?? component.TextLocalizationId
-			?? string.Empty;
 		var baseVariableProvider = request.VariableProvider ?? new DefaultPaywallVariableProvider();
 		var variableProvider = variables is null
 			? baseVariableProvider
@@ -252,17 +253,35 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		void UpdateText()
 		{
 			var package = FindPackage(request, packageContextIdentifier ?? request.Selection.SelectedIdentifier, allowDefaultPackage: false);
+			var overrides = request.Semantics.Resolve(component, packageContextIdentifier ?? request.Selection.SelectedIdentifier);
+			var textId = overrides.String("text_lid") ?? component.TextLocalizationId;
+			var text = PaywallLocalizationResolver.ResolveText(request.PaywallData, request.Locale, textId)
+				?? textId ?? string.Empty;
+			label.IsVisible = request.Semantics.IsVisible(component, packageContextIdentifier ?? request.Selection.SelectedIdentifier);
+			label.TextColor = PaywallMauiStyleResolver.ResolveColor(overrides.Element("color") ?? component.Color, request.UiConfig)
+				?? Colors.Black;
+			label.FontSize = PaywallMauiStyleResolver.ResolveFontSize(overrides.Element("font_size") ?? component.FontSize);
+			label.FontAttributes = PaywallMauiStyleResolver.ResolveFontAttributes(
+				overrides.String("font_weight") ?? component.FontWeight,
+				overrides.Number("font_weight_int") is { } weight ? (int)weight : component.FontWeightInt);
+			label.HorizontalTextAlignment = PaywallMauiStyleResolver.ResolveTextAlignment(
+				overrides.String("horizontal_alignment") ?? component.HorizontalAlignment);
+			ApplyBoxStyles(label, overrides.Element("padding") ?? component.Padding,
+				overrides.Element("margin") ?? component.Margin,
+				overrides.Element("background_color") ?? component.BackgroundColor, request.UiConfig);
+			PaywallMauiStyleResolver.ApplySize(label, overrides.Element("size") ?? component.Size);
+			var eligibility = request.Semantics.Context.IntroOfferEligibility.TryGetValue(package?.Identifier ?? "", out var known)
+				? known : PaywallEligibility.Unknown;
 			label.Text = PaywallTextProcessor.ProcessVariables(text, variableProvider, new PaywallVariableContext
 			{
 				Package = package,
 				ApplicationName = request.ApplicationName,
-				Locale = request.Locale
-			});
+				Locale = request.Locale,
+				IntroOfferEligibility = eligibility,
+				CustomVariables = request.Semantics.Context.CustomVariables
+			}, request.Diagnostic);
 		}
-		ObserveSelection(label, request, UpdateText);
-
-		ApplyBoxStyles(label, component.Padding, component.Margin, component.BackgroundColor, request.UiConfig);
-		PaywallMauiStyleResolver.ApplySize(label, component.Size);
+		ObserveSemantics(label, request, UpdateText);
 
 		return label;
 	}
@@ -383,7 +402,13 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 				border.Stroke = unselectedStroke;
 			}
 		});
-		packageView.IsEnabled = FindPackage(request, component.PackageId, allowDefaultPackage: false) is not null;
+		ObserveSemantics(packageView, request, () =>
+		{
+			packageView.IsVisible = request.Semantics.IsVisible(component, component.PackageId) &&
+				(component.Stack is null || request.Semantics.IsVisible(component.Stack, component.PackageId));
+			packageView.IsEnabled = packageView.IsVisible &&
+				FindPackage(request, component.PackageId, allowDefaultPackage: false) is not null;
+		});
 
 		return packageView;
 	}
@@ -533,12 +558,13 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		string? packageContextIdentifier,
 		IReadOnlyDictionary<string, string>? variables)
 	{
-		if (component.Visible == false || component.Tabs.Count == 0)
+		if (component.Tabs.Count == 0)
 		{
 			return new ContentView { IsVisible = false };
 		}
 
-		var selectedTabId = component.DefaultTabId ?? component.Tabs.First().Id;
+		var selectedTabId = component.Tabs.FirstOrDefault(t => t.Id == component.DefaultTabId)?.Id ??
+			component.Tabs.First().Id;
 		var controlHost = new ContentView();
 		var tabHost = new Grid();
 		tabHost.Unloaded += (_, _) => tabHost.AbortAnimation("PaywallTabCrossfade");
@@ -554,12 +580,15 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 
 		void SelectTab(string tabId)
 		{
-			if (string.Equals(selectedTabId, tabId, StringComparison.Ordinal))
+			if (string.Equals(selectedTabId, tabId, StringComparison.Ordinal) ||
+				!component.Tabs.Any(t => t.Id == tabId))
 			{
 				return;
 			}
 
 			selectedTabId = tabId;
+			request.Semantics.Apply(component.StateUpdates,
+				JsonSerializer.SerializeToElement(tabId, ModelSerializerContext.Default.String));
 			Refresh(animateContent: true);
 		}
 
@@ -582,6 +611,7 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 
 			var tab = component.Tabs.FirstOrDefault(t => string.Equals(t.Id, selectedTabId, StringComparison.Ordinal))
 				?? component.Tabs.First();
+			request.Selection.SetActiveTab(component, tab.Id);
 			request.SelectPackage(request.Selection.PreferredPackage(tab.Stack));
 			var tabContent = tab.Stack is null
 				? new ContentView { IsVisible = false }
@@ -609,6 +639,17 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 			component.Shadow,
 			request.UiConfig);
 		PaywallMauiStyleResolver.ApplySize(view, component.Size);
+		ObserveSemantics(view, request, () =>
+		{
+			var overrides = request.Semantics.Resolve(component, packageContextIdentifier);
+			view.IsVisible = request.Semantics.IsVisible(component, packageContextIdentifier);
+			ApplySemanticContainerStyles(view,
+				overrides.Element("padding") ?? component.Padding,
+				overrides.Element("margin") ?? component.Margin,
+				overrides.Element("background_color") ?? overrides.Element("background") ??
+				component.BackgroundColor ?? component.Background, request.UiConfig);
+			PaywallMauiStyleResolver.ApplySize(view, overrides.Element("size") ?? component.Size);
+		});
 		return view;
 	}
 
@@ -1346,6 +1387,19 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		};
 	}
 
+	static void ObserveSemantics(View view, PaywallRenderRequest request, Action update)
+	{
+		update();
+		request.Semantics.Changed += update;
+		view.Unloaded += (_, _) => request.Semantics.Changed -= update;
+		view.Loaded += (_, _) =>
+		{
+			request.Semantics.Changed -= update;
+			request.Semantics.Changed += update;
+			update();
+		};
+	}
+
 	static Package? FindPackage(PaywallRenderRequest request, string? packageIdentifier, bool allowDefaultPackage)
 	{
 		var package = request.Packages.FirstOrDefault(p => string.Equals(p.Identifier, packageIdentifier, StringComparison.Ordinal));
@@ -1649,6 +1703,21 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		else
 		{
 			view.Background = PaywallMauiStyleResolver.ResolveBackground(background, uiConfig);
+		}
+	}
+
+	static void ApplySemanticContainerStyles(
+		View view, JsonElement? padding, JsonElement? margin, JsonElement? background, PaywallUiConfig? uiConfig)
+	{
+		if (view is Border border)
+		{
+			border.Padding = PaywallMauiStyleResolver.ResolveThickness(padding);
+			border.Margin = PaywallMauiStyleResolver.ResolveThickness(margin);
+			border.Background = PaywallMauiStyleResolver.ResolveBackground(background, uiConfig);
+		}
+		else
+		{
+			ApplyBoxStyles(view, padding, margin, background, uiConfig);
 		}
 	}
 

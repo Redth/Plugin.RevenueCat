@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using Plugin.RevenueCat.Models;
+using System.Text.Json;
 
 namespace Plugin.RevenueCat.Paywalls;
 
@@ -16,6 +17,10 @@ public sealed class PaywallVariableContext
 	public string? ApplicationName { get; init; }
 
 	public string? Locale { get; init; }
+
+	public PaywallEligibility IntroOfferEligibility { get; init; } = PaywallEligibility.Unknown;
+
+	public IReadOnlyDictionary<string, JsonElement>? CustomVariables { get; init; }
 }
 
 public sealed class DefaultPaywallVariableProvider : IPaywallVariableProvider
@@ -27,8 +32,25 @@ public sealed class DefaultPaywallVariableProvider : IPaywallVariableProvider
 		"product_name" => context.Package?.StoreProduct?.Title,
 		"sub_period" => GetPeriodName(context.Package?.StoreProduct?.SubscriptionPeriod),
 		"sub_duration" => GetDuration(context.Package?.StoreProduct?.SubscriptionPeriod),
-		_ => null
+		"price_per_period" => context.Package?.StoreProduct?.PriceString,
+		"sub_price_per_week" => context.Package?.StoreProduct?.DefaultSubscriptionOption?.FullPricePhase?.PricePerWeek?.Formatted,
+		"sub_price_per_month" => context.Package?.StoreProduct?.DefaultSubscriptionOption?.FullPricePhase?.PricePerMonth?.Formatted,
+		"sub_offer_duration" => context.IntroOfferEligibility == PaywallEligibility.Eligible
+			? GetDuration(GetIntroPhase(context.Package)?.BillingPeriod ??
+				context.Package?.StoreProduct?.IntroductoryDiscount?.SubscriptionPeriod)
+			: null,
+		"sub_offer_price" => context.IntroOfferEligibility == PaywallEligibility.Eligible
+			? GetIntroPhase(context.Package)?.Price?.Formatted ??
+				context.Package?.StoreProduct?.IntroductoryDiscount?.PriceString
+			: null,
+		_ => context.CustomVariables?.TryGetValue(variableName, out var value) == true &&
+			value.ValueKind is JsonValueKind.String or JsonValueKind.Number or JsonValueKind.True or JsonValueKind.False
+				? value.ToString() : null
 	};
+
+	static PricingPhase? GetIntroPhase(Package? package) =>
+		package?.StoreProduct?.DefaultSubscriptionOption?.FreePhase ??
+		package?.StoreProduct?.DefaultSubscriptionOption?.IntroPhase;
 
 	static string? GetDuration(SubscriptionPeriod? period)
 	{

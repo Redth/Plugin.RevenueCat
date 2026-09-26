@@ -7,9 +7,22 @@ namespace Plugin.RevenueCat.Paywalls;
 public sealed class PaywallRenderRequest
 {
 	PaywallSelectionState? selection;
+	PaywallSemanticSession? semantics;
 	internal bool ActionInProgress { get; set; }
 
-	internal PaywallSelectionState Selection => selection ??= new(GetComponentsConfig(), Packages, SelectedPackageIdentifier);
+	internal PaywallSemanticSession Semantics => semantics ??=
+		new(PaywallData, SemanticContext, Diagnostic, GetComponentsConfig());
+
+	internal PaywallSelectionState Selection => selection ??= new(GetComponentsConfig(), Packages, SelectedPackageIdentifier, Semantics);
+
+	internal void UpdateSemanticContext(PaywallSemanticContext? context)
+	{
+		Semantics.UpdateContext(context);
+		if (Selection.Reconcile())
+		{
+			SelectionReconciled?.Invoke(Selection.SelectedIdentifier);
+		}
+	}
 
 	internal void SelectPackage(string? identifier)
 	{
@@ -34,6 +47,13 @@ public sealed class PaywallRenderRequest
 	public string? ApplicationName { get; init; }
 
 	public string? SelectedPackageIdentifier { get; init; }
+
+	public PaywallSemanticContext? SemanticContext { get; init; }
+
+	/// <summary>Reports unsupported or malformed semantic rules without interpreting them as matched.</summary>
+	public Action<string>? Diagnostic { get; init; }
+
+	internal Action<string?>? SelectionReconciled { get; init; }
 
 	public object? PlatformContext { get; init; }
 

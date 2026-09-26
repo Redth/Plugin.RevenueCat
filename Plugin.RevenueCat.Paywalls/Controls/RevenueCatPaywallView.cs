@@ -12,6 +12,7 @@ public class RevenueCatPaywallView : ContentView
 	readonly IPaywallActionHandler eventActionHandler;
 	string? selectedPackageIdentifier;
 	bool updatingOffering;
+	PaywallRenderRequest? activeRequest;
 
 	public RevenueCatPaywallView()
 		: this(new DefaultPaywallRenderer())
@@ -112,6 +113,19 @@ public class RevenueCatPaywallView : ContentView
 		default(IPaywallVariableProvider),
 		propertyChanged: OnRenderPropertyChanged);
 
+	public static readonly BindableProperty SemanticContextProperty = BindableProperty.Create(
+		nameof(SemanticContext), typeof(PaywallSemanticContext), typeof(RevenueCatPaywallView),
+		default(PaywallSemanticContext), propertyChanged: OnSemanticContextChanged);
+
+	/// <summary>Explicit customer eligibility, variables and display facts; unknown eligibility never implies a trial.</summary>
+	public PaywallSemanticContext? SemanticContext
+	{
+		get => (PaywallSemanticContext?)GetValue(SemanticContextProperty);
+		set => SetValue(SemanticContextProperty, value);
+	}
+
+	public event EventHandler<string>? SemanticDiagnostic;
+
 	public PaywallOfferingsResponse? PaywallOfferings
 	{
 		get => (PaywallOfferingsResponse?)GetValue(PaywallOfferingsProperty);
@@ -181,10 +195,11 @@ public class RevenueCatPaywallView : ContentView
 	public void Render()
 	{
 		selectedPackageIdentifier = new PaywallSelectionState(
-			PaywallData?.ComponentsConfig, Packages, selectedPackageIdentifier).SelectedIdentifier;
+			PaywallData?.ComponentsConfig, Packages, selectedPackageIdentifier,
+			new PaywallSemanticSession(PaywallData, SemanticContext)).SelectedIdentifier;
 		var actionHandler = ActionHandler ?? eventActionHandler;
 
-		Content = renderer.Render(new PaywallRenderRequest
+		activeRequest = new PaywallRenderRequest
 		{
 			PaywallData = PaywallData,
 			UiConfig = UiConfig,
@@ -193,6 +208,9 @@ public class RevenueCatPaywallView : ContentView
 			ApplicationName = ApplicationName,
 			OfferingIdentifier = OfferingIdentifier,
 			SelectedPackageIdentifier = selectedPackageIdentifier,
+			SemanticContext = SemanticContext,
+			Diagnostic = message => SemanticDiagnostic?.Invoke(this, message),
+			SelectionReconciled = identifier => selectedPackageIdentifier = identifier,
 			PlatformContext = PlatformContext,
 			ActionHandler = actionHandler,
 			VariableProvider = VariableProvider,
@@ -210,7 +228,8 @@ public class RevenueCatPaywallView : ContentView
 					Render();
 				}
 			}
-		});
+		};
+		Content = renderer.Render(activeRequest);
 	}
 
 	protected virtual void OnPurchaseRequested(PaywallPurchaseRequestedEventArgs e) =>
@@ -278,6 +297,22 @@ public class RevenueCatPaywallView : ContentView
 	static void OnRenderPropertyChanged(BindableObject bindable, object oldValue, object newValue)
 	{
 		if (bindable is RevenueCatPaywallView { updatingOffering: false } view)
+		{
+			view.Render();
+		}
+	}
+
+	static void OnSemanticContextChanged(BindableObject bindable, object oldValue, object newValue)
+	{
+		if (bindable is not RevenueCatPaywallView { updatingOffering: false } view)
+		{
+			return;
+		}
+		if (view.renderer.HandlesPackageSelectionUpdates && view.activeRequest is not null)
+		{
+			view.activeRequest.UpdateSemanticContext(newValue as PaywallSemanticContext);
+		}
+		else
 		{
 			view.Render();
 		}

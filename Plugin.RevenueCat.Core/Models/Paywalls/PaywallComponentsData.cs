@@ -35,6 +35,9 @@ public partial class PaywallComponentsData
 	[JsonPropertyName("exit_offers")]
 	public JsonElement? ExitOffers { get; set; }
 
+	[JsonPropertyName("state_declarations")]
+	public Dictionary<string, PaywallStateDeclaration> StateDeclarations { get; set; } = new();
+
 	[JsonPropertyName("play_store_product_change_mode")]
 	public JsonElement? PlayStoreProductChangeMode { get; set; }
 
