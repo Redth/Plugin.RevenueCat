@@ -20,14 +20,29 @@ public partial class Offering
 	[JsonPropertyName("description")]
 	public string Description { get; set; }
 
-	[JsonPropertyName("packages")]
-	public List<Package> Packages { get; set; } = new();
-
 	[JsonPropertyName("metadata")]
 	public Dictionary<string, JsonElement> Metadata { get; set; } = new();
 
+	[JsonPropertyName("packages")]
+	public List<Package> Packages { get; set; } = new();
+
 	[JsonExtensionData]
 	public IDictionary<string, JsonElement>? ExtensionData { get; set; }
+
+	[JsonPropertyName("paywall")]
+	public LegacyPaywallData? Paywall { get; set; }
+
+	[JsonPropertyName("paywall_components")]
+	public PaywallComponentsData? PaywallComponents { get; set; }
+
+	[JsonPropertyName("draft_paywall_components")]
+	public PaywallComponentsData? DraftPaywallComponents { get; set; }
+
+	[JsonPropertyName("ui_config")]
+	public PaywallUiConfig? UiConfig { get; set; }
+
+	[JsonPropertyName("web_checkout_url")]
+	public string? WebCheckoutUrl { get; set; }
 }
 #pragma warning restore CS8618
 #pragma warning restore CS8601

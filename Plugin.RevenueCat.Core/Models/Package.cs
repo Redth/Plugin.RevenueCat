@@ -26,6 +26,9 @@ public partial class Package
 		get => PackageType;
 		set => PackageType = value;
 	}
+
+	[JsonPropertyName("web_checkout_url")]
+	public string? WebCheckoutUrl { get; set; }
 	
 	[JsonPropertyName("store_product")]
 	public StoreProduct? StoreProduct { get; set; }

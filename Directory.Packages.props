@@ -4,16 +4,18 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="DotNetEnv" Version="3.1.1" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
-    <PackageVersion Include="Microsoft.Maui.Controls" Version="10.0.20" />
-    <PackageVersion Include="Microsoft.Maui.DevFlow.Agent" Version="0.1.0-preview.8.26256.5" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.12" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.12" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.12" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.12" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.12" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.12" />
+    <PackageVersion Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+    <PackageVersion Include="Microsoft.Maui.DevFlow.Agent" Version="0.1.0-preview.12.26421.1" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="10.0.12" />
     <PackageVersion Include="Nerdbank.GitVersioning" Version="3.7.115" />
+    <PackageVersion Include="SkiaSharp.Views.Maui.Controls" Version="4.152.1" />
+    <PackageVersion Include="Svg.Skia" Version="5.2.3" />
     <PackageVersion Include="Xamarin.GooglePlayServices.Ads.Identifier" Version="118.2.0.3" />
     <PackageVersion Include="Xamarin.GooglePlayServices.Auth.Blockstore" Version="116.4.0.6" />
     <PackageVersion Include="Xamarin.KotlinX.Serialization.Json" Version="1.8.1" />

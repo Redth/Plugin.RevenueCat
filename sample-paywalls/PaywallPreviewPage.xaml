@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:PaywallGallerySample"
+             xmlns:paywalls="clr-namespace:Plugin.RevenueCat.Paywalls;assembly=Plugin.RevenueCat.Paywalls"
+             x:Class="PaywallGallerySample.PaywallPreviewPage"
+             x:DataType="local:PaywallExample"
+             Title="{Binding Title}">
+    <Grid RowDefinitions="Auto,*,Auto"
+          RowSpacing="12"
+          Padding="16">
+        <VerticalStackLayout Spacing="4">
+            <Label Text="{Binding Title}"
+                   FontSize="22"
+                   FontAttributes="Bold" />
+            <Label Text="{Binding Description}"
+                   FontSize="13"
+                   TextColor="{AppThemeBinding Light=#5f6368, Dark=#c7c7c7}" />
+        </VerticalStackLayout>
+
+        <Border Grid.Row="1"
+                Stroke="#d9dce3"
+                StrokeThickness="1"
+                BackgroundColor="{AppThemeBinding Light=#f8f9fb, Dark=#111111}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="26" />
+            </Border.StrokeShape>
+            <paywalls:RcPaywallView x:Name="PaywallView"
+                                    Locale="en_US"
+                                    ApplicationName="Paywall Gallery"
+                                    PurchaseRequested="OnPurchaseRequested"
+                                    RestoreRequested="OnRestoreRequested"
+                                    DismissRequested="OnDismissRequested"
+                                    NavigationRequested="OnNavigationRequested" />
+        </Border>
+
+        <Border Grid.Row="2"
+                Padding="12"
+                Stroke="#d9dce3"
+                StrokeThickness="1"
+                BackgroundColor="{AppThemeBinding Light=#ffffff, Dark=#1f1f1f}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="14" />
+            </Border.StrokeShape>
+            <VerticalStackLayout Spacing="4">
+                <Label Text="Host app event log"
+                       FontSize="12"
+                       FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light=#5f6368, Dark=#c7c7c7}" />
+                <Label x:Name="EventLogLabel"
+                       Text="Tap a package, purchase button, restore button, or navigation action."
+                       FontSize="12"
+                       LineBreakMode="WordWrap" />
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+</ContentPage>

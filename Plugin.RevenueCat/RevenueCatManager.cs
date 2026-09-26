@@ -79,6 +79,9 @@ public class RevenueCatManager : IRevenueCatManager
 	public Task<RevenueCatOperationResult<CustomerInfo>> LogOutWithResultAsync()
 		=> RequestResult<CustomerInfo>(nameof(LogOutAsync), PlatformImplementation.LogOutAsync);
 
+	public Task<string?> GetAppUserIdAsync()
+		=> Task.FromResult(AppUserId);
+
 	public Task<CustomerInfo?> GetCustomerInfoAsync(bool force)
 		=> GetValue(GetCustomerInfoWithResultAsync(force));
 
