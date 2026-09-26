@@ -90,6 +90,28 @@ dotnet build ./sample/MauiSample.csproj -f net10.0-maccatalyst --no-restore
 
 These commands only compile/package the sample; real purchase flows still require platform store configuration and test accounts.
 
+### Native SDK dependency validation
+
+The slim wrappers target RevenueCat iOS **5.91.0** and Android **10.23.2**. Recheck the full Android runtime graph after an SDK update with
+`cd android/native && ./gradlew :revenuecatbinding:dependencies --configuration releaseRuntimeClasspath`.
+For 10.23.2, the direct runtime edges are Play Billing 8.3.0, Amazon Appstore 3.0.5,
+Tink Android 1.10.0, Google Play Services Ads Identifier 17.0.1 / Auth Blockstore
+16.4.0, Kotlin stdlib/Parcelize 2.0.21, coroutines 1.6.4, AndroidX Core Ktx 1.8.0,
+Lifecycle Process 2.5.0, serialization JSON 1.5.1, and Poko annotations 0.17.2.
+The wrapper additionally uses Gson 2.12.1 and resolves serialization JSON JVM
+1.7.3. The binding maps runtime artifacts to central NuGet packages (including
+BillingClient 8.3.0.2, Tink Android 1.10.0.2, GoogleGson 2.12.1, Kotlin stdlib
+2.3.10.1, coroutines 1.10.2.3, and AndroidX Lifecycle 2.10.0.2); the newer
+Kotlin/AndroidX NuGet versions satisfy other MAUI dependencies as well.
+
+**Verifier limitation:** The .NET Android Java-dependency verifier currently fails
+with `XAJDV7004` when it reads the empty `PackageReference.Version` metadata left
+by central package management. The RevenueCat Maven items therefore retain
+`VerifyDependencies="False"`; this is *not* evidence that the verifier passed.
+The Gradle graph, NuGet graph, native tests, binding builds, and consuming sample
+builds must all be checked independently. Do not ignore a missing runtime artifact
+or downgrade a NuGet package merely to make the build pass.
+
 ### Android 15 / 16 KB page-size notes
 
 This binding package does not currently ship native RevenueCat `.so` libraries on Android, so 16 KB Play Console warnings are usually caused by the consuming app's packaged native dependencies or Android build toolchain rather than the RevenueCat wrapper itself.
