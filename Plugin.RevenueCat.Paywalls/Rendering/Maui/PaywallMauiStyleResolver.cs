@@ -475,7 +475,7 @@ static class PaywallMauiStyleResolver
 		};
 	}
 
-	static void ApplySizeConstraint(View view, JsonElement constraint, bool isWidth)
+	internal static void ApplySizeConstraint(View view, JsonElement constraint, bool isWidth)
 	{
 		var type = GetType(constraint);
 		if (type == "fixed" && constraint.TryGetProperty("value", out var value) && value.TryGetDouble(out var fixedSize))

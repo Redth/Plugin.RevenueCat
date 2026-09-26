@@ -1738,19 +1738,94 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 
 	static Action<JsonElement?> CaptureSizeUpdater(View view)
 	{
-		var width = view.WidthRequest;
-		var height = view.HeightRequest;
-		var horizontal = view.HorizontalOptions;
-		var vertical = view.VerticalOptions;
+		var initialWidth = view.WidthRequest;
+		var initialHeight = view.HeightRequest;
+		var initialHorizontal = view.HorizontalOptions;
+		var initialVertical = view.VerticalOptions;
+		var expectedHorizontal = initialHorizontal;
+		var expectedVertical = initialVertical;
+		var horizontalOwned = true;
+		var verticalOwned = true;
+		JsonElement? previousWidth = null;
+		JsonElement? previousHeight = null;
 		return size =>
 		{
-			view.WidthRequest = width;
-			view.HeightRequest = height;
-			view.HorizontalOptions = horizontal;
-			view.VerticalOptions = vertical;
-			PaywallMauiStyleResolver.ApplySize(view, size);
+			UpdateConstraint(GetConstraint(size, "width"), ref previousWidth, isWidth: true);
+			UpdateConstraint(GetConstraint(size, "height"), ref previousHeight, isWidth: false);
 		};
+
+		void UpdateConstraint(JsonElement? next, ref JsonElement? previous, bool isWidth)
+		{
+			if (isWidth && !view.HorizontalOptions.Equals(expectedHorizontal))
+			{
+				horizontalOwned = false;
+			}
+			else if (!isWidth && !view.VerticalOptions.Equals(expectedVertical))
+			{
+				verticalOwned = false;
+			}
+			if (previous?.GetRawText() == next?.GetRawText())
+			{
+				return;
+			}
+
+			if (previous is { } old)
+			{
+				var oldType = PaywallMauiStyleResolver.GetType(old);
+				if (oldType == "fixed" && old.TryGetProperty("value", out var fixedValue) &&
+					fixedValue.TryGetDouble(out var lastValue))
+				{
+					if (isWidth && view.WidthRequest == lastValue)
+					{
+						view.WidthRequest = initialWidth;
+					}
+					else if (!isWidth && view.HeightRequest == lastValue)
+					{
+						view.HeightRequest = initialHeight;
+					}
+				}
+				else if (oldType == "fill")
+				{
+					if (isWidth && horizontalOwned)
+					{
+						view.HorizontalOptions = initialHorizontal;
+						expectedHorizontal = initialHorizontal;
+					}
+					else if (!isWidth && verticalOwned)
+					{
+						view.VerticalOptions = initialVertical;
+						expectedVertical = initialVertical;
+					}
+				}
+			}
+
+			if (next is { } constraint)
+			{
+				if (PaywallMauiStyleResolver.GetType(constraint) != "fill" ||
+					(isWidth ? horizontalOwned : verticalOwned))
+				{
+					PaywallMauiStyleResolver.ApplySizeConstraint(view, constraint, isWidth);
+					if (PaywallMauiStyleResolver.GetType(constraint) == "fill")
+					{
+						if (isWidth)
+						{
+							expectedHorizontal = LayoutOptions.Fill;
+						}
+						else
+						{
+							expectedVertical = LayoutOptions.Fill;
+						}
+					}
+				}
+			}
+			previous = next;
+		}
 	}
+
+	static JsonElement? GetConstraint(JsonElement? size, string dimension) =>
+		size is { ValueKind: JsonValueKind.Object } value &&
+		value.TryGetProperty(dimension, out var constraint) && constraint.ValueKind == JsonValueKind.Object
+			? constraint : null;
 
 	sealed class OverlayPaywallVariableProvider(
 		IPaywallVariableProvider inner,

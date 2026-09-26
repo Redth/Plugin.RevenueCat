@@ -340,6 +340,53 @@ public sealed class PaywallSemanticsTests
 	}
 
 	[TestMethod]
+	public void Initial_Fixed_Size_Returning_To_Fill_Preserves_Parent_Row_Alignment()
+	{
+		var labelComponent = Text("row-offer", "Plan details");
+		labelComponent.Size = JsonSerializer.SerializeToElement(new
+		{
+			height = new { type = "fill" }
+		});
+		labelComponent.Overrides =
+		[
+			Override(new { size = new { height = new { type = "fixed", value = 42 } } },
+				Condition("variable_condition", "=", value: true, variable: "show_fixed"))
+		];
+		var view = new RevenueCatPaywallView
+		{
+			SemanticContext = new()
+			{
+				CustomVariables = new Dictionary<string, JsonElement>
+				{
+					["show_fixed"] = JsonSerializer.SerializeToElement(true)
+				}
+			},
+			PaywallData = new()
+			{
+				ComponentsConfig = new()
+				{
+					Base = new()
+					{
+						Stack = new()
+						{
+							Dimension = JsonSerializer.SerializeToElement(new { type = "horizontal" }),
+							Components = [labelComponent]
+						}
+					}
+				}
+			}
+		};
+		var label = Find<Label>(view, "row-offer");
+		Assert.AreEqual(42, label.HeightRequest);
+		Assert.AreEqual(LayoutOptions.Center, label.VerticalOptions);
+
+		view.SemanticContext = new PaywallSemanticContext();
+		Assert.AreEqual(-1, label.HeightRequest);
+		Assert.AreEqual(LayoutOptions.Center, label.VerticalOptions);
+		Assert.AreSame(label, Find<Label>(view, "row-offer"));
+	}
+
+	[TestMethod]
 	public void Badged_Stack_Does_Not_Duplicate_Container_Padding_Or_Background()
 	{
 		var stack = new PaywallStackComponent
