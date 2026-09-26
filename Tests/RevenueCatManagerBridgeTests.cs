@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Plugin.RevenueCat;
 using Plugin.RevenueCat.Models;
+using Plugin.RevenueCat.Paywalls;
 
 namespace Tests;
 
@@ -250,6 +251,58 @@ public sealed class RevenueCatManagerBridgeTests
 
 	static RevenueCatManager CreateManager(IRevenueCatPlatformImplementation platform)
 	=> new(new RevenueCatOptions(null, null, null, null, false, null, null, null), platform);
+
+	[TestMethod]
+	[DataRow("unknown", PaywallEligibility.Unknown)]
+	[DataRow("ineligible", PaywallEligibility.Ineligible)]
+	[DataRow("eligible", PaywallEligibility.Eligible)]
+	[DataRow("no_intro_offer_exists", PaywallEligibility.NoIntroOfferExists)]
+	public async Task IntroEligibility_BridgeMapsIntoProductScopedPaywallContext(
+		string nativeStatus, PaywallEligibility expected)
+	{
+		var platform = new EligibilityPlatform
+		{
+			EligibilityRequest = _ => Task.FromResult<string?>(
+				JsonSerializer.Serialize(new Dictionary<string, string> { ["store-product"] = nativeStatus }))
+		};
+		var result = await CreateManager(platform)
+			.CheckTrialOrIntroDiscountEligibilityWithResultAsync(["store-product"]);
+		Assert.IsTrue(result.IsSuccess);
+		Assert.IsNotNull(result.Value);
+
+		var eligibility = result.Value.ToDictionary(
+			pair => new PaywallOfferKey(pair.Key),
+			pair => pair.Value switch
+			{
+				IntroEligibilityStatus.Eligible => PaywallEligibility.Eligible,
+				IntroEligibilityStatus.Ineligible => PaywallEligibility.Ineligible,
+				IntroEligibilityStatus.NoIntroOfferExists => PaywallEligibility.NoIntroOfferExists,
+				_ => PaywallEligibility.Unknown
+			});
+		var package = new Package
+		{
+			Identifier = "package-alias",
+			StoreProduct = new()
+			{
+				Identifier = "store-product",
+				IntroductoryDiscount = new()
+				{
+					NumberOfPeriods = 3,
+					SubscriptionPeriod = new() { Unit = SubscriptionPeriodUnit.Month, Value = 1 }
+				}
+			}
+		};
+		var semantics = new PaywallSemanticSession(null,
+			new() { IntroOfferEligibility = eligibility }, packages: [package]);
+		Assert.AreEqual(expected, semantics.IntroEligibility(package));
+		Assert.AreEqual(
+			expected == PaywallEligibility.Eligible ? "3 months" : null,
+			new DefaultPaywallVariableProvider().Resolve("sub_offer_duration",
+				new() { Package = package, IntroOfferEligibility = semantics.IntroEligibility(package) }));
+
+		package.StoreProduct.Identifier = "replacement-product";
+		Assert.AreEqual(PaywallEligibility.Unknown, semantics.IntroEligibility(package));
+	}
 
 	[TestMethod]
 	public async Task IntroEligibility_MapsEveryNativeStatusAndUnknownMissingProducts()

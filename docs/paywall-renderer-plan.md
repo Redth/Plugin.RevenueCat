@@ -367,6 +367,38 @@ Actions are delegated to the host through either an explicit `IPaywallActionHand
 - customer center.
 - unknown/custom actions.
 
+### Connecting native eligibility to the paywall
+
+The optional `IRevenueCatIntroEligibility` capability returns customer-specific iOS/Mac
+Catalyst results keyed by store product ID. The paywall library does not reference the native
+plugin. A host using both packages can map a **successful** result explicitly:
+
+```csharp
+static IReadOnlyDictionary<PaywallOfferKey, PaywallEligibility> MapIntroEligibility(
+    IReadOnlyDictionary<string, IntroEligibilityStatus> statuses) =>
+    statuses.ToDictionary(
+        pair => new PaywallOfferKey(pair.Key),
+        pair => pair.Value switch
+        {
+            IntroEligibilityStatus.Eligible => PaywallEligibility.Eligible,
+            IntroEligibilityStatus.Ineligible => PaywallEligibility.Ineligible,
+            IntroEligibilityStatus.NoIntroOfferExists => PaywallEligibility.NoIntroOfferExists,
+            _ => PaywallEligibility.Unknown
+        });
+```
+
+The enums have different numeric ordering: **do not cast between them**. Assign this map to
+`PaywallSemanticContext.IntroOfferEligibility`, preserving the host's other semantic facts.
+Use the product identifier, not a reusable package alias. Android offer-specific facts, if
+independently established, require the exact product and subscription-option identifier.
+
+Eligibility is customer-scoped. Invalidate it immediately on login/logout or customer change;
+do not retain a previous user's known-eligible map while a new query is pending. Handle a
+failed/unsupported native result as a failure with eligibility still unknown, not as proof of
+ineligibility. Unknown introductory eligibility does not itself prevent a normal full-price
+purchase. The cross-project regression tests exercise all four native statuses, product-ID
+mapping, introductory duration, and stale data after a product replacement.
+
 ## Variables
 
 Initial variable support should include:
