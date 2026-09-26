@@ -126,7 +126,8 @@ public sealed class PaywallMauiRenderingTests
 		Assert.AreEqual("$49.99", Find<Label>(view, "footer-price").Text);
 
 		var monthlyTabButton = Descendants(view).OfType<Border>()
-			.Single(b => b.Content is Label { Text: "Monthly" });
+			.Single(b => b.GestureRecognizers.OfType<TapGestureRecognizer>().Any() &&
+				Descendants(b).OfType<Label>().Any(label => label.Text == "Monthly"));
 		Tap(monthlyTabButton);
 		var monthlyCard = Find<Border>(view, "monthly");
 		Tap(monthlyCard);
