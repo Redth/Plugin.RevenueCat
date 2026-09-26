@@ -8,10 +8,11 @@ public sealed class PaywallRenderRequest
 {
 	PaywallSelectionState? selection;
 	PaywallSemanticSession? semantics;
+	IReadOnlyList<Package> packages = [];
 	internal bool ActionInProgress { get; set; }
 
 	internal PaywallSemanticSession Semantics => semantics ??=
-		new(PaywallData, SemanticContext, Diagnostic, GetComponentsConfig());
+		new(PaywallData, SemanticContext, Diagnostic, GetComponentsConfig(), Packages);
 
 	internal PaywallSelectionState Selection => selection ??= new(GetComponentsConfig(), Packages, SelectedPackageIdentifier, Semantics);
 
@@ -22,6 +23,17 @@ public sealed class PaywallRenderRequest
 		{
 			SelectionReconciled?.Invoke(Selection.SelectedIdentifier);
 		}
+	}
+
+	internal void UpdatePackages(IReadOnlyList<Package> updatedPackages)
+	{
+		packages = updatedPackages;
+		Semantics.UpdatePackages(updatedPackages);
+		if (Selection.UpdatePackages(updatedPackages))
+		{
+			SelectionReconciled?.Invoke(Selection.SelectedIdentifier);
+		}
+		Semantics.SelectionChanged();
 	}
 
 	internal void SelectPackage(string? identifier)
@@ -38,7 +50,11 @@ public sealed class PaywallRenderRequest
 
 	public PaywallUiConfig? UiConfig { get; init; }
 
-	public IReadOnlyList<Package> Packages { get; init; } = [];
+	public IReadOnlyList<Package> Packages
+	{
+		get => packages;
+		init => packages = value;
+	}
 
 	public string? OfferingIdentifier { get; init; }
 

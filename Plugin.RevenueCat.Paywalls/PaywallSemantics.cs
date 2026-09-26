@@ -14,14 +14,17 @@ public enum PaywallEligibility
 	NoIntroOfferExists
 }
 
+public readonly record struct PaywallOfferKey(string ProductIdentifier, string? SubscriptionOptionIdentifier = null);
+
 /// <summary>Host-provided presentation facts. An offered trial is not evidence of customer eligibility.</summary>
 public sealed class PaywallSemanticContext
 {
-	public IReadOnlyDictionary<string, PaywallEligibility> IntroOfferEligibility { get; init; } =
-		new Dictionary<string, PaywallEligibility>();
+	/// <summary>Customer-scoped: replace this context on login/logout and whenever the active customer changes.</summary>
+	public IReadOnlyDictionary<PaywallOfferKey, PaywallEligibility> IntroOfferEligibility { get; init; } =
+		new Dictionary<PaywallOfferKey, PaywallEligibility>();
 
-	public IReadOnlyDictionary<string, PaywallEligibility> PromoOfferEligibility { get; init; } =
-		new Dictionary<string, PaywallEligibility>();
+	public IReadOnlyDictionary<PaywallOfferKey, PaywallEligibility> PromoOfferEligibility { get; init; } =
+		new Dictionary<PaywallOfferKey, PaywallEligibility>();
 
 	public IReadOnlyDictionary<string, JsonElement> CustomVariables { get; init; } =
 		new Dictionary<string, JsonElement>();
@@ -42,14 +45,17 @@ internal sealed class PaywallSemanticSession
 	readonly IReadOnlyDictionary<string, PaywallStateDeclaration> declarations;
 	readonly Action<string>? diagnostic;
 	readonly bool discardRules;
+	IReadOnlyList<Package> packages;
 
 	public PaywallSemanticSession(
 		PaywallComponentsData? data,
 		PaywallSemanticContext? context = null,
 		Action<string>? diagnostic = null,
-		PaywallComponentsConfig? config = null)
+		PaywallComponentsConfig? config = null,
+		IReadOnlyList<Package>? packages = null)
 	{
 		declarations = data?.StateDeclarations ?? new Dictionary<string, PaywallStateDeclaration>();
+		this.packages = packages ?? [];
 		Context = context ?? new PaywallSemanticContext();
 		this.diagnostic = diagnostic;
 		var root = (data?.ComponentsConfig ?? config)?.Base;
@@ -58,7 +64,7 @@ internal sealed class PaywallSemanticSession
 			HasUnsupportedConditions(root?.StickyFooter);
 		if (discardRules)
 		{
-			Report("Unsupported condition found: conditional paywall rules are disabled for this presentation.");
+			Report("Unsupported condition or unmodeled override found: conditional paywall rules are disabled for this presentation.");
 		}
 		foreach (var (key, declaration) in declarations)
 		{
@@ -86,6 +92,12 @@ internal sealed class PaywallSemanticSession
 	}
 
 	public void SelectionChanged() => Changed?.Invoke();
+
+	public void UpdatePackages(IReadOnlyList<Package> updatedPackages) => packages = updatedPackages;
+
+	public PaywallEligibility IntroEligibility(Package? package) =>
+		Context.IntroOfferEligibility.TryGetValue(OfferEligibilityKey(package?.Identifier) ?? default, out var eligibility)
+			? eligibility : PaywallEligibility.Unknown;
 
 	public bool IsVisible(PaywallComponent? component, string? packageId = null)
 	{
@@ -216,9 +228,10 @@ internal sealed class PaywallSemanticSession
 			case "promo_offer":
 			case "intro_offer_condition":
 			case "promo_offer_condition":
+				var eligibilityKey = OfferEligibilityKey(packageId ?? SelectedPackageIdentifier);
 				var eligibility = (condition.Type.StartsWith("intro", StringComparison.Ordinal)
 					? Context.IntroOfferEligibility : Context.PromoOfferEligibility)
-					.TryGetValue(packageId ?? SelectedPackageIdentifier ?? "", out var known)
+					.TryGetValue(eligibilityKey ?? default, out var known)
 						? known : PaywallEligibility.Unknown;
 				if (eligibility == PaywallEligibility.Unknown)
 				{
@@ -283,6 +296,21 @@ internal sealed class PaywallSemanticSession
 		}
 	}
 
+	PaywallOfferKey? OfferEligibilityKey(string? packageIdentifier)
+	{
+		if (string.IsNullOrWhiteSpace(packageIdentifier))
+		{
+			return null;
+		}
+		var product = packages.FirstOrDefault(p => p.Identifier == packageIdentifier)?.StoreProduct;
+		if (string.IsNullOrWhiteSpace(product?.Identifier))
+		{
+			return null;
+		}
+		var optionId = product.DefaultSubscriptionOption?.Id;
+		return new PaywallOfferKey(product.Identifier, string.IsNullOrWhiteSpace(optionId) ? null : optionId);
+	}
+
 	bool InvalidCondition(PaywallComponentOverrideCondition condition)
 	{
 		Report($"Unsupported or unresolved paywall condition '{condition.Type ?? "null"}'.");
@@ -331,22 +359,37 @@ internal sealed class PaywallSemanticSession
 		{
 			return true;
 		}
-		return component switch
+		if (component.ExtensionData?.ContainsKey("overrides") == true)
 		{
-			PaywallStackComponent stack => stack.Components.Any(HasUnsupportedConditions),
+			return true;
+		}
+		return HasUnsupportedConditions(component.Fallback) || (component switch
+		{
+			PaywallStackComponent stack => stack.Components.Any(HasUnsupportedConditions) ||
+				HasUnsupportedConditions(EmbeddedStack(stack.Badge)),
 			PaywallPackageComponent package => HasUnsupportedConditions(package.Stack),
 			PaywallButtonComponent button => HasUnsupportedConditions(button.Stack),
 			PaywallPurchaseButtonComponent purchase => HasUnsupportedConditions(purchase.Stack),
 			PaywallHeaderComponent header => HasUnsupportedConditions(header.Stack),
 			PaywallStickyFooterComponent footer => HasUnsupportedConditions(footer.Stack),
-			PaywallTabsComponent tabs => tabs.Tabs.Any(t => HasUnsupportedConditions(t.Stack)),
+			PaywallTabsComponent tabs => tabs.Tabs.Any(t => HasUnsupportedConditions(t.Stack)) ||
+				HasUnsupportedConditions(EmbeddedStack(tabs.Control)),
 			PaywallCarouselComponent carousel => carousel.Pages.Any(HasUnsupportedConditions),
-			PaywallUnknownComponent unknown => HasUnsupportedConditions(unknown.Fallback),
-			PaywallVideoComponent video => HasUnsupportedConditions(video.Fallback),
 			PaywallCountdownComponent countdown =>
 				HasUnsupportedConditions(countdown.CountdownStack) || HasUnsupportedConditions(countdown.EndStack),
 			_ => false
-		};
+		});
+	}
+
+	static PaywallStackComponent? EmbeddedStack(JsonElement? data)
+	{
+		if (data is not { ValueKind: JsonValueKind.Object } parent ||
+			!parent.TryGetProperty("stack", out var stack) ||
+			stack.ValueKind != JsonValueKind.Object)
+		{
+			return null;
+		}
+		return stack.Deserialize(ModelSerializerContext.Default.PaywallStackComponent);
 	}
 
 	void Report(string message)
@@ -400,6 +443,7 @@ internal sealed class PaywallSemanticSession
 	{
 		if (op is not ("=" or "!=") ||
 			actual.ValueKind != expected.ValueKind &&
+			!(IsBoolean(actual) && IsBoolean(expected)) &&
 			!(actual.ValueKind == JsonValueKind.Number && expected.ValueKind == JsonValueKind.Number))
 		{
 			return false;
@@ -407,6 +451,9 @@ internal sealed class PaywallSemanticSession
 		var matches = Equal(actual, expected);
 		return op == "=" ? matches : !matches;
 	}
+
+	static bool IsBoolean(JsonElement value) =>
+		value.ValueKind is JsonValueKind.True or JsonValueKind.False;
 }
 
 internal sealed class PaywallResolvedOverrides(

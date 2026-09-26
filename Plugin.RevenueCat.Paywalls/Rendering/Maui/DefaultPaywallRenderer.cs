@@ -106,13 +106,22 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 			PaywallCountdownComponent countdown => RenderCountdown(countdown, request, packageContextIdentifier, tabSelected, selectedTabId, variables, tabIds),
 			PaywallVideoComponent video => RenderVideo(video, request, packageContextIdentifier, tabSelected, selectedTabId, variables, tabIds),
 			{ Fallback: { } componentFallback } => RenderComponent(componentFallback, request, packageContextIdentifier, tabSelected, selectedTabId, variables, tabIds),
-			_ => new ContentView { IsVisible = false }
+			_ => RenderUnsupportedComponent(component, request)
 		};
 		if (!string.IsNullOrWhiteSpace(component.Id))
 		{
 			view.AutomationId = component.Id;
 		}
 		return view;
+	}
+
+	static View RenderUnsupportedComponent(PaywallComponent component, PaywallRenderRequest request)
+	{
+		var message = $"Unsupported paywall component '{component.Type ?? component.GetType().Name}'" +
+			$" ({component.Id ?? "no id"}); no fallback is available.";
+		System.Diagnostics.Trace.TraceWarning("{0}", message);
+		request.Diagnostic?.Invoke(message);
+		return new ContentView { IsVisible = false };
 	}
 
 	View RenderStack(
@@ -141,30 +150,36 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 				i);
 		}
 
-		var view = WrapContainer(
+		var initialOverrides = request.Semantics.Resolve(component, packageContextIdentifier);
+		var container = WrapContainer(
 			layout,
-			request.Semantics.Resolve(component, packageContextIdentifier).Element("padding") ?? component.Padding,
-			request.Semantics.Resolve(component, packageContextIdentifier).Element("margin") ?? component.Margin,
-			request.Semantics.Resolve(component, packageContextIdentifier).Element("background_color") ??
-				request.Semantics.Resolve(component, packageContextIdentifier).Element("background") ??
+			initialOverrides.Element("padding") ?? component.Padding,
+			initialOverrides.Element("margin") ?? component.Margin,
+			initialOverrides.Element("background_color") ??
+				initialOverrides.Element("background") ??
 				component.BackgroundColor ?? component.Background,
 			component.Shape,
 			component.Border,
 			component.Shadow,
 			request.UiConfig);
-		view = ApplyBadge(view, component.Badge, request, packageContextIdentifier, tabSelected, selectedTabId, variables, tabIds);
-		PaywallMauiStyleResolver.ApplySize(view, component.Size);
+		var view = ApplyBadge(container, component.Badge, request, packageContextIdentifier, tabSelected, selectedTabId, variables, tabIds);
+		var applySize = CaptureSizeUpdater(view);
 		ObserveSemantics(view, request, () =>
 		{
 			var overrides = request.Semantics.Resolve(component, packageContextIdentifier);
 			view.IsVisible = request.Semantics.IsVisible(component, packageContextIdentifier);
 			var background = overrides.Element("background_color") ?? overrides.Element("background") ??
 				component.BackgroundColor ?? component.Background;
-			ApplySemanticContainerStyles(view,
+			var margin = overrides.Element("margin") ?? component.Margin;
+			ApplySemanticContainerStyles(container,
 				overrides.Element("padding") ?? component.Padding,
-				overrides.Element("margin") ?? component.Margin,
+				ReferenceEquals(container, view) ? margin : null,
 				background, request.UiConfig);
-			PaywallMauiStyleResolver.ApplySize(view, overrides.Element("size") ?? component.Size);
+			if (!ReferenceEquals(container, view))
+			{
+				view.Margin = PaywallMauiStyleResolver.ResolveThickness(margin);
+			}
+			applySize(overrides.Element("size") ?? component.Size);
 		});
 
 		return view;
@@ -249,6 +264,7 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 			FontAttributes = PaywallMauiStyleResolver.ResolveFontAttributes(component.FontWeight, component.FontWeightInt),
 			LineBreakMode = LineBreakMode.WordWrap
 		};
+		var applySize = CaptureSizeUpdater(label);
 
 		void UpdateText()
 		{
@@ -269,9 +285,8 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 			ApplyBoxStyles(label, overrides.Element("padding") ?? component.Padding,
 				overrides.Element("margin") ?? component.Margin,
 				overrides.Element("background_color") ?? component.BackgroundColor, request.UiConfig);
-			PaywallMauiStyleResolver.ApplySize(label, overrides.Element("size") ?? component.Size);
-			var eligibility = request.Semantics.Context.IntroOfferEligibility.TryGetValue(package?.Identifier ?? "", out var known)
-				? known : PaywallEligibility.Unknown;
+			applySize(overrides.Element("size") ?? component.Size);
+			var eligibility = request.Semantics.IntroEligibility(package);
 			label.Text = PaywallTextProcessor.ProcessVariables(text, variableProvider, new PaywallVariableContext
 			{
 				Package = package,
@@ -638,7 +653,7 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 			component.Border,
 			component.Shadow,
 			request.UiConfig);
-		PaywallMauiStyleResolver.ApplySize(view, component.Size);
+		var applySize = CaptureSizeUpdater(view);
 		ObserveSemantics(view, request, () =>
 		{
 			var overrides = request.Semantics.Resolve(component, packageContextIdentifier);
@@ -648,7 +663,7 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 				overrides.Element("margin") ?? component.Margin,
 				overrides.Element("background_color") ?? overrides.Element("background") ??
 				component.BackgroundColor ?? component.Background, request.UiConfig);
-			PaywallMauiStyleResolver.ApplySize(view, overrides.Element("size") ?? component.Size);
+			applySize(overrides.Element("size") ?? component.Size);
 		});
 		return view;
 	}
@@ -1719,6 +1734,22 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		{
 			ApplyBoxStyles(view, padding, margin, background, uiConfig);
 		}
+	}
+
+	static Action<JsonElement?> CaptureSizeUpdater(View view)
+	{
+		var width = view.WidthRequest;
+		var height = view.HeightRequest;
+		var horizontal = view.HorizontalOptions;
+		var vertical = view.VerticalOptions;
+		return size =>
+		{
+			view.WidthRequest = width;
+			view.HeightRequest = height;
+			view.HorizontalOptions = horizontal;
+			view.VerticalOptions = vertical;
+			PaywallMauiStyleResolver.ApplySize(view, size);
+		};
 	}
 
 	sealed class OverlayPaywallVariableProvider(

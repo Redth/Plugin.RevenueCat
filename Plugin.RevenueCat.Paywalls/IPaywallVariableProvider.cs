@@ -36,8 +36,7 @@ public sealed class DefaultPaywallVariableProvider : IPaywallVariableProvider
 		"sub_price_per_week" => context.Package?.StoreProduct?.DefaultSubscriptionOption?.FullPricePhase?.PricePerWeek?.Formatted,
 		"sub_price_per_month" => context.Package?.StoreProduct?.DefaultSubscriptionOption?.FullPricePhase?.PricePerMonth?.Formatted,
 		"sub_offer_duration" => context.IntroOfferEligibility == PaywallEligibility.Eligible
-			? GetDuration(GetIntroPhase(context.Package)?.BillingPeriod ??
-				context.Package?.StoreProduct?.IntroductoryDiscount?.SubscriptionPeriod)
+			? GetOfferDuration(context.Package)
 			: null,
 		"sub_offer_price" => context.IntroOfferEligibility == PaywallEligibility.Eligible
 			? GetIntroPhase(context.Package)?.Price?.Formatted ??
@@ -52,15 +51,30 @@ public sealed class DefaultPaywallVariableProvider : IPaywallVariableProvider
 		package?.StoreProduct?.DefaultSubscriptionOption?.FreePhase ??
 		package?.StoreProduct?.DefaultSubscriptionOption?.IntroPhase;
 
-	static string? GetDuration(SubscriptionPeriod? period)
+	static string? GetOfferDuration(Package? package)
 	{
-		if (period is null || period.Unit == SubscriptionPeriodUnit.Unknown)
+		var option = package?.StoreProduct?.DefaultSubscriptionOption;
+		if (option?.FreePhase is not null && option.IntroPhase is not null)
+		{
+			return null;
+		}
+		var phase = GetIntroPhase(package);
+		var discount = package?.StoreProduct?.IntroductoryDiscount;
+		return phase is not null
+			? phase.BillingCycleCount is { } cycles ? GetDuration(phase.BillingPeriod, cycles) : null
+			: discount?.NumberOfPeriods is { } periods ? GetDuration(discount.SubscriptionPeriod, periods) : null;
+	}
+
+	static string? GetDuration(SubscriptionPeriod? period, int cycles = 1)
+	{
+		if (period is null || period.Unit == SubscriptionPeriodUnit.Unknown || cycles <= 0 || period.Value <= 0)
 		{
 			return null;
 		}
 
 		var unit = GetPeriodName(period);
-		return period.Value == 1 ? unit : $"{period.Value} {unit}s";
+		var total = (long)period.Value * cycles;
+		return total == 1 ? unit : $"{total} {unit}s";
 	}
 
 	static string? GetPeriodName(SubscriptionPeriod? period) => period?.Unit switch

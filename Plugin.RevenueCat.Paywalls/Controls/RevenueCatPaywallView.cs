@@ -69,7 +69,7 @@ public class RevenueCatPaywallView : ContentView
 		typeof(IReadOnlyList<Package>),
 		typeof(RevenueCatPaywallView),
 		Array.Empty<Package>(),
-		propertyChanged: OnRenderPropertyChanged);
+		propertyChanged: OnPackagesChanged);
 
 	public static readonly BindableProperty LocaleProperty = BindableProperty.Create(
 		nameof(Locale),
@@ -196,7 +196,7 @@ public class RevenueCatPaywallView : ContentView
 	{
 		selectedPackageIdentifier = new PaywallSelectionState(
 			PaywallData?.ComponentsConfig, Packages, selectedPackageIdentifier,
-			new PaywallSemanticSession(PaywallData, SemanticContext)).SelectedIdentifier;
+			new PaywallSemanticSession(PaywallData, SemanticContext, packages: Packages)).SelectedIdentifier;
 		var actionHandler = ActionHandler ?? eventActionHandler;
 
 		activeRequest = new PaywallRenderRequest
@@ -311,6 +311,22 @@ public class RevenueCatPaywallView : ContentView
 		if (view.renderer.HandlesPackageSelectionUpdates && view.activeRequest is not null)
 		{
 			view.activeRequest.UpdateSemanticContext(newValue as PaywallSemanticContext);
+		}
+		else
+		{
+			view.Render();
+		}
+	}
+
+	static void OnPackagesChanged(BindableObject bindable, object oldValue, object newValue)
+	{
+		if (bindable is not RevenueCatPaywallView { updatingOffering: false } view)
+		{
+			return;
+		}
+		if (view.renderer.HandlesPackageSelectionUpdates && view.activeRequest is not null)
+		{
+			view.activeRequest.UpdatePackages(newValue as IReadOnlyList<Package> ?? Array.Empty<Package>());
 		}
 		else
 		{

@@ -4,7 +4,7 @@ namespace Plugin.RevenueCat.Paywalls;
 
 internal sealed class PaywallSelectionState
 {
-	readonly IReadOnlyList<Package> packages;
+	IReadOnlyList<Package> packages;
 	readonly PaywallComponentsConfig? config;
 	readonly PaywallSemanticSession semantics;
 	readonly Dictionary<PaywallTabsComponent, string> activeTabs = new();
@@ -58,6 +58,12 @@ internal sealed class PaywallSelectionState
 			return false;
 		}
 		activeTabs[tabs] = tabId;
+		return Reconcile();
+	}
+
+	public bool UpdatePackages(IReadOnlyList<Package> updatedPackages)
+	{
+		packages = updatedPackages;
 		return Reconcile();
 	}
 
