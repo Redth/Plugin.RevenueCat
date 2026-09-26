@@ -19,6 +19,28 @@ public sealed class PaywallMauiRenderingTests
 	public void ResetDispatcher() => DispatcherProvider.SetCurrent(null);
 
 	[TestMethod]
+	public void Semantic_Refresh_Preserves_Parent_Assigned_Row_Alignment()
+	{
+		var view = CreateView(new()
+		{
+			Components =
+			[
+				new PaywallStackComponent
+				{
+					Dimension = JsonSerializer.SerializeToElement(new { type = "horizontal" }),
+					Components = [Text("row-label", "Plan details")]
+				}
+			]
+		});
+		var label = Find<Label>(view, "row-label");
+		Assert.AreEqual(LayoutOptions.Center, label.VerticalOptions);
+
+		view.SemanticContext = new PaywallSemanticContext();
+
+		Assert.AreEqual(LayoutOptions.Center, label.VerticalOptions);
+	}
+
+	[TestMethod]
 	public void Custom_Renderer_Retains_The_Default_Rerender_Callback_Contract()
 	{
 		var renderer = new RecordingRenderer();
