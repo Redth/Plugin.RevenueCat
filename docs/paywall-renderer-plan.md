@@ -23,7 +23,7 @@ structured operation results, native serializers, and tests rather than overwrit
 | SkiaSharp MAUI / Svg.Skia | 4.152.1 / 5.2.3 | Compatible .NET 10 assets, checked against NuGet dependency manifests |
 | MSTest SDK | 4.4.1 | One SDK-managed test toolchain instead of mismatched 3.6.4/3.9.3 overrides |
 | DevFlow Agent / CLI | 0.1.0-preview.12.26421.1 | Aligned Debug tooling; not a reason to switch the app to .NET 11 preview |
-| RevenueCat native SDKs | iOS 5.72.0 / Android 10.5.0 retained from main | Current upstream is [iOS 5.91.0](https://github.com/RevenueCat/purchases-ios/releases/tag/5.91.0) / [Android 10.23.2](https://github.com/RevenueCat/purchases-android/releases/tag/10.23.2); a separate native dependency/API validation pass is required before adopting them |
+| RevenueCat native SDKs | iOS 5.91.0 / Android 10.23.2 | [iOS release](https://github.com/RevenueCat/purchases-ios/releases/tag/5.91.0), [Android release](https://github.com/RevenueCat/purchases-android/releases/tag/10.23.2); native tests, bindings and classic consumers validated after integration |
 
 `MauiVersion` in `Directory.Build.props` also aligns implicit MAUI dependencies with the
 central Controls package. `global.json` allows patch roll-forward, not an accidental
@@ -74,8 +74,8 @@ native handler, measurement, accessibility, GPU, store-purchase, or AOT tests.
 6. **P2 - Performance and completeness:** update countdown labels without rebuilding their
    stack each second; add bounded shared asset caching, remote fonts, proper localized period/
    trial variables, and supported video behavior. Measure allocations and dropped frames.
-7. **Release gate:** update native RevenueCat versions with their full dependency graphs,
-   resolve AndroidX version-constraint warnings in the core bindings, run live store sandbox
+7. **Release gate:** retain native SDK/dependency compatibility checks on future upgrades;
+   the current versions and AndroidX alignment are now integrated. Run live store sandbox
    purchases and restore, verify trimmed/AOT packages and all supported native targets.
 
 No numeric native accessibility/adaptivity score is claimed from source or gallery captures
@@ -116,7 +116,7 @@ The consolidated plan must distinguish shipped behavior, test-only evidence, unv
 native behavior and deliberately unsupported syntax. In particular, no live-store,
 VoiceOver/TalkBack or full RevenueCatUI-parity claim follows from a managed test alone.
 
-### Validation performed for this refresh
+### Initial refresh validation, before parallel implementation
 
 - **82 offline managed tests passed**, including construction of all 15 gallery fixtures as
   MAUI view trees. These tests do not require RevenueCat credentials.
@@ -134,6 +134,44 @@ VoiceOver/TalkBack or full RevenueCatUI-parity claim follows from a managed test
 - iOS/Android device interaction, Windows UI, accessibility, background/resume and live
   RevenueCat/store sandbox flows were **not** validated in this pass. Existing local NuGet
   source warnings and core-binding AndroidX constraint warnings are not claimed to be fixed.
+
+### Integrated native and semantic work
+
+The native upgrade preserves the previous public API signatures and public-SDK wrapper
+mechanisms. Android dependencies now include the required Tink 1.10.0 runtime and aligned
+Kotlin/Coroutines/AndroidX packages; the earlier NU1608 constraint warnings are gone from the
+integrated classic sample builds. See the README for the exact graph and the separately
+documented XAJDV7004 central-package-management verifier limitation.
+
+The optional native introductory-eligibility interface is additive. Existing applications
+and implementations of `IRevenueCatManager` do not need to implement or use it. iOS and Mac
+Catalyst query the public SDK; Android returns an explicit unsupported-platform result.
+Cancellation and customer changes cannot turn into successful eligibility facts.
+
+The semantic engine now supports a bounded, source-verified subset:
+
+| Area | Implemented behavior | Remaining boundary |
+| --- | --- | --- |
+| Overrides | Ordered matching overrides on text, stacks and tabs; conditions within an entry are ANDed; later matching non-null values win | Not a complete style/layout override engine |
+| Conditions | Selected state, compact/medium/expanded, intro/promo eligibility, typed variable/state equality, selected-package membership, window comparisons | Window/screen facts are host-provided; arbitrary expressions are not evaluated |
+| Eligibility | Explicit unknown/eligible/ineligible/no-intro states keyed by product and subscription option | Offer metadata alone does not prove eligibility; hosts invalidate customer-scoped context |
+| State | Typed declarations and tab-driven literal/`$value` assignments | Other state-producing controls and advanced operations remain unsupported |
+| Refresh | Existing text, visibility, container styles, dimensions and package availability update in place; selected purchase target is reconciled | Broader native focus/background/device coverage remains required |
+| Offer copy | Explicitly eligible intro price/duration, including known billing-cycle counts | Missing cycles or multi-phase intro durations are not fabricated; regionalized copy remains incomplete |
+| Unsupported input | Diagnostics and paywall-wide rule fallback for unsupported conditions/unmodeled overrides | `web_view`, dynamic media overrides, multiple intro offers and non-in-app checkout are not implemented |
+
+Source provenance is pinned to RevenueCat iOS **5.91.0**:
+`ComponentOverrides.swift`, `StateDeclaration.swift`, `StateUpdate.swift`,
+`PaywallComponentBase.swift`, `PaywallTabsComponent.swift`, and the V2
+`PresentedPartials`, `TabsComponentViewModel` and `PaywallStateStore` implementations;
+Android **10.23.2** `StateUpdate.kt` is an additional cross-check.
+`Tests/data/paywall_semantics.json` is a small sanitized derived fixture, not a claim that
+every dashboard-exported paywall is supported.
+
+Integration regressions specifically cover boolean inequality, matching/unmatching size
+overrides, parent-assigned row alignment, badged container padding, exact product/offer
+identity and native-to-paywall enum mapping. These are behavioral checks beyond the original
+gallery parsing tests.
 
 ## Goal
 
