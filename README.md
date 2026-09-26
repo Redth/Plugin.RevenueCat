@@ -76,6 +76,18 @@ Use the `IRevenueCatManager` instance (resolved through dependency injection) to
 
 For non-throwing error handling, use the matching `*WithResultAsync` / `*WithOperationResultAsync` methods. These return `RevenueCatOperationResult<T>` with `IsSuccess`, `Value`, `Error`, and `UserCancelled` so you can inspect native RevenueCat error codes/messages and distinguish user-cancelled purchases while the existing nullable-returning methods remain source-compatible.
 
+On iOS and Mac Catalyst, the concrete manager also implements the optional
+`IRevenueCatIntroEligibility` capability. Its
+`CheckTrialOrIntroDiscountEligibilityWithResultAsync(productIdentifiers, cancellationToken)`
+returns product-ID keyed `IntroEligibilityStatus` values: `Unknown`, `Ineligible`,
+`Eligible`, or `NoIntroOfferExists` (native JSON: `no_intro_offer_exists`). This
+checks a customer's **trial or introductory discount**, not promotional-offer
+eligibility. Android does not expose an equivalent check; calling the optional
+capability there returns an explicit `unsupported_platform` failure. Discard and
+refresh eligibility data when the app user logs in or out; a result is rejected if
+the SDK app user ID changes during the request. Missing product IDs remain
+`Unknown`, and failed native requests must not be interpreted as ineligibility.
+
 Configuration options are available through `RevenueCatOptionsBuilder` for explicit store selection (`WithAppStore("google" | "amazon" | "test")`), proxy URL, purchases-completed-by mode, entitlement verification mode, diagnostics, automatic device identifier collection, iOS StoreKit version, and Android pending prepaid-plan transactions.
 
 ### Smoke validation
