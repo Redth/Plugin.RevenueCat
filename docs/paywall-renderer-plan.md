@@ -82,6 +82,40 @@ No numeric native accessibility/adaptivity score is claimed from source or galle
 alone. The current custom controls, fixed-size fixtures and English period strings prevent a
 production-ready conformance claim.
 
+### Acceptance criteria for the next implementation increment
+
+The native SDK, paywall semantics and accessibility workstreams must integrate against the
+same refreshed baseline. Completing them requires more than three independent builds:
+
+| Workstream | Required evidence |
+| --- | --- |
+| Native SDK compatibility | Pin verified stable releases; reconcile Maven/NuGet dependencies; compile Java/Swift wrappers and .NET bindings; retain the existing public API signatures, serialized field meanings, callback/error behavior and offering fallback rules; run the classic sample and compatibility tests |
+| Conditional UI and state | Pin upstream grammar and precedence; test supported predicates, override ordering, state updates and variable resolution; distinguish unknown eligibility from eligible/ineligible; exercise changes to customer, selected package and available store products without inventing trial eligibility |
+| Accessibility | Expose actionable roles, localized names and selected/checked/disabled states; prevent duplicate activation; provide keyboard/focus behavior and platform-sized hit targets; test the actual native properties where possible and label any screen-reader/device coverage that remains unverified |
+| Combined behavior | A visible, eligible and available plan must be the same plan that is announced and passed to purchase; hiding/removing the selected plan must reconcile selection; changing context must update both UI and accessibility state without resetting the whole paywall |
+
+Integration must retain the stable non-paywall usage path: an app using only
+`Plugin.RevenueCat` must not require the paywall renderer, new eligibility context, or any
+RevenueCatUI native library to initialize, fetch products, purchase, restore or receive
+customer-info updates. New host context for paywalls must be additive and safe when omitted.
+
+The combined regression pass must cover at least:
+
+- A tab switch changes the announced selection, displayed price/trial text and purchase
+  package together; inactive or unavailable plans cannot remain the purchase target.
+- Unknown eligibility never becomes a promise of a free trial. Resolving eligibility or
+  customer state updates affected content and semantics without replacing unrelated views.
+- Pointer, keyboard and native accessibility activation each invoke one guarded action,
+  with consistent disabled/busy/error behavior.
+- Conditional visibility and state updates do not leave focus on removed content or retain
+  listeners to discarded views; package selection preserves existing layout and scroll state.
+- The legacy managed/native compatibility suite still passes after all three workstreams
+  are combined, alongside paywall tests, platform builds and package checks.
+
+The consolidated plan must distinguish shipped behavior, test-only evidence, unverified
+native behavior and deliberately unsupported syntax. In particular, no live-store,
+VoiceOver/TalkBack or full RevenueCatUI-parity claim follows from a managed test alone.
+
 ### Validation performed for this refresh
 
 - **82 offline managed tests passed**, including construction of all 15 gallery fixtures as
