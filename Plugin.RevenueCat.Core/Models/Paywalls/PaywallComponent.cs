@@ -295,6 +295,12 @@ public sealed partial class PaywallCarouselComponent : PaywallComponent
 
 public sealed partial class PaywallTabsComponent : PaywallComponent
 {
+	[JsonPropertyName("overrides")]
+	public List<PaywallComponentOverride> Overrides { get; set; } = new();
+
+	[JsonPropertyName("state_updates")]
+	public List<PaywallStateUpdate> StateUpdates { get; set; } = new();
+
 	[JsonPropertyName("visible")]
 	public bool? Visible { get; set; }
 
@@ -465,9 +471,33 @@ public partial class PaywallComponentOverrideCondition
 	[JsonPropertyName("variable")]
 	public string? Variable { get; set; }
 
+	[JsonPropertyName("name")]
+	public string? Name { get; set; }
+
 	[JsonPropertyName("packages")]
 	public List<string> Packages { get; set; } = new();
 
 	[JsonExtensionData]
 	public Dictionary<string, JsonElement>? ExtensionData { get; set; }
+}
+
+public sealed class PaywallStateUpdate
+{
+	[JsonPropertyName("set")]
+	public string? Set { get; set; }
+
+	[JsonPropertyName("to")]
+	public JsonElement? To { get; set; }
+
+	[JsonExtensionData]
+	public Dictionary<string, JsonElement>? ExtensionData { get; set; }
+}
+
+public sealed class PaywallStateDeclaration
+{
+	[JsonPropertyName("type")]
+	public string? Type { get; set; }
+
+	[JsonPropertyName("default")]
+	public JsonElement Default { get; set; }
 }

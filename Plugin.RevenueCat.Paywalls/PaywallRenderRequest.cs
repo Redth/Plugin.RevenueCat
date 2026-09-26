@@ -7,9 +7,34 @@ namespace Plugin.RevenueCat.Paywalls;
 public sealed class PaywallRenderRequest
 {
 	PaywallSelectionState? selection;
+	PaywallSemanticSession? semantics;
+	IReadOnlyList<Package> packages = [];
 	internal bool ActionInProgress { get; set; }
 
-	internal PaywallSelectionState Selection => selection ??= new(GetComponentsConfig(), Packages, SelectedPackageIdentifier);
+	internal PaywallSemanticSession Semantics => semantics ??=
+		new(PaywallData, SemanticContext, Diagnostic, GetComponentsConfig(), Packages);
+
+	internal PaywallSelectionState Selection => selection ??= new(GetComponentsConfig(), Packages, SelectedPackageIdentifier, Semantics);
+
+	internal void UpdateSemanticContext(PaywallSemanticContext? context)
+	{
+		Semantics.UpdateContext(context);
+		if (Selection.Reconcile())
+		{
+			SelectionReconciled?.Invoke(Selection.SelectedIdentifier);
+		}
+	}
+
+	internal void UpdatePackages(IReadOnlyList<Package> updatedPackages)
+	{
+		packages = updatedPackages;
+		Semantics.UpdatePackages(updatedPackages);
+		if (Selection.UpdatePackages(updatedPackages))
+		{
+			SelectionReconciled?.Invoke(Selection.SelectedIdentifier);
+		}
+		Semantics.SelectionChanged();
+	}
 
 	internal void SelectPackage(string? identifier)
 	{
@@ -25,7 +50,11 @@ public sealed class PaywallRenderRequest
 
 	public PaywallUiConfig? UiConfig { get; init; }
 
-	public IReadOnlyList<Package> Packages { get; init; } = [];
+	public IReadOnlyList<Package> Packages
+	{
+		get => packages;
+		init => packages = value;
+	}
 
 	public string? OfferingIdentifier { get; init; }
 
@@ -34,6 +63,13 @@ public sealed class PaywallRenderRequest
 	public string? ApplicationName { get; init; }
 
 	public string? SelectedPackageIdentifier { get; init; }
+
+	public PaywallSemanticContext? SemanticContext { get; init; }
+
+	/// <summary>Reports unsupported or malformed semantic rules without interpreting them as matched.</summary>
+	public Action<string>? Diagnostic { get; init; }
+
+	internal Action<string?>? SelectionReconciled { get; init; }
 
 	public object? PlatformContext { get; init; }
 
