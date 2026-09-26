@@ -96,7 +96,8 @@ internal sealed class PaywallSemanticSession
 	public void UpdatePackages(IReadOnlyList<Package> updatedPackages) => packages = updatedPackages;
 
 	public PaywallEligibility IntroEligibility(Package? package) =>
-		Context.IntroOfferEligibility.TryGetValue(OfferEligibilityKey(package?.Identifier) ?? default, out var eligibility)
+		OfferEligibilityKey(package?.Identifier) is { } key &&
+		Context.IntroOfferEligibility.TryGetValue(key, out var eligibility)
 			? eligibility : PaywallEligibility.Unknown;
 
 	public bool IsVisible(PaywallComponent? component, string? packageId = null)
@@ -229,9 +230,13 @@ internal sealed class PaywallSemanticSession
 			case "intro_offer_condition":
 			case "promo_offer_condition":
 				var eligibilityKey = OfferEligibilityKey(packageId ?? SelectedPackageIdentifier);
+				if (eligibilityKey is null)
+				{
+					return false;
+				}
 				var eligibility = (condition.Type.StartsWith("intro", StringComparison.Ordinal)
 					? Context.IntroOfferEligibility : Context.PromoOfferEligibility)
-					.TryGetValue(eligibilityKey ?? default, out var known)
+					.TryGetValue(eligibilityKey.Value, out var known)
 						? known : PaywallEligibility.Unknown;
 				if (eligibility == PaywallEligibility.Unknown)
 				{

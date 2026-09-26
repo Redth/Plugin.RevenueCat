@@ -18,6 +18,32 @@ public sealed class PaywallSemanticsTests
 	public void Cleanup() => DispatcherProvider.SetCurrent(null);
 
 	[TestMethod]
+	public void Missing_Product_Identity_Cannot_Match_A_Default_Eligibility_Key()
+	{
+		var context = new PaywallSemanticContext
+		{
+			IntroOfferEligibility = new Dictionary<PaywallOfferKey, PaywallEligibility>
+			{
+				[default] = PaywallEligibility.Eligible
+			},
+			PromoOfferEligibility = new Dictionary<PaywallOfferKey, PaywallEligibility>
+			{
+				[default] = PaywallEligibility.Eligible
+			}
+		};
+		var session = new PaywallSemanticSession(null, context);
+		Assert.AreEqual(PaywallEligibility.Unknown, session.IntroEligibility(null));
+		foreach (var type in new[] { "intro_offer", "promo_offer" })
+		{
+			var text = new PaywallTextComponent
+			{
+				Overrides = [Override(new { visible = true }, Condition(type))]
+			};
+			Assert.IsNull(session.Resolve(text).Boolean("visible"));
+		}
+	}
+
+	[TestMethod]
 	public void Overrides_Match_All_Conditions_In_Order_And_Reject_Unsupported_Conditions()
 	{
 		var text = new PaywallTextComponent
