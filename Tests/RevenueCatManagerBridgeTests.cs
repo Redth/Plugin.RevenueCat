@@ -251,6 +251,95 @@ public sealed class RevenueCatManagerBridgeTests
 	static RevenueCatManager CreateManager(IRevenueCatPlatformImplementation platform)
 	=> new(new RevenueCatOptions(null, null, null, null, false, null, null, null), platform);
 
+	[TestMethod]
+	public async Task IntroEligibility_MapsEveryNativeStatusAndUnknownMissingProducts()
+	{
+		var platform = new EligibilityPlatform
+		{
+			EligibilityRequest = _ => Task.FromResult<string?>("""
+				{"eligible":"eligible","ineligible":"ineligible","none":"no_intro_offer_exists","undetermined":"unknown"}
+				""")
+		};
+		IRevenueCatIntroEligibility capability = CreateManager(platform);
+
+		var result = await capability.CheckTrialOrIntroDiscountEligibilityWithResultAsync(
+			[" eligible ", "ineligible", "none", "undetermined", "missing", "eligible"]);
+
+		Assert.IsTrue(result.IsSuccess);
+		Assert.AreEqual("eligible,ineligible,none,undetermined,missing", platform.LastEligibilityRequest);
+		Assert.AreEqual(IntroEligibilityStatus.Eligible, result.Value!["eligible"]);
+		Assert.AreEqual(IntroEligibilityStatus.Ineligible, result.Value["ineligible"]);
+		Assert.AreEqual(IntroEligibilityStatus.NoIntroOfferExists, result.Value["none"]);
+		Assert.AreEqual(IntroEligibilityStatus.Unknown, result.Value["undetermined"]);
+		Assert.AreEqual(IntroEligibilityStatus.Unknown, result.Value["missing"]);
+		Assert.AreEqual(5, result.Value.Count);
+		Assert.AreEqual(0, (int)IntroEligibilityStatus.Unknown);
+	}
+
+	[TestMethod]
+	public async Task IntroEligibility_UnsupportedPlatformAndNativeErrorsAreExplicitFailures()
+	{
+		var unsupported = await CreateManager(new RecordingPlatform())
+			.CheckTrialOrIntroDiscountEligibilityWithResultAsync(["product"]);
+		Assert.IsFalse(unsupported.IsSuccess);
+		Assert.AreEqual("unsupported_platform", unsupported.Error?.Code);
+
+		var platform = new EligibilityPlatform { EligibilityRequest = _ => Task.FromResult<string?>("{}") };
+		var manager = CreateManager(platform);
+		var empty = await manager.CheckTrialOrIntroDiscountEligibilityWithResultAsync(["product"]);
+		Assert.IsFalse(empty.IsSuccess);
+		Assert.AreEqual("empty_eligibility_response", empty.Error?.Code);
+
+		platform.EligibilityRequest = _ => Task.FromResult<string?>("""{"product":"future_status"}""");
+		var unrecognized = await manager.CheckTrialOrIntroDiscountEligibilityWithResultAsync(["product"]);
+		Assert.IsFalse(unrecognized.IsSuccess);
+		Assert.AreEqual("invalid_eligibility_status", unrecognized.Error?.Code);
+
+		platform.EligibilityRequest = _ => Task.FromException<string?>(new InvalidOperationException("Native eligibility failed."));
+		var nativeError = await manager.CheckTrialOrIntroDiscountEligibilityWithResultAsync(["product"]);
+		Assert.IsFalse(nativeError.IsSuccess);
+		Assert.AreEqual(nameof(InvalidOperationException), nativeError.Error?.Code);
+		Assert.IsNull(nativeError.Value);
+	}
+
+	[TestMethod]
+	public async Task IntroEligibility_RejectsStaleCustomerAndHonorsCancellation()
+	{
+		var pending = new TaskCompletionSource<string?>(TaskCreationOptions.RunContinuationsAsynchronously);
+		var platform = new EligibilityPlatform { EligibilityRequest = _ => pending.Task };
+		var manager = CreateManager(platform);
+		var query = manager.CheckTrialOrIntroDiscountEligibilityWithResultAsync(["product"]);
+		platform.AppUserId = "other-customer";
+		pending.SetResult("""{"product":"eligible"}""");
+		var stale = await query;
+		Assert.IsFalse(stale.IsSuccess);
+		Assert.AreEqual("customer_changed", stale.Error?.Code);
+
+		var delayed = new TaskCompletionSource<string?>(TaskCreationOptions.RunContinuationsAsynchronously);
+		platform.EligibilityRequest = _ => delayed.Task;
+		using var cancellation = new CancellationTokenSource();
+		var cancelled = manager.CheckTrialOrIntroDiscountEligibilityWithResultAsync(["product"], cancellation.Token);
+		cancellation.Cancel();
+		await Assert.ThrowsAsync<OperationCanceledException>(async () => await cancelled);
+		delayed.SetResult("""{"product":"unknown"}""");
+	}
+
+	[TestMethod]
+	public async Task IntroEligibility_InvalidInputAndUninitializedIdentityDoNotCallNativeSdk()
+	{
+		var platform = new EligibilityPlatform { EligibilityRequest = _ => Task.FromResult<string?>("{}") };
+		var manager = CreateManager(platform);
+		await Assert.ThrowsAsync<ArgumentException>(
+			async () => await manager.CheckTrialOrIntroDiscountEligibilityWithResultAsync(["invalid,product"]));
+		Assert.IsNull(platform.LastEligibilityRequest);
+
+		platform.AppUserId = null;
+		var result = await manager.CheckTrialOrIntroDiscountEligibilityWithResultAsync(["product"]);
+		Assert.IsFalse(result.IsSuccess);
+		Assert.AreEqual("not_initialized", result.Error?.Code);
+		Assert.IsNull(platform.LastEligibilityRequest);
+	}
+
 	static string ReadFixture(string fileName)
 	=> File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "data", "revenuecat", fileName));
 
@@ -267,10 +356,10 @@ public sealed class RevenueCatManagerBridgeTests
 		return document.RootElement.GetProperty("country_code").GetString()!;
 	}
 
-	sealed class RecordingPlatform : IRevenueCatPlatformImplementation
+	class RecordingPlatform : IRevenueCatPlatformImplementation
 	{
 		public string? ApiKey { get; init; } = "synthetic-api-key";
-		public string? AppUserId { get; init; } = "synthetic-user-001";
+		public string? AppUserId { get; set; } = "synthetic-user-001";
 		public bool IsAnonymous { get; init; } = true;
 		public string? CustomerInfoJson { get; set; }
 		public string? OfferingJson { get; set; }
@@ -404,5 +493,17 @@ public sealed class RevenueCatManagerBridgeTests
 
 		public void SetAttributes(IDictionary<string, string> attributes)
 		=> Attributes = new Dictionary<string, string>(attributes);
+	}
+
+	sealed class EligibilityPlatform : RecordingPlatform, IRevenueCatIntroEligibilityPlatform
+	{
+		public Func<string, Task<string?>> EligibilityRequest { get; set; } = _ => Task.FromResult<string?>(null);
+		public string? LastEligibilityRequest { get; private set; }
+
+		public Task<string?> CheckTrialOrIntroDiscountEligibilityAsync(string productIdentifiersCsv)
+		{
+			LastEligibilityRequest = productIdentifiersCsv;
+			return EligibilityRequest(productIdentifiersCsv);
+		}
 	}
 }

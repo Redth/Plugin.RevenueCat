@@ -78,6 +78,10 @@ namespace RevenueCat
 		[Export("getProducts:productType:callback:")]
 		[Async]
 		void GetProducts(NSString productIdentifiersCsv, [NullAllowed] NSString productType, System.Action<NSString?, NSError?> callback);
+
+		[Export("checkTrialOrIntroDiscountEligibility:callback:")]
+		[Async]
+		void CheckTrialOrIntroDiscountEligibility(NSString productIdentifiersCsv, System.Action<NSString?, NSError?> callback);
 		
 		[Export("setEmail:")]
 		void SetEmail(NSString email);

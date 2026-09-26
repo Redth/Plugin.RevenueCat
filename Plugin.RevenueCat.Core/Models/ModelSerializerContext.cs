@@ -84,6 +84,7 @@ namespace Plugin.RevenueCat.Models;
 [JsonSerializable(typeof(Dictionary<string, NonSubscription>))]
 [JsonSerializable(typeof(Dictionary<string, Offering>))]
 [JsonSerializable(typeof(Dictionary<string, VirtualCurrency>))]
+[JsonSerializable(typeof(Dictionary<string, string>))]
 public partial class ModelSerializerContext : JsonSerializerContext
 {
 }
