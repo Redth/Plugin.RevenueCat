@@ -1,6 +1,8 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Microsoft.Maui.Platform;
 using Plugin.RevenueCat;
+using Plugin.RevenueCat.Models;
+using Plugin.RevenueCat.Paywalls;
 
 namespace MauiSample;
 
@@ -136,6 +138,83 @@ public partial class MainPage : ContentPage
 
 		var priceString = $"{title} - {description} - {price} {currency}";
 		await this.DisplayAlert($"Offering: {rcOfferingId.Text}", priceString, "OK");
+	}
+
+	private async void ShowFixturePaywall_Clicked(object? sender, EventArgs e)
+	{
+		await using var stream = await FileSystem.OpenAppPackageFileAsync("paywall_offerings_response.json");
+		using var reader = new StreamReader(stream);
+		var json = await reader.ReadToEndAsync();
+		var response = json.ToPaywallOfferingsResponse();
+		var offering = response?.CurrentOffering;
+		var paywall = offering?.PaywallComponents;
+
+		if (paywall is null)
+		{
+			await DisplayAlert("Paywall", "Fixture paywall data could not be loaded.", "OK");
+			return;
+		}
+
+		var packages = offering?.Packages
+			.Select(package => new Package
+			{
+				Identifier = package.Identifier ?? string.Empty,
+				StoreProduct = new StoreProduct
+				{
+					Identifier = package.PlatformProductIdentifier ?? package.Identifier ?? string.Empty,
+					Title = package.Identifier ?? "Demo package",
+					Description = "Fixture product",
+					PriceString = "$4.99",
+					CurrencyCode = "USD",
+					SubscriptionPeriod = new SubscriptionPeriod
+					{
+						Value = 1,
+						Unit = SubscriptionPeriodUnit.Month
+					}
+				}
+			})
+			.ToArray() ?? [];
+
+		await Navigation.PushModalAsync(new ContentPage
+		{
+			Title = "Fixture Paywall",
+			Content = new RevenueCatPaywallView
+			{
+				PaywallData = paywall,
+				UiConfig = response?.UiConfig,
+				Packages = packages,
+				OfferingIdentifier = offering?.Identifier,
+				ActionHandler = new SamplePaywallActionHandler(this)
+			}
+		});
+	}
+
+	sealed class SamplePaywallActionHandler : IPaywallActionHandler
+	{
+		readonly Page page;
+
+		public SamplePaywallActionHandler(Page page)
+		{
+			this.page = page;
+		}
+
+		public async Task<CustomerInfo?> PurchaseAsync(PaywallPurchaseRequest request, CancellationToken cancellationToken = default)
+		{
+			await page.DisplayAlert("Fixture Purchase", $"Purchase requested for {request.PackageIdentifier}.", "OK");
+			return null;
+		}
+
+		public async Task<CustomerInfo?> RestoreAsync(CancellationToken cancellationToken = default)
+		{
+			await page.DisplayAlert("Fixture Restore", "Restore requested.", "OK");
+			return null;
+		}
+
+		public Task DismissAsync(CancellationToken cancellationToken = default) =>
+			page.Navigation.PopModalAsync();
+
+		public Task NavigateAsync(PaywallNavigationRequest request, CancellationToken cancellationToken = default) =>
+			page.DisplayAlert("Fixture Navigation", $"Navigation requested: {request.Destination ?? request.ActionType}", "OK");
 	}
 }
 

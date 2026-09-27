@@ -1,0 +1,117 @@
+{
+  "current_offering_id": "best_value",
+  "offerings": [
+    {
+      "identifier": "best_value",
+      "description": "Badged annual package example",
+      "packages": [
+        { "identifier": "$rc_monthly", "platform_product_identifier": "pro_monthly" },
+        { "identifier": "$rc_annual", "platform_product_identifier": "pro_annual" }
+      ],
+      "paywall_components": {
+        "id": "best_value_badge_fixture",
+        "template_name": "components",
+        "revision": 1,
+        "components_config": {
+          "base": {
+            "background": { "type": "color", "value": { "light": { "type": "hex", "value": "#f8fafcff" } } },
+            "stack": {
+              "type": "stack",
+              "spacing": 18,
+              "padding": { "top": 34, "bottom": 26, "leading": 20, "trailing": 20 },
+              "components": [
+                { "type": "text", "id": "title", "text_lid": "title", "font_size": "heading_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#0f172aff" } } },
+                { "type": "text", "id": "subtitle", "text_lid": "subtitle", "font_size": "body_m", "horizontal_alignment": "center", "color": { "light": { "type": "hex", "value": "#475569ff" } } },
+                {
+                  "type": "package",
+                  "id": "monthly-card",
+                  "package_id": "$rc_monthly",
+                  "stack": {
+                    "type": "stack",
+                    "spacing": 4,
+                    "padding": { "top": 18, "bottom": 18, "leading": 18, "trailing": 18 },
+                    "shape": { "type": "rectangle", "corners": { "topLeading": 22, "topTrailing": 22, "bottomLeading": 22, "bottomTrailing": 22 } },
+                    "border": { "color": { "light": { "type": "hex", "value": "#cbd5e1ff" } }, "width": 1 },
+                    "background_color": { "light": { "type": "hex", "value": "#ffffffff" } },
+                    "components": [
+                      { "type": "text", "id": "monthly-title", "text_lid": "monthly_title", "font_size": "body_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#0f172aff" } } },
+                      { "type": "text", "id": "monthly-price", "text_lid": "monthly_price", "font_size": "body_m", "color": { "light": { "type": "hex", "value": "#64748bff" } } }
+                    ]
+                  }
+                },
+                {
+                  "type": "package",
+                  "id": "annual-card",
+                  "package_id": "$rc_annual",
+                  "is_selected_by_default": true,
+                  "stack": {
+                    "type": "stack",
+                    "spacing": 6,
+                    "padding": { "top": 26, "bottom": 22, "leading": 18, "trailing": 18 },
+                    "shape": { "type": "rectangle", "corners": { "topLeading": 28, "topTrailing": 28, "bottomLeading": 28, "bottomTrailing": 28 } },
+                    "border": { "color": { "light": { "type": "hex", "value": "#22c55eff" } }, "width": 2 },
+                    "shadow": { "color": { "light": { "type": "hex", "value": "#0f172aff" } }, "radius": 18, "x": 0, "y": 8 },
+                    "background_color": { "light": { "type": "linear", "degrees": 135, "points": [ { "color": "#ecfdf5ff", "percent": 0 }, { "color": "#dcfce7ff", "percent": 100 } ] } },
+                    "badge": {
+                      "style": "overlay",
+                      "alignment": "top_trailing",
+                      "stack": {
+                        "type": "stack",
+                        "padding": { "top": 7, "bottom": 7, "leading": 12, "trailing": 12 },
+                        "shape": { "type": "pill" },
+                        "background_color": { "light": { "type": "hex", "value": "#16a34aff" } },
+                        "components": [
+                          { "type": "text", "id": "badge-text", "text_lid": "badge", "font_size": "body_s", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#ffffffff" } } }
+                        ]
+                      }
+                    },
+                    "components": [
+                      { "type": "text", "id": "annual-title", "text_lid": "annual_title", "font_size": "body_xl", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#065f46ff" } } },
+                      { "type": "text", "id": "annual-price", "text_lid": "annual_price", "font_size": "body_m", "color": { "light": { "type": "hex", "value": "#047857ff" } } }
+                    ]
+                  }
+                }
+              ]
+            },
+            "sticky_footer": {
+              "type": "footer",
+              "stack": {
+                "type": "stack",
+                "padding": { "top": 16, "bottom": 24, "leading": 24, "trailing": 24 },
+                "components": [
+                  {
+                    "type": "purchase_button",
+                    "id": "purchase",
+                    "stack": {
+                      "type": "stack",
+                      "padding": { "top": 15, "bottom": 15, "leading": 20, "trailing": 20 },
+                      "shape": { "type": "pill" },
+                      "background_color": { "light": { "type": "hex", "value": "#16a34aff" } },
+                      "components": [
+                        { "type": "text", "id": "cta", "text_lid": "cta", "font_size": "body_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#ffffffff" } } }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "components_localizations": {
+          "en_US": {
+            "title": "Unlock the best value",
+            "subtitle": "A RevenueCat-style badge calls attention to the default selected plan.",
+            "monthly_title": "Monthly",
+            "monthly_price": "{{ price }} per {{ sub_period }}",
+            "annual_title": "Annual Pro",
+            "annual_price": "{{ price }} per {{ sub_period }}",
+            "badge": "SAVE 40%",
+            "cta": "Continue with selected plan"
+          }
+        },
+        "default_locale": "en_US"
+      }
+    }
+  ],
+  "ui_config": { "app": { "colors": {}, "fonts": {} }, "localizations": {}, "variable_config": {}, "custom_variables": {} }
+}

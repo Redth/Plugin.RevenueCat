@@ -11,7 +11,8 @@ namespace Plugin.RevenueCat.Models;
     Converters = [
         typeof(IsoDateTimeOffsetConverter),
         typeof(DateOnlyConverter),
-        typeof(TimeOnlyConverter)
+        typeof(TimeOnlyConverter),
+        typeof(PaywallComponentConverter)
     ])]
 [JsonSerializable(typeof(CustomerInfo))]
 [JsonSerializable(typeof(Offering))]
@@ -34,6 +35,37 @@ namespace Plugin.RevenueCat.Models;
 [JsonSerializable(typeof(PricingPhase))]
 [JsonSerializable(typeof(InstallmentsInfo))]
 [JsonSerializable(typeof(Price))]
+[JsonSerializable(typeof(PaywallOfferingsResponse))]
+[JsonSerializable(typeof(PaywallOffering))]
+[JsonSerializable(typeof(PaywallComponentsData))]
+[JsonSerializable(typeof(PaywallStateDeclaration))]
+[JsonSerializable(typeof(PaywallStateUpdate))]
+[JsonSerializable(typeof(string))]
+[JsonSerializable(typeof(PaywallComponentsConfig))]
+[JsonSerializable(typeof(PaywallRootComponents))]
+[JsonSerializable(typeof(PaywallLocalizationData))]
+[JsonSerializable(typeof(PaywallUiConfig))]
+[JsonSerializable(typeof(PaywallComponent))]
+[JsonSerializable(typeof(PaywallButtonComponent))]
+[JsonSerializable(typeof(PaywallCarouselComponent))]
+[JsonSerializable(typeof(PaywallCountdownComponent))]
+[JsonSerializable(typeof(PaywallFallbackHeaderComponent))]
+[JsonSerializable(typeof(PaywallHeaderComponent))]
+[JsonSerializable(typeof(PaywallIconComponent))]
+[JsonSerializable(typeof(PaywallImageComponent))]
+[JsonSerializable(typeof(PaywallPackageComponent))]
+[JsonSerializable(typeof(PaywallPurchaseButtonComponent))]
+[JsonSerializable(typeof(PaywallStackComponent))]
+[JsonSerializable(typeof(PaywallStickyFooterComponent))]
+[JsonSerializable(typeof(PaywallTabComponent))]
+[JsonSerializable(typeof(PaywallTabControlButtonComponent))]
+[JsonSerializable(typeof(PaywallTabControlComponent))]
+[JsonSerializable(typeof(PaywallTabControlToggleComponent))]
+[JsonSerializable(typeof(PaywallTabsComponent))]
+[JsonSerializable(typeof(PaywallTextComponent))]
+[JsonSerializable(typeof(PaywallTimelineComponent))]
+[JsonSerializable(typeof(PaywallUnknownComponent))]
+[JsonSerializable(typeof(PaywallVideoComponent))]
 [JsonSerializable(typeof(PackageType))]
 [JsonSerializable(typeof(RevenueCatProductType))]
 [JsonSerializable(typeof(SubscriptionPeriodUnit))]
@@ -45,12 +77,14 @@ namespace Plugin.RevenueCat.Models;
 [JsonSerializable(typeof(List<StoreProductDiscount>))]
 [JsonSerializable(typeof(List<SubscriptionOption>))]
 [JsonSerializable(typeof(List<PricingPhase>))]
+[JsonSerializable(typeof(List<PaywallComponent>))]
 [JsonSerializable(typeof(List<NonSubscription>))]
 [JsonSerializable(typeof(Dictionary<string, Entitlement>))]
 [JsonSerializable(typeof(Dictionary<string, Subscription>))]
 [JsonSerializable(typeof(Dictionary<string, NonSubscription>))]
 [JsonSerializable(typeof(Dictionary<string, Offering>))]
 [JsonSerializable(typeof(Dictionary<string, VirtualCurrency>))]
+[JsonSerializable(typeof(Dictionary<string, string>))]
 public partial class ModelSerializerContext : JsonSerializerContext
 {
 }

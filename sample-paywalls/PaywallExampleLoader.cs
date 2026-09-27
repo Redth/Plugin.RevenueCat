@@ -1,0 +1,155 @@
+using System.Text.Json;
+using Plugin.RevenueCat.Models;
+
+namespace PaywallGallerySample;
+
+public static class PaywallExampleLoader
+{
+	static readonly PaywallExampleDefinition[] Definitions =
+	[
+		new(
+			"Basic subscription",
+			"Minimal stack, package card, sticky purchase button, and product variables.",
+			"stack, text, package, purchase_button, sticky_footer",
+			"paywalls/basic.json"),
+		new(
+			"Media header",
+			"Hero image, icon, header region, and local image assets.",
+			"header, image, icon, stack, purchase_button",
+			"paywalls/header_media.json"),
+		new(
+			"Package selector",
+			"Multiple packages with selected-state highlighting and price variables.",
+			"package, horizontal stack, text variables, purchase_button",
+			"paywalls/package_selector.json"),
+		new(
+			"Actions and fallback",
+			"Restore and navigation actions plus unknown-component fallback rendering.",
+			"button, restore, navigation, unknown fallback",
+			"paywalls/actions_fallback.json"),
+		new(
+			"Best value badge",
+			"Annual package card with RevenueCat-style badge overlay, rounded border, and shadow.",
+			"badge, shape, border, shadow, package",
+			"paywalls/best_value_badge.json"),
+		new(
+			"Dark gradient",
+			"Full-screen dark gradient, glassy rounded feature card, and pill purchase button.",
+			"linear gradient, rounded card, pill CTA",
+			"paywalls/dark_gradient.json"),
+		new(
+			"Feature checklist",
+			"Benefit rows and compact plan card inspired by checklist-style subscription templates.",
+			"horizontal stacks, icon assets, rounded rows",
+			"paywalls/feature_checklist.json"),
+		new(
+			"Lifetime launch offer",
+			"High-contrast hero layout for a one-time lifetime purchase.",
+			"hero image, lifetime package, sticky footer",
+			"paywalls/lifetime_offer.json"),
+		new(
+			"Bottom sheet",
+			"Sheet-like paywall surface with rounded top corners and legal action buttons.",
+			"rounded sheet, restore, terms, sticky footer",
+			"paywalls/bottom_sheet.json"),
+		new(
+			"Two-column benefits",
+			"Card grid layout using horizontal stacks and RevenueCat color aliases.",
+			"color aliases, horizontal stacks, cards",
+			"paywalls/two_column_benefits.json"),
+		new(
+			"Trial story",
+			"Timeline-like onboarding story using supported stacks and fallback-safe components.",
+			"story cards, fallback, package, purchase",
+			"paywalls/trial_story.json"),
+		new(
+			"Premium comparison",
+			"Plan comparison cards with separate monthly and annual CTAs.",
+			"multiple packages, badges, rounded comparison cards",
+			"paywalls/premium_comparison.json"),
+		new(
+			"Carousel onboarding",
+			"Swipeable RevenueCat-style carousel pages with page indicators.",
+			"carousel, page_control, page spacing, package",
+			"paywalls/carousel_onboarding.json"),
+		new(
+			"Tabbed plans",
+			"Tabs with a toggle control and per-tab package cards.",
+			"tabs, tab_control_toggle, package selection",
+			"paywalls/tabbed_plans.json"),
+		new(
+			"Timeline countdown",
+			"Timeline items, countdown variables, and video fallback rendering.",
+			"timeline, countdown, video fallback",
+			"paywalls/timeline_countdown.json"),
+		new(
+			"Trial eligibility",
+			"Switch mocked customer eligibility; a regular purchase remains available without a trial promise.",
+			"intro_offer, offer variables, accessibility",
+			"paywalls/verified_eligibility.json"),
+		new(
+			"Audience rules",
+			"Combine audience and selected-package conditions; later matching overrides win.",
+			"AND conditions, precedence, typed variables",
+			"paywalls/verified_rules.json"),
+		new(
+			"Stateful plan tabs",
+			"Three button tabs publish their ID into declared state and update the selected plan.",
+			"tab_control_button, state_updates, state_condition",
+			"paywalls/verified_tab_state.json"),
+		new(
+			"Mixed package visibility",
+			"A hidden default outside tabs must not become the purchase target when tabs change.",
+			"conditional visibility, mixed package scopes, catalog changes",
+			"paywalls/verified_mixed_packages.json"),
+		new(
+			"Window rule boundaries",
+			"Simulated host dimensions exercise the exact 700-unit boundary, not a resized preview.",
+			"window width, aspect ratio, size restoration",
+			"paywalls/verified_window_rules.json"),
+		new(
+			"Localized legal actions",
+			"Exact and neutral-language matches, default text, and localized legal links.",
+			"locale fallback, long text, url_lid",
+			"paywalls/verified_localization.json"),
+		new(
+			"Forward compatibility",
+			"Author-provided media fallbacks render; unsupported checkout is rejected rather than purchased.",
+			"unknown component, video, web_view, unsupported checkout",
+			"paywalls/verified_fallbacks.json"),
+		new(
+			"Timed offer expiry",
+			"A fresh ten-second deadline transitions to the authored end stack; expired state is reproducible.",
+			"countdown, live variables, end stack, lifecycle",
+			"paywalls/verified_countdown.json")
+	];
+
+	public static Task<IReadOnlyList<PaywallExample>> LoadAsync() =>
+		LoadAsync(Microsoft.Maui.Storage.FileSystem.OpenAppPackageFileAsync);
+
+	public static async Task<IReadOnlyList<PaywallExample>> LoadAsync(Func<string, Task<Stream>> openAsset)
+	{
+		ArgumentNullException.ThrowIfNull(openAsset);
+		var examples = new List<PaywallExample>();
+		foreach (var definition in Definitions)
+		{
+			await using var stream = await openAsset(definition.AssetName);
+			var response = await JsonSerializer.DeserializeAsync(stream, ModelSerializerContext.Default.PaywallOfferingsResponse)
+				?? throw new InvalidOperationException($"Paywall fixture '{definition.AssetName}' could not be parsed.");
+
+			examples.Add(new PaywallExample(
+				definition.Title,
+				definition.Description,
+				definition.ComponentSummary,
+				response));
+		}
+
+		return examples;
+	}
+
+	sealed record PaywallExampleDefinition(
+		string Title,
+		string Description,
+		string ComponentSummary,
+		string AssetName);
+}

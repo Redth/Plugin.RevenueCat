@@ -1,0 +1,67 @@
+{
+  "current_offering_id": "state_lab",
+  "gallery": {
+    "sources": [
+      "https://github.com/RevenueCat/purchases-android/blob/1c44a44177559fd90a769af66745bb17bff5e095/examples/paywall-tester/src/main/java/com/revenuecat/paywallstester/paywalls/TabsWithButtons.kt",
+      "https://github.com/RevenueCat/purchases-ios/blob/d654b8b85143c29e5bb73d0ff92f5f5766fbbedc/Tests/RevenueCatUITests/PaywallsV2/PaywallStateStoreTests.swift"
+    ],
+    "variants": [
+      { "name": "Declared default", "expected_outcome": "Annual starts selected. Each tab changes the state caption, price and purchase package together.",
+        "expected_text": { "state-caption": "Annual selected", "purchase-copy": "Continue for $49.99" }, "expected_purchase_package": "$rc_annual" }
+    ]
+  },
+  "offerings": [{
+    "identifier": "state_lab",
+    "packages": [
+      { "identifier": "$rc_weekly", "platform_product_identifier": "gallery.weekly" },
+      { "identifier": "$rc_monthly", "platform_product_identifier": "gallery.monthly" },
+      { "identifier": "$rc_annual", "platform_product_identifier": "gallery.annual" }
+    ],
+    "paywall_components": {
+      "id": "verified-state", "default_locale": "en_US",
+      "state_declarations": { "selectedTab": { "type": "string", "default": "annual" } },
+      "components_config": { "base": {
+        "background": { "light": { "type": "hex", "value": "#edf5ffff" } },
+        "stack": { "type": "stack", "spacing": 20, "padding": { "top": 24, "bottom": 24, "leading": 16, "trailing": 16 }, "components": [
+          { "type": "text", "text_lid": "title", "font_size": "heading_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#18385eff" } } },
+          { "type": "tabs", "id": "billing-tabs", "default_tab_id": "annual", "state_updates": [{ "set": "selectedTab", "to": "$value" }],
+            "control": { "type": "buttons", "stack": { "type": "stack", "dimension": { "type": "horizontal", "distribution": "center" }, "spacing": 6, "components": [
+              { "type": "tab_control_button", "id": "weekly-tab", "tab_id": "weekly", "stack": { "type": "stack", "shape": { "type": "pill" }, "padding": { "top": 8, "bottom": 8, "leading": 12, "trailing": 12 }, "background_color": { "light": { "type": "hex", "value": "#ffffffff" } }, "components": [{ "type": "text", "text_lid": "weekly", "font_size": "body_s" }] } },
+              { "type": "tab_control_button", "id": "monthly-tab", "tab_id": "monthly", "stack": { "type": "stack", "shape": { "type": "pill" }, "padding": { "top": 8, "bottom": 8, "leading": 12, "trailing": 12 }, "background_color": { "light": { "type": "hex", "value": "#ffffffff" } }, "components": [{ "type": "text", "text_lid": "monthly", "font_size": "body_s" }] } },
+              { "type": "tab_control_button", "id": "annual-tab", "tab_id": "annual", "stack": { "type": "stack", "shape": { "type": "pill" }, "padding": { "top": 8, "bottom": 8, "leading": 12, "trailing": 12 }, "background_color": { "light": { "type": "hex", "value": "#ffffffff" } }, "components": [{ "type": "text", "text_lid": "annual", "font_size": "body_s" }] } }
+            ] } },
+            "tabs": [
+              { "id": "weekly", "name": "Weekly", "stack": { "type": "stack", "spacing": 14, "components": [
+                { "type": "text", "text_lid": "weekly_copy", "font_size": "body_l" },
+                { "type": "package", "id": "weekly-package", "package_id": "$rc_weekly", "stack": { "type": "stack", "shape": { "type": "rectangle", "corners": { "all": 22 } }, "padding": { "top": 22, "bottom": 22, "leading": 16, "trailing": 16 }, "background_color": { "light": { "type": "hex", "value": "#ffffffff" } }, "components": [{ "type": "text", "text_lid": "plan", "font_size": "heading_s" }] } }
+              ] } },
+              { "id": "monthly", "name": "Monthly", "stack": { "type": "stack", "spacing": 14, "components": [
+                { "type": "text", "text_lid": "monthly_copy", "font_size": "body_l" },
+                { "type": "package", "id": "monthly-package", "package_id": "$rc_monthly", "stack": { "type": "stack", "shape": { "type": "rectangle", "corners": { "all": 22 } }, "padding": { "top": 22, "bottom": 22, "leading": 16, "trailing": 16 }, "background_color": { "light": { "type": "hex", "value": "#ffffffff" } }, "components": [{ "type": "text", "text_lid": "plan", "font_size": "heading_s" }] } }
+              ] } },
+              { "id": "annual", "name": "Annual", "stack": { "type": "stack", "spacing": 14, "components": [
+                { "type": "text", "text_lid": "annual_copy", "font_size": "body_l" },
+                { "type": "package", "id": "annual-package", "package_id": "$rc_annual", "stack": { "type": "stack", "shape": { "type": "rectangle", "corners": { "all": 22 } }, "padding": { "top": 22, "bottom": 22, "leading": 16, "trailing": 16 }, "background_color": { "light": { "type": "hex", "value": "#ffffffff" } }, "components": [{ "type": "text", "text_lid": "plan", "font_size": "heading_s" }] } }
+              ] } }
+            ] },
+          { "type": "text", "id": "state-caption", "text_lid": "annual_state", "font_size": "body_l", "font_weight": "bold",
+            "overrides": [
+              { "conditions": [{ "type": "state_condition", "name": "selectedTab", "operator": "=", "value": "weekly" }], "properties": { "text_lid": "weekly_state" } },
+              { "conditions": [{ "type": "state_condition", "name": "selectedTab", "operator": "=", "value": "monthly" }], "properties": { "text_lid": "monthly_state" } }
+            ] }
+        ] },
+        "sticky_footer": { "type": "footer", "stack": { "type": "stack", "padding": { "top": 12, "bottom": 18, "leading": 20, "trailing": 20 }, "components": [
+          { "type": "purchase_button", "id": "purchase", "stack": { "type": "stack", "shape": { "type": "pill" }, "padding": { "top": 15, "bottom": 15, "leading": 16, "trailing": 16 }, "background_color": { "light": { "type": "hex", "value": "#245a91ff" } }, "components": [
+            { "type": "text", "id": "purchase-copy", "text_lid": "cta", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#ffffffff" } } }
+          ] } }
+        ] } }
+      } },
+      "components_localizations": { "en_US": {
+        "title": "Find your rhythm", "weekly": "Weekly", "monthly": "Monthly", "annual": "Annual",
+        "weekly_copy": "A short commitment.", "monthly_copy": "Room to build a habit.", "annual_copy": "A year of uninterrupted access.",
+        "weekly_state": "Weekly selected", "monthly_state": "Monthly selected", "annual_state": "Annual selected",
+        "plan": "{{ product_name }} - {{ price }}", "cta": "Continue for {{ price }}"
+      } }
+    }
+  }]
+}

@@ -1,0 +1,51 @@
+{
+  "current_offering_id": "window_lab",
+  "gallery": {
+    "sources": [
+      "https://github.com/RevenueCat/purchases-ios/blob/d654b8b85143c29e5bb73d0ff92f5f5766fbbedc/Tests/RevenueCatUITests/PaywallsV2/WindowSizeConditionTests.swift"
+    ],
+    "variants": [
+      { "name": "No measured size", "expected_outcome": "Base copy and natural height. No window rule matches without dimensions.",
+        "expected_text": { "width-copy": "A compact reading experience" }, "expected_visible": { "landscape-note": false }, "expected_purchase_package": "$rc_monthly" },
+      { "name": "699 x 874", "width": 699, "height": 874, "expected_outcome": "Still compact: the wide rule starts at exactly 700.",
+        "expected_text": { "width-copy": "A compact reading experience" }, "expected_visible": { "landscape-note": false }, "expected_purchase_package": "$rc_monthly" },
+      { "name": "700 x 874", "width": 700, "height": 874, "expected_outcome": "Wide copy, 22-point type and 88-unit panel. Return to narrow to restore natural height.",
+        "expected_text": { "width-copy": "Room for the whole story" }, "expected_visible": { "landscape-note": false }, "expected_purchase_package": "$rc_monthly" },
+      { "name": "904 x 640", "width": 904, "height": 640, "expected_outcome": "Wide copy plus the landscape note (aspect ratio at least 1.2).",
+        "expected_text": { "width-copy": "Room for the whole story", "landscape-note": "Landscape context detected" }, "expected_visible": { "landscape-note": true }, "expected_purchase_package": "$rc_monthly" }
+    ]
+  },
+  "offerings": [{
+    "identifier": "window_lab", "packages": [{ "identifier": "$rc_monthly", "platform_product_identifier": "gallery.monthly" }],
+    "paywall_components": {
+      "id": "verified-window", "default_locale": "en_US",
+      "components_config": { "base": {
+        "background": { "light": { "type": "hex", "value": "#f0f5f8ff" } },
+        "stack": { "type": "stack", "spacing": 18, "padding": { "top": 24, "bottom": 24, "leading": 20, "trailing": 20 }, "components": [
+          { "type": "text", "text_lid": "title", "font_size": "heading_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#213e51ff" } } },
+          { "type": "stack", "id": "responsive-panel", "shape": { "type": "rectangle", "corners": { "all": 22 } }, "padding": { "top": 16, "bottom": 16, "leading": 16, "trailing": 16 }, "background_color": { "light": { "type": "hex", "value": "#ffffffff" } },
+            "overrides": [{ "conditions": [{ "type": "window_width_condition", "operator": ">=", "value": 700 }], "properties": { "size": { "height": { "type": "fixed", "value": 88 } } } }],
+            "components": [
+              { "type": "text", "id": "width-copy", "text_lid": "compact", "font_size": 17,
+                "overrides": [{ "conditions": [{ "type": "window_width_condition", "operator": ">=", "value": 700 }], "properties": { "text_lid": "wide", "font_size": 22 } }] }
+            ] },
+          { "type": "text", "id": "landscape-note", "text_lid": "landscape", "visible": false,
+            "overrides": [{ "conditions": [{ "type": "window_aspect_ratio_condition", "operator": ">=", "value": 1.2 }], "properties": { "visible": true } }] },
+          { "type": "text", "text_lid": "note", "font_size": "body_m" },
+          { "type": "package", "id": "monthly", "package_id": "$rc_monthly", "stack": { "type": "stack", "shape": { "type": "pill" }, "padding": { "top": 16, "bottom": 16, "leading": 12, "trailing": 12 }, "background_color": { "light": { "type": "hex", "value": "#ffffffff" } }, "components": [{ "type": "text", "text_lid": "plan" }] } }
+        ] },
+        "sticky_footer": { "type": "footer", "stack": { "type": "stack", "padding": { "top": 12, "bottom": 18, "leading": 20, "trailing": 20 }, "components": [
+          { "type": "purchase_button", "id": "purchase", "stack": { "type": "stack", "shape": { "type": "pill" }, "padding": { "top": 15, "bottom": 15, "leading": 16, "trailing": 16 }, "background_color": { "light": { "type": "hex", "value": "#315a70ff" } }, "components": [
+            { "type": "text", "text_lid": "cta", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#ffffffff" } } }
+          ] } }
+        ] } }
+      } },
+      "components_localizations": { "en_US": {
+        "title": "A layout with boundaries", "compact": "A compact reading experience",
+        "wide": "Room for the whole story", "landscape": "Landscape context detected",
+        "note": "The picker simulates host dimensions. It does not resize this preview or certify tablet layout.",
+        "plan": "{{ product_name }} - {{ price }}", "cta": "Continue"
+      } }
+    }
+  }]
+}

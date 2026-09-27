@@ -1,0 +1,46 @@
+{
+  "current_offering_id": "fallback_lab",
+  "gallery": {
+    "sources": [
+      "https://github.com/RevenueCat/purchases-ios/blob/d654b8b85143c29e5bb73d0ff92f5f5766fbbedc/Tests/UnitTests/Paywalls/Components/FallbackComponentTests.swift",
+      "https://github.com/RevenueCat/purchases-ios/blob/d654b8b85143c29e5bb73d0ff92f5f5766fbbedc/Sources/Paywalls/Components/PaywallPurchaseButtonComponent.swift"
+    ],
+    "variants": [
+      { "name": "Safe unsupported features", "expected_outcome": "Three authored fallbacks appear. Web checkout reports NotSupportedException and must not invoke purchase.",
+        "expected_text": { "future-copy": "Future component fallback", "video-copy": "Video fallback", "web-copy": "Web content fallback" } }
+    ]
+  },
+  "offerings": [{
+    "identifier": "fallback_lab", "packages": [{ "identifier": "$rc_monthly", "platform_product_identifier": "gallery.monthly" }],
+    "paywall_components": {
+      "id": "verified-fallbacks", "default_locale": "en_US",
+      "components_config": { "base": {
+        "background": { "light": { "type": "hex", "value": "#f6f3eeff" } },
+        "stack": { "type": "stack", "spacing": 16, "padding": { "top": 24, "bottom": 24, "leading": 20, "trailing": 20 }, "components": [
+          { "type": "text", "text_lid": "title", "font_size": "heading_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#514333ff" } } },
+          { "type": "future_component", "fallback": { "type": "stack", "padding": { "top": 16, "bottom": 16, "leading": 14, "trailing": 14 }, "shape": { "type": "rectangle", "corners": { "all": 18 } }, "background_color": { "light": { "type": "hex", "value": "#ffffffff" } }, "components": [
+            { "type": "text", "id": "future-copy", "text_lid": "future", "font_weight": "bold" }
+          ] } },
+          { "type": "video", "source": { "url": "https://example.com/unfetched-video.mp4" }, "fallback": { "type": "stack", "padding": { "top": 16, "bottom": 16, "leading": 14, "trailing": 14 }, "shape": { "type": "rectangle", "corners": { "all": 18 } }, "background_color": { "light": { "type": "hex", "value": "#ffffffff" } }, "components": [
+            { "type": "text", "id": "video-copy", "text_lid": "video", "font_weight": "bold" }
+          ] } },
+          { "type": "web_view", "url": "https://example.com/unfetched-content", "fallback": { "type": "stack", "padding": { "top": 16, "bottom": 16, "leading": 14, "trailing": 14 }, "shape": { "type": "rectangle", "corners": { "all": 18 } }, "background_color": { "light": { "type": "hex", "value": "#ffffffff" } }, "components": [
+            { "type": "text", "id": "web-copy", "text_lid": "web", "font_weight": "bold" }
+          ] } },
+          { "type": "text", "text_lid": "note", "font_size": "body_m" }
+        ] },
+        "sticky_footer": { "type": "footer", "stack": { "type": "stack", "padding": { "top": 12, "bottom": 18, "leading": 20, "trailing": 20 }, "components": [
+          { "type": "purchase_button", "id": "unsupported-purchase", "method": { "type": "web_checkout" }, "stack": { "type": "stack", "shape": { "type": "pill" }, "padding": { "top": 15, "bottom": 15, "leading": 16, "trailing": 16 }, "background_color": { "light": { "type": "hex", "value": "#65513aff" } }, "components": [
+            { "type": "text", "text_lid": "cta", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#ffffffff" } } }
+          ] } }
+        ] } }
+      } },
+      "components_localizations": { "en_US": {
+        "title": "Fall back, not forward",
+        "future": "Future component fallback", "video": "Video fallback", "web": "Web content fallback",
+        "note": "These representations are deliberately unsupported. No remote content is fetched, and unsupported checkout must never become an in-app purchase.",
+        "cta": "Test unsupported checkout"
+      } }
+    }
+  }]
+}
