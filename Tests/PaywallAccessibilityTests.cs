@@ -160,6 +160,39 @@ public sealed class PaywallAccessibilityTests
 	}
 
 	[TestMethod]
+	public void Default_Tab_Content_Is_Centered_Without_Changing_Package_Content_Alignment()
+	{
+		var view = CreateView(
+			new PaywallPackageComponent
+			{
+				Id = "page-package", PackageId = "annual",
+				Stack = new() { Components = [new PaywallTextComponent { TextLocalizationId = "Plan" }] }
+			},
+			new PaywallTabsComponent
+			{
+				Id = "tabs",
+				Tabs =
+				[
+					new() { Id = "first", Name = "First", Stack = new() },
+					new() { Id = "second", Name = "Second", Stack = new() }
+				]
+			});
+		var tabs = Descendants(Find<View>(view, "tabs")).OfType<Border>()
+			.Where(tab => PaywallAccessibility.GetSurface(tab) is not null).ToArray();
+		Assert.AreEqual(2, tabs.Length);
+		foreach (var tab in tabs)
+		{
+			Assert.IsInstanceOfType<Grid>(tab.Content);
+			var decoration = ((Grid)tab.Content).Children.OfType<ContentView>().Single();
+			Assert.AreEqual(LayoutOptions.Center, decoration.VerticalOptions);
+		}
+		var package = Find<Border>(view, "page-package");
+		Assert.IsInstanceOfType<Grid>(package.Content);
+		var packageDecoration = ((Grid)package.Content).Children.OfType<ContentView>().Single();
+		Assert.AreEqual(LayoutOptions.Fill, packageDecoration.VerticalOptions);
+	}
+
+	[TestMethod]
 	public void Package_Selection_Updates_The_Same_Accessible_Action_And_Its_Name()
 	{
 		var view = CreateView(new PaywallPackageComponent

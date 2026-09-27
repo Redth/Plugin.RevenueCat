@@ -1,6 +1,8 @@
 using System.Text.Json;
 using Microsoft.Maui.Controls;
+using RoundRectangle = Microsoft.Maui.Controls.Shapes.RoundRectangle;
 using Microsoft.Maui.Dispatching;
+using Microsoft.Maui.Graphics;
 using PaywallGallerySample;
 using Plugin.RevenueCat.Models;
 using Plugin.RevenueCat.Paywalls;
@@ -132,6 +134,99 @@ public sealed class PaywallGalleryScenarioTests
 		Assert.AreEqual("$rc_annual", Purchase(view));
 		ApplyInputs(view, example, example.Variants[2]);
 		Assert.AreEqual("Standard access", Find<Label>(view, "audience-message").Text);
+	}
+
+	[TestMethod]
+	public void Carousel_Uses_Page_Indicators_Without_Native_Scrollbars()
+	{
+		var example = Load("carousel_onboarding");
+		var view = Create(example, new PaywallGalleryVariant());
+		var carousel = Descendants(Find<View>(view, "value-carousel")).OfType<CarouselView>().Single();
+		var indicator = Descendants(view).OfType<IndicatorView>().Single();
+		Assert.AreEqual(ScrollBarVisibility.Never, carousel.HorizontalScrollBarVisibility);
+		Assert.AreEqual(ScrollBarVisibility.Never, carousel.VerticalScrollBarVisibility);
+		Assert.IsTrue(carousel.IsSwipeEnabled);
+		Assert.IsTrue(carousel.Loop);
+		Assert.IsTrue(indicator.IsVisible);
+		var body = Descendants(view).OfType<ScrollView>().Single();
+		Assert.AreEqual(ScrollOrientation.Vertical, body.Orientation);
+		Assert.AreEqual(ScrollBarVisibility.Default, body.VerticalScrollBarVisibility);
+	}
+
+	[TestMethod]
+	[DataRow("best_value_badge", "annual-card", "monthly-card")]
+	[DataRow("premium_comparison", "annual", "monthly")]
+	public void Badged_Package_Selection_Uses_The_Authored_Card_Border(
+		string fixture, string annualId, string monthlyId)
+	{
+		var example = Load(fixture);
+		var view = Create(example, new PaywallGalleryVariant());
+		var root = view.Content;
+		var outer = Find<Border>(view, annualId);
+		var card = Descendants(outer).OfType<Border>().Skip(1).First();
+		var badge = Descendants(outer).OfType<Border>().Last();
+		var action = PaywallAccessibility.GetSurface(outer);
+		var shape = card.StrokeShape;
+		Assert.IsInstanceOfType<RoundRectangle>(shape);
+		Assert.AreEqual(new CornerRadius(28), ((RoundRectangle)shape).CornerRadius);
+		Assert.AreEqual(0, outer.StrokeThickness, "The accessibility wrapper must not add an outline.");
+		Assert.AreEqual(2, card.StrokeThickness);
+		Assert.IsInstanceOfType<SolidColorBrush>(card.Stroke);
+		Assert.AreEqual(Colors.DeepSkyBlue, ((SolidColorBrush)card.Stroke).Color);
+		Assert.AreEqual(0, badge.StrokeThickness);
+
+		Tap(view, monthlyId);
+		Assert.AreSame(shape, card.StrokeShape);
+		Assert.AreEqual(2, card.StrokeThickness);
+		Assert.AreEqual(0, outer.StrokeThickness);
+		Assert.IsFalse(PaywallAccessibility.GetSelected(outer));
+		Assert.AreEqual(
+			fixture == "best_value_badge" ? Color.FromArgb("#22c55e") : Colors.Transparent,
+			((SolidColorBrush)card.Stroke).Color);
+
+		Tap(view, annualId);
+		Assert.AreSame(root, view.Content);
+		Assert.AreSame(action, PaywallAccessibility.GetSurface(outer));
+		Assert.AreSame(shape, card.StrokeShape);
+		Assert.AreEqual(0, outer.StrokeThickness);
+		Assert.AreEqual(2, card.StrokeThickness);
+		Assert.AreEqual(Colors.DeepSkyBlue, ((SolidColorBrush)card.Stroke).Color);
+		Assert.AreEqual("$rc_annual", Purchase(view));
+	}
+
+	[TestMethod]
+	[DataRow("verified_tab_state", "weekly-tab", "monthly-tab")]
+	[DataRow("verified_mixed_packages", "details-tab", "weekly-tab")]
+	public void Tab_Content_Is_Centered_Within_The_Accessible_Hit_Target(
+		string fixture, string firstTab, string secondTab)
+	{
+		var example = Load(fixture);
+		var view = Create(example, example.Variants[0]);
+
+		void AssertCentered(string id)
+		{
+			var tab = Find<Border>(view, id);
+			var layers = tab.Content as Grid;
+			Assert.IsNotNull(layers);
+			var decoration = layers.Children.OfType<ContentView>().Single();
+			var action = PaywallAccessibility.GetSurface(tab);
+			Assert.IsNotNull(action);
+			Assert.AreEqual(LayoutOptions.Center, decoration.VerticalOptions);
+			Assert.AreEqual(LayoutOptions.Fill, decoration.HorizontalOptions);
+			Assert.AreEqual(8, decoration.Padding.Top);
+			Assert.AreEqual(8, decoration.Padding.Bottom);
+			Assert.AreEqual(LayoutOptions.Fill, action.VerticalOptions);
+			Assert.IsTrue(action.MinimumHeightRequest >= 44);
+		}
+
+		AssertCentered(firstTab);
+		AssertCentered(secondTab);
+		Tap(view, secondTab);
+		AssertCentered(firstTab);
+		AssertCentered(secondTab);
+		view.SemanticContext = new PaywallSemanticContext();
+		AssertCentered(firstTab);
+		AssertCentered(secondTab);
 	}
 
 	[TestMethod]

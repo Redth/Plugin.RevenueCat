@@ -184,6 +184,16 @@ internal static class PaywallAccessibility
 		return false;
 	}
 
+	internal static void CenterTabContent(View target)
+	{
+		if (Surfaces.TryGetValue(target, out var button) &&
+			States.GetValue(button, _ => throw new InvalidOperationException()).Decoration is { } decoration)
+		{
+			// The native hit target can be taller than the authored tab content and padding.
+			decoration.VerticalOptions = LayoutOptions.Center;
+		}
+	}
+
 	internal static void SetSelected(View target, bool selected)
 	{
 		if (Surfaces.TryGetValue(target, out var button))

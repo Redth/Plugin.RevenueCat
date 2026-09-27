@@ -16,6 +16,11 @@ sample's picker and `PaywallGalleryScenarioTests` consume the same inputs. The t
 actual managed MAUI controls and invoke their accessible action commands; they check visible
 ancestors, exact text, available/selected packages, events, object identity and restored sizes.
 Interactive tests additionally assert outcomes independently of the metadata.
+The tab examples also check that visible content stays vertically centered inside the native
+minimum-height hit target, without changing the fixture padding or package-card alignment.
+Best value badge and Premium comparison assert that selection uses the authored card border,
+not an extra outline on the accessibility wrapper. Carousel onboarding asserts that page dots
+remain visible while native carousel scrollbars are hidden; the main paywall still scrolls.
 
 In the sample, use **Mocked validation input** to choose a preset. The event panel shows the
 expected result and the actual action/diagnostic. Preset changes preserve existing selection
@@ -83,7 +88,7 @@ managed construction test alone.
 
 ## Validation recorded for this increment
 
-The complete offline suite includes **37 new gallery checks**: 23 preset cases plus catalog,
+The source-backed increment introduced **37 gallery checks**: 23 preset cases plus catalog,
 interaction, locale-link, fallback and deadline assertions. Mac Catalyst inspection confirmed
 eligible-to-ineligible copy changes, weekly tab state/price updates, the Spanish neutral-locale
 legal URL event, and the live transition from a nine-second remaining value to `Offer ended`.

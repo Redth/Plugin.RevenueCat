@@ -408,9 +408,10 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 
 			return Task.CompletedTask;
 		}, request);
-		ReservePackageSelectionStroke(packageView);
+		var selectionTarget = FindFirstBorder(content) ?? packageView;
+		ReservePackageSelectionStroke(selectionTarget);
 
-		var border = FindFirstBorder(packageView);
+		var border = FindFirstBorder(selectionTarget);
 		var unselectedStroke = border?.Stroke;
 		ObserveSelection(packageView, request, () =>
 		{
@@ -419,7 +420,7 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 			PaywallAccessibility.RefreshName(packageView, component.PackageId);
 			if (isSelected)
 			{
-				ApplySelectedPackageStyle(packageView);
+				ApplySelectedPackageStyle(selectionTarget);
 			}
 			else if (border is not null)
 			{
@@ -508,6 +509,8 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 			}),
 			Loop = component.Loop,
 			Position = Math.Clamp(component.InitialPageIndex ?? 0, 0, component.Pages.Count - 1),
+			HorizontalScrollBarVisibility = ScrollBarVisibility.Never,
+			VerticalScrollBarVisibility = ScrollBarVisibility.Never,
 			HorizontalOptions = LayoutOptions.Fill,
 			VerticalOptions = LayoutOptions.Fill
 		};
@@ -726,11 +729,13 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 
 			return Task.CompletedTask;
 		}, request, PaywallActionKind.Choice, component.TabId);
-		ReservePackageSelectionStroke(button);
+		PaywallAccessibility.CenterTabContent(button);
+		var selectionTarget = FindFirstBorder(content) ?? button;
+		ReservePackageSelectionStroke(selectionTarget);
 
 		if (string.Equals(component.TabId, selectedTabId, StringComparison.Ordinal))
 		{
-			ApplySelectedPackageStyle(button);
+			ApplySelectedPackageStyle(selectionTarget);
 		}
 		PaywallAccessibility.SetSelected(button, string.Equals(component.TabId, selectedTabId, StringComparison.Ordinal));
 
@@ -1172,6 +1177,7 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 
 				return Task.CompletedTask;
 			}, request, PaywallActionKind.Choice, tab.Name ?? tab.Id);
+			PaywallAccessibility.CenterTabContent(border);
 			PaywallAccessibility.SetSelected(border, string.Equals(tab.Id, selectedTabId, StringComparison.Ordinal));
 			layout.Children.Add(border);
 		}
