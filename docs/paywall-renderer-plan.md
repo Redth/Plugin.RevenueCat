@@ -173,6 +173,65 @@ overrides, parent-assigned row alignment, badged container padding, exact produc
 identity and native-to-paywall enum mapping. These are behavioral checks beyond the original
 gallery parsing tests.
 
+### Integrated accessibility work
+
+The visual paywall still uses authored MAUI stacks, borders and the custom toggle track. A
+transparent native activation button supplies focus, keyboard activation and accessibility
+semantics, with a 44pt minimum on Apple platforms and 48dp on Android. Register it through
+`UseRevenueCatPaywalls()`; Android uses a paywall-specific button handler for radio/switch
+checked state rather than changing global MAUI button behavior.
+
+- Android package nodes expose `RadioButton` semantics; the tab toggle exposes `Switch`;
+  purchase/navigation actions remain buttons. Apple buttons expose selected/disabled traits
+  and localized on/off or busy values.
+- Names come from visible localized content. Conditionally hidden trial copy is excluded,
+  and name/selected/enabled state follows semantic and catalog updates. Built-in fallback
+  labels/hints currently cover English, French and Spanish, not every supported store locale.
+- Decorative content is removed from the accessibility-important tree without deleting the
+  authored visuals. Async activation shares one guarded command for native and managed test
+  paths. Hidden/disabled actions cannot execute; busy actions disable the other surfaces.
+- Real tab swaps respect system reduced-motion settings on iOS/Mac Catalyst and Android.
+  Selection changes still do not fade or replace the whole paywall.
+- Native action surfaces unregister during unloading/handler teardown. Integration exposed
+  and fixed an Android crash caused by busy-state updates touching a disposed button from a
+  previous tab. Repeated native touch and Tab/Enter switching was rerun after the correction.
+- Conditional padding updates target the visual content, not both the outer action container
+  and inner decoration; adding accessibility must not double the authored spacing.
+
+**Native evidence:** the integrated app on the dedicated Android API 35 emulator exposed
+radio/button/switch roles, checked/selected/enabled state and no duplicate package text in the
+compressed accessibility tree. Android Tab focused the switch, Enter changed its state, and
+six subsequent native toggles plus a mock purchase preserved the matching monthly package
+without a process crash. The custom track's appearance was inspected.
+
+**Not certified:** TalkBack/VoiceOver spoken output, desktop keyboard/focus behavior,
+large-text/RTL coverage and Windows accessibility have not been comprehensively exercised.
+Mac direct inspection was blocked by missing Accessibility/Screen Recording grants, which
+were not bypassed. Focus continuity when whole tab controls are replaced remains a follow-up;
+native roles and managed tests alone are not a full accessibility audit.
+
+### Final combined validation
+
+- **117 offline managed tests passed**, including new cross-workstream coverage for native
+  eligibility mapping, conditional accessibility names/visibility/disabled state, restored
+  layout constraints and visual padding.
+- All **2,050 baseline public/protected API signatures and constraints** from the managed
+  Core/API/plugin/paywall assemblies remain present. New capabilities are additive.
+- Final Release Android gallery (profiled AOT enabled) and Release Mac Catalyst gallery builds
+  passed. Classic Android and Mac Catalyst sample consumers also built successfully after all
+  workstreams were combined, with no AndroidX NU1608 version-constraint warnings.
+- The final paywall package compiled its `net10.0`, Android, iOS and Mac Catalyst assemblies.
+  Native workstream evidence additionally includes Java tests/assembly builds, Swift XCTest
+  status/selector coverage, and the iOS plugin build.
+- Native Android inspection of the **combined** implementation confirmed package radio-button
+  checked state, switch state, 48dp hit targets, deduplicated visible text and matching mock
+  purchase routing. The keyboard/lifecycle crash was reproduced and then verified absent with
+  native Tab/Enter activation followed by six repeated touch toggles.
+
+These results do not replace live App Store/Play sandbox purchases, spoken screen-reader
+testing, or broad accessibility conformance verification. Those explicit release gates and
+the SDK dependency-verifier limitation remain documented rather than marked as passed.
+
 ## Goal
 
 RevenueCat Paywalls V2 are remote UI definitions. The native RevenueCatUI SDKs render those definitions with platform-native UI frameworks, but binding those UI SDKs would significantly increase dependency and maintenance complexity, especially on Android. This repository can instead parse the paywall component payload and render a useful subset with .NET MAUI controls.
@@ -298,7 +357,8 @@ The current fixture set covers:
 
 The sample includes deterministic local SVG assets under `sample-paywalls/Resources/Images/` and raw paywall JSON fixtures under `sample-paywalls/Resources/Raw/paywalls/`. The SVG files are also packaged as raw app assets so the renderer exercises the SkiaSharp SVG path instead of relying on MAUI's generated PNG image assets.
 
-Apps that render paywalls should call `builder.UseRevenueCatPaywalls()` during MAUI startup. This registers SkiaSharp for SVG paywall image/icon rendering.
+Apps that render paywalls should call `builder.UseRevenueCatPaywalls()` during MAUI startup.
+This registers SkiaSharp and the Android accessible activation-button handler.
 
 DevFlow is installed through the repo tool manifest and enabled in the sample under `#if DEBUG` with `builder.AddMauiDevFlowAgent()`. Mac Catalyst debug builds include the local server entitlement needed by the DevFlow agent. Useful validation commands:
 
@@ -320,14 +380,14 @@ dotnet tool run maui -- devflow ui screenshot --selector PaywallPreviewPage --ou
 | `text` | `Label` | Yes |
 | `image` | `Image` or SkiaSharp-backed SVG view in optional `Border` | Yes |
 | `icon` | `Image` or SkiaSharp-backed SVG view from resolved icon URL | Yes |
-| `button` | `Border`/`ContentView` with tap gesture and nested stack; host actions | Partial (native accessibility/keyboard roles pending) |
-| `package` | Selectable `Border`/`ContentView` with nested stack | Yes |
-| `purchase_button` | Tappable nested stack that calls in-app purchase action | Partial (non-in-app checkout is explicitly rejected) |
+| `button` | Authored nested stack plus native accessible activation button; host actions | Partial (broader accessibility validation remains) |
+| `package` | Selectable authored stack with native selected/checked action surface | Yes, within supported conditional grammar |
+| `purchase_button` | Native accessible button over authored stack; in-app purchase action | Partial (non-in-app checkout is explicitly rejected) |
 | `header` | Top row/overlay | Yes |
 | `sticky_footer` / `footer` | Bottom row pinned outside body scroll | Yes |
 | `carousel` | `CarouselView` with page peek, spacing, loop, initial position, auto-advance, and `IndicatorView` page control | Partial |
 | `tabs` / tab-control buttons | selected content view + local tab state | Partial |
-| `tab_control_toggle` | Custom pill track/thumb mapped to the first/second tab IDs | Partial (not a native accessible switch) |
+| `tab_control_toggle` | Custom pill track/thumb plus native checkable action mapped to first/second tab IDs | Partial (Android switch semantics inspected; full screen-reader coverage pending) |
 | `timeline` | vertical rows with icon/title/description and connector lines | Partial |
 | `countdown` | timer-refreshed countdown variable resolution and countdown/end stack selection | Partial |
 | `video` | renders fallback component or placeholder | Partial |
@@ -372,11 +432,11 @@ The first implementation supports:
 Deferred:
 
 - custom remote fonts.
-- advanced conditional overrides.
+- override properties/conditions beyond the documented supported subset.
 - video backgrounds.
 - pixel-perfect safe-area/hero media behavior.
 - richer carousel transitions such as fade.
-- native accessibility/keyboard semantics for the renderer-owned tab toggle.
+- broader screen-reader, keyboard focus continuity, large-text and RTL verification.
 
 ## State and actions
 
@@ -385,6 +445,7 @@ Implemented state:
 - selected package ID.
 - selected tab ID for the currently rendered tabs component.
 - pending gesture operation gating (async `IPaywallActionHandler` only).
+- explicit customer/offer eligibility, custom variables and typed tab-updated state.
 - current locale.
 - current app theme at render time (live theme-change handling remains a gap).
 
@@ -439,7 +500,7 @@ mapping, introductory duration, and stale data after a product replacement.
 
 ## Variables
 
-Initial variable support should include:
+Basic variable support includes:
 
 - `{{ app_name }}`
 - `{{ price }}`
@@ -447,18 +508,21 @@ Initial variable support should include:
 - `{{ sub_period }}`
 - `{{ sub_duration }}`
 
-Additional variables require richer product and intro-offer metadata:
+The following variables use available product metadata; intro variables additionally require
+explicit eligibility:
 
 - `price_per_period`
 - `sub_price_per_week`
 - `sub_price_per_month`
 - `sub_offer_duration`
 - `sub_offer_price`
-- `sub_relative_discount`
 
-Structured diagnostics for unresolved variables and full locale-aware period/trial formatting
-remain planned. The built-in period names are English; apps requiring additional languages
-must supply an appropriate variable provider until that gap is closed.
+`sub_relative_discount`, complex/multiple intro phases and comprehensive locale-aware offer
+copy remain unsupported.
+
+Unresolved variables report through the optional semantic diagnostic callback; full
+locale-aware period/trial formatting remains planned. The built-in period names are English;
+apps requiring additional languages must supply an appropriate variable provider.
 
 ## Test plan
 

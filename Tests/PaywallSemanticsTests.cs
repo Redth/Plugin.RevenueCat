@@ -626,7 +626,8 @@ public sealed class PaywallSemanticsTests
 		var stateLabel = Find<Label>(view, "state");
 		Assert.IsFalse(stateLabel.IsVisible);
 		var monthlyButton = Descendants(view).OfType<Border>()
-			.Single(b => b.Content is Label { Text: "Monthly" });
+			.Single(b => b.GestureRecognizers.OfType<TapGestureRecognizer>().Any() &&
+				Descendants(b).OfType<Label>().Any(label => label.Text == "Monthly"));
 		Tap(monthlyButton);
 
 		Assert.AreSame(root, view.Content);

@@ -377,7 +377,13 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 					Url = TryGetUrl(component.Action?.Url, request)
 				});
 			}
-		}, request);
+		}, request, fallback: PaywallAccessibility.Localize(request.Locale,
+			component.Action?.Type switch
+			{
+				"restore_purchases" => "Restore purchases",
+				"navigate_back" => "Close",
+				_ => "Action"
+			}));
 
 		return button;
 	}
@@ -408,7 +414,10 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		var unselectedStroke = border?.Stroke;
 		ObserveSelection(packageView, request, () =>
 		{
-			if (string.Equals(component.PackageId, request.Selection.SelectedIdentifier, StringComparison.Ordinal))
+			var isSelected = string.Equals(component.PackageId, request.Selection.SelectedIdentifier, StringComparison.Ordinal);
+			PaywallAccessibility.SetSelected(packageView, isSelected);
+			PaywallAccessibility.RefreshName(packageView, component.PackageId);
+			if (isSelected)
 			{
 				ApplySelectedPackageStyle(packageView);
 			}
@@ -421,8 +430,9 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		{
 			packageView.IsVisible = request.Semantics.IsVisible(component, component.PackageId) &&
 				(component.Stack is null || request.Semantics.IsVisible(component.Stack, component.PackageId));
-			packageView.IsEnabled = packageView.IsVisible &&
-				FindPackage(request, component.PackageId, allowDefaultPackage: false) is not null;
+			PaywallAccessibility.SetEnabled(packageView, packageView.IsVisible &&
+				FindPackage(request, component.PackageId, allowDefaultPackage: false) is not null);
+			PaywallAccessibility.RefreshName(packageView, component.PackageId);
 		});
 
 		return packageView;
@@ -465,7 +475,7 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 					PlatformContext = request.PlatformContext
 				});
 			}
-		}, request);
+		}, request, fallback: PaywallAccessibility.Localize(request.Locale, "Purchase"));
 	}
 
 	View RenderCarousel(
@@ -631,7 +641,7 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 			var tabContent = tab.Stack is null
 				? new ContentView { IsVisible = false }
 				: RenderStack(tab.Stack, request, packageContextIdentifier, null, null, variables);
-			if (animateContent)
+			if (animateContent && !PaywallAccessibility.ReduceMotionRequested())
 			{
 				AnimateContentSwap(tabHost, tabContent);
 			}
@@ -715,13 +725,14 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 			}
 
 			return Task.CompletedTask;
-		}, request);
+		}, request, PaywallActionKind.Choice, component.TabId);
 		ReservePackageSelectionStroke(button);
 
 		if (string.Equals(component.TabId, selectedTabId, StringComparison.Ordinal))
 		{
 			ApplySelectedPackageStyle(button);
 		}
+		PaywallAccessibility.SetSelected(button, string.Equals(component.TabId, selectedTabId, StringComparison.Ordinal));
 
 		return button;
 	}
@@ -771,19 +782,22 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 
 		var currentValue = isToggled;
 		ApplyToggleState(track, thumb, component, request.UiConfig, currentValue);
-		AddTapGesture(toggle, () =>
+		var surface = PaywallAccessibility.Wrap(toggle);
+		AddTapGesture(surface, () =>
 		{
 			currentValue = !currentValue;
 			ApplyToggleState(track, thumb, component, request.UiConfig, currentValue);
 			var tabId = currentValue ? onTabId : offTabId;
+			PaywallAccessibility.SetSelected(surface, currentValue);
 			if (!string.IsNullOrWhiteSpace(tabId))
 			{
 				tabSelected?.Invoke(tabId);
 			}
 
 			return Task.CompletedTask;
-		}, request);
-		return toggle;
+		}, request, PaywallActionKind.Toggle, PaywallAccessibility.Localize(request.Locale, "Change plan"));
+		PaywallAccessibility.SetSelected(surface, currentValue);
+		return surface;
 	}
 
 	View RenderTimeline(
@@ -1157,7 +1171,8 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 				}
 
 				return Task.CompletedTask;
-			}, request);
+			}, request, PaywallActionKind.Choice, tab.Name ?? tab.Id);
+			PaywallAccessibility.SetSelected(border, string.Equals(tab.Id, selectedTabId, StringComparison.Ordinal));
 			layout.Children.Add(border);
 		}
 
@@ -1339,54 +1354,83 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 		};
 	}
 
-	static View WrapTappable(View content, Func<Task> tapped, PaywallRenderRequest request)
+	static View WrapTappable(View content, Func<Task> tapped, PaywallRenderRequest request,
+		PaywallActionKind kind = PaywallActionKind.Button, string? fallback = null)
 	{
-		AddTapGesture(content, tapped, request);
-		return content;
+		var target = PaywallAccessibility.Wrap(content);
+		AddTapGesture(target, tapped, request, kind, fallback);
+		return target;
 	}
 
 	static View MakePackageTappable(View content, Func<Task> tapped, PaywallRenderRequest request)
 	{
-		var target = FindFirstBorder(content) is null
-			? new Border
-			{
-				Content = content,
-				Padding = 0,
-				StrokeThickness = 0
-			}
-			: content;
+		var target = PaywallAccessibility.Wrap(content);
 
-		AddTapGesture(target, tapped, request);
+		AddTapGesture(target, tapped, request, PaywallActionKind.Choice);
 		return target;
 	}
 
-	static void AddTapGesture(View target, Func<Task> tapped, PaywallRenderRequest request)
+	static void AddTapGesture(View target, Func<Task> tapped, PaywallRenderRequest request,
+		PaywallActionKind kind = PaywallActionKind.Button, string? fallback = null)
 	{
 		var tap = new TapGestureRecognizer
 		{
 			Command = new Command(async () =>
 			{
-				if (request.ActionInProgress || !target.IsEnabled)
+				if (request.ActionInProgress || !IsActionAvailable(target) || PaywallAccessibility.GetSurface(target)?.IsEnabled == false)
 				{
 					return;
 				}
 				request.ActionInProgress = true;
 				try
 				{
+					PaywallAccessibility.SetBusy(request, true);
 					await tapped();
 				}
 				catch (Exception error)
 				{
 					System.Diagnostics.Trace.TraceError("Paywall action failed: {0}", error);
 					request.ActionFailed?.Invoke(error);
+					if (target.Handler is not null)
+					{
+						Microsoft.Maui.Accessibility.SemanticScreenReader.Default.Announce(error.Message);
+					}
 				}
 				finally
 				{
 					request.ActionInProgress = false;
+					PaywallAccessibility.SetBusy(request, false);
 				}
 			})
 		};
 		target.GestureRecognizers.Add(tap);
+		target.HandlerChanged += (_, _) =>
+		{
+			if (target.Handler is null)
+			{
+				if (!target.GestureRecognizers.Contains(tap))
+				{
+					target.GestureRecognizers.Add(tap);
+				}
+			}
+			else
+			{
+				target.GestureRecognizers.Remove(tap);
+			}
+		};
+		PaywallAccessibility.AddSurface(target, request, fallback, kind, tap.Command);
+	}
+
+	static bool IsActionAvailable(View target)
+	{
+		for (Element? element = target; element is not null; element = element.Parent)
+		{
+			if (element is VisualElement { IsVisible: false } or VisualElement { IsEnabled: false })
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 
 	static void ObserveSelection(View view, PaywallRenderRequest request, Action update)
@@ -1726,7 +1770,11 @@ public sealed class DefaultPaywallRenderer : IPaywallRenderer
 	{
 		if (view is Border border)
 		{
-			border.Padding = PaywallMauiStyleResolver.ResolveThickness(padding);
+			var resolvedPadding = PaywallMauiStyleResolver.ResolveThickness(padding);
+			if (!PaywallAccessibility.TrySetVisualPadding(border, resolvedPadding))
+			{
+				border.Padding = resolvedPadding;
+			}
 			border.Margin = PaywallMauiStyleResolver.ResolveThickness(margin);
 			border.Background = PaywallMauiStyleResolver.ResolveBackground(background, uiConfig);
 		}

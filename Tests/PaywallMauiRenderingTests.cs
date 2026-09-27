@@ -79,8 +79,8 @@ public sealed class PaywallMauiRenderingTests
 		{
 			Packages = response.CurrentOffering.Packages.Select(p => new Package
 			{
-				Identifier = p.Identifier,
-				StoreProduct = new() { Title = p.Identifier, PriceString = "$1.00" }
+				Identifier = p.Identifier ?? throw new InvalidOperationException("Fixture package identifier is missing."),
+				StoreProduct = new() { Title = p.Identifier ?? "Fixture product", PriceString = "$1.00" }
 			}).ToArray(),
 			PaywallOfferings = response
 		};
@@ -148,7 +148,8 @@ public sealed class PaywallMauiRenderingTests
 		Assert.AreEqual("$49.99", Find<Label>(view, "footer-price").Text);
 
 		var monthlyTabButton = Descendants(view).OfType<Border>()
-			.Single(b => b.Content is Label { Text: "Monthly" });
+			.Single(b => b.GestureRecognizers.OfType<TapGestureRecognizer>().Any() &&
+				Descendants(b).OfType<Label>().Any(label => label.Text == "Monthly"));
 		Tap(monthlyTabButton);
 		var monthlyCard = Find<Border>(view, "monthly");
 		Tap(monthlyCard);
