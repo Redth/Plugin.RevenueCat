@@ -16,6 +16,13 @@
             <Label Text="{Binding Description}"
                    FontSize="13"
                    TextColor="{AppThemeBinding Light=#5f6368, Dark=#c7c7c7}" />
+            <Picker x:Name="ScenarioPicker"
+                    AutomationId="GalleryScenario"
+                    Title="Mocked validation input"
+                    ItemsSource="{Binding Variants}"
+                    ItemDisplayBinding="{Binding Name, x:DataType=local:PaywallGalleryVariant}"
+                    IsVisible="{Binding HasVariants}"
+                    SelectedIndexChanged="OnScenarioChanged" />
         </VerticalStackLayout>
 
         <Border Grid.Row="1"
@@ -49,6 +56,11 @@
                        TextColor="{AppThemeBinding Light=#5f6368, Dark=#c7c7c7}" />
                 <Label x:Name="EventLogLabel"
                        Text="Tap a package, purchase button, restore button, or navigation action."
+                       FontSize="12"
+                       LineBreakMode="WordWrap" />
+                <Label x:Name="ExpectedOutcomeLabel"
+                       AutomationId="GalleryExpectedOutcome"
+                       IsVisible="{Binding HasVariants}"
                        FontSize="12"
                        LineBreakMode="WordWrap" />
             </VerticalStackLayout>

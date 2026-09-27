@@ -337,6 +337,11 @@ render model remains planned; it is a prerequisite for full conditional/layout p
 
 ## Standalone gallery sample
 
+For the expanded source-backed fixture corpus, exact preset expectations, immutable upstream
+references and feature coverage boundaries, see [Paywall gallery coverage](paywall-gallery-coverage.md).
+The gallery includes 23 examples, with eight behavior cases and 23 selectable mocked-input
+presets shared with the automated scenario tests.
+
 The repository now includes `sample-paywalls/PaywallGallerySample.csproj`, a standalone MAUI app that references only `Plugin.RevenueCat.Paywalls`. It does not initialize the RevenueCat SDK, which keeps visual iteration and manual validation isolated from store configuration.
 
 The gallery starts at `PaywallGalleryPage`, lists offline fixtures, and opens `PaywallPreviewPage` with an embedded `RcPaywallView`. The preview page wires the paywall action events to an on-page event log so purchase/restore/navigation behavior can be validated without live credentials.

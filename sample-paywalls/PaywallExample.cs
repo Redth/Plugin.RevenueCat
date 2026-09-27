@@ -10,7 +10,9 @@ public sealed class PaywallExample
 		Description = description;
 		ComponentSummary = componentSummary;
 		Response = response;
-		Packages = CreateDemoPackages(response.CurrentOffering ?? response.Offerings.FirstOrDefault());
+		GalleryCase = PaywallGalleryCase.Read(response);
+		Packages = GalleryCase is { Packages.Count: > 0 } ? GalleryCase.Packages :
+			CreateDemoPackages(response.CurrentOffering ?? response.Offerings.FirstOrDefault());
 	}
 
 	public string Title { get; }
@@ -24,6 +26,12 @@ public sealed class PaywallExample
 	public PaywallOfferingsResponse Response { get; }
 
 	public IReadOnlyList<Package> Packages { get; }
+
+	public PaywallGalleryCase? GalleryCase { get; }
+
+	public IReadOnlyList<PaywallGalleryVariant> Variants => GalleryCase?.Variants ?? [];
+
+	public bool HasVariants => Variants.Count > 0;
 
 	static IReadOnlyList<Package> CreateDemoPackages(PaywallOffering? offering)
 	{

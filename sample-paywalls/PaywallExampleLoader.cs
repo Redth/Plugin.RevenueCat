@@ -81,15 +81,59 @@ public static class PaywallExampleLoader
 			"Timeline countdown",
 			"Timeline items, countdown variables, and video fallback rendering.",
 			"timeline, countdown, video fallback",
-			"paywalls/timeline_countdown.json")
+			"paywalls/timeline_countdown.json"),
+		new(
+			"Trial eligibility",
+			"Switch mocked customer eligibility; a regular purchase remains available without a trial promise.",
+			"intro_offer, offer variables, accessibility",
+			"paywalls/verified_eligibility.json"),
+		new(
+			"Audience rules",
+			"Combine audience and selected-package conditions; later matching overrides win.",
+			"AND conditions, precedence, typed variables",
+			"paywalls/verified_rules.json"),
+		new(
+			"Stateful plan tabs",
+			"Three button tabs publish their ID into declared state and update the selected plan.",
+			"tab_control_button, state_updates, state_condition",
+			"paywalls/verified_tab_state.json"),
+		new(
+			"Mixed package visibility",
+			"A hidden default outside tabs must not become the purchase target when tabs change.",
+			"conditional visibility, mixed package scopes, catalog changes",
+			"paywalls/verified_mixed_packages.json"),
+		new(
+			"Window rule boundaries",
+			"Simulated host dimensions exercise the exact 700-unit boundary, not a resized preview.",
+			"window width, aspect ratio, size restoration",
+			"paywalls/verified_window_rules.json"),
+		new(
+			"Localized legal actions",
+			"Exact and neutral-language matches, default text, and localized legal links.",
+			"locale fallback, long text, url_lid",
+			"paywalls/verified_localization.json"),
+		new(
+			"Forward compatibility",
+			"Author-provided media fallbacks render; unsupported checkout is rejected rather than purchased.",
+			"unknown component, video, web_view, unsupported checkout",
+			"paywalls/verified_fallbacks.json"),
+		new(
+			"Timed offer expiry",
+			"A fresh ten-second deadline transitions to the authored end stack; expired state is reproducible.",
+			"countdown, live variables, end stack, lifecycle",
+			"paywalls/verified_countdown.json")
 	];
 
-	public static async Task<IReadOnlyList<PaywallExample>> LoadAsync()
+	public static Task<IReadOnlyList<PaywallExample>> LoadAsync() =>
+		LoadAsync(Microsoft.Maui.Storage.FileSystem.OpenAppPackageFileAsync);
+
+	public static async Task<IReadOnlyList<PaywallExample>> LoadAsync(Func<string, Task<Stream>> openAsset)
 	{
+		ArgumentNullException.ThrowIfNull(openAsset);
 		var examples = new List<PaywallExample>();
 		foreach (var definition in Definitions)
 		{
-			await using var stream = await FileSystem.OpenAppPackageFileAsync(definition.AssetName);
+			await using var stream = await openAsset(definition.AssetName);
 			var response = await JsonSerializer.DeserializeAsync(stream, ModelSerializerContext.Default.PaywallOfferingsResponse)
 				?? throw new InvalidOperationException($"Paywall fixture '{definition.AssetName}' could not be parsed.");
 

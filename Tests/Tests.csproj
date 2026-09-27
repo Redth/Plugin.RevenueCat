@@ -30,6 +30,9 @@
     <!-- Exercise the shipping renderer's managed view tree without native handlers. -->
     <Compile Include="../Plugin.RevenueCat.Paywalls/Controls/**/*.cs" Link="Paywalls/Controls/%(Filename)%(Extension)" />
     <Compile Include="../Plugin.RevenueCat.Paywalls/Rendering/Maui/**/*.cs" Link="Paywalls/Rendering/%(Filename)%(Extension)" />
+    <Compile Include="../sample-paywalls/PaywallGalleryCase.cs" Link="Gallery/PaywallGalleryCase.cs" />
+    <Compile Include="../sample-paywalls/PaywallExample.cs" Link="Gallery/PaywallExample.cs" />
+    <Compile Include="../sample-paywalls/PaywallExampleLoader.cs" Link="Gallery/PaywallExampleLoader.cs" />
     <None Include="../sample-paywalls/Resources/Raw/paywalls/*.json" Link="paywalls/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
     <None Update="data\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -1,0 +1,50 @@
+{
+  "current_offering_id": "countdown_lab",
+  "gallery": {
+    "sources": [
+      "https://github.com/RevenueCat/purchases-ios/blob/d654b8b85143c29e5bb73d0ff92f5f5766fbbedc/Sources/Paywalls/Components/PaywallCountdownComponent.swift"
+    ],
+    "variants": [
+      { "name": "Ten seconds remaining", "countdown_seconds_from_now": 10,
+        "expected_outcome": "The countdown ticks, then Offer ended replaces it. Switch presets to restart. This is not a real discount.",
+        "expected_text": { "countdown-title": "Preview ends soon" }, "expected_purchase_package": "$rc_monthly" },
+      { "name": "Already expired", "countdown_seconds_from_now": -1,
+        "expected_outcome": "Offer ended is visible immediately; no running countdown remains.",
+        "expected_text": { "expired-copy": "Offer ended" }, "expected_purchase_package": "$rc_monthly" }
+    ]
+  },
+  "offerings": [{
+    "identifier": "countdown_lab", "packages": [{ "identifier": "$rc_monthly", "platform_product_identifier": "gallery.monthly" }],
+    "paywall_components": {
+      "id": "verified-countdown", "default_locale": "en_US",
+      "components_config": { "base": {
+        "background": { "light": { "type": "hex", "value": "#f4f0ffff" } },
+        "stack": { "type": "stack", "spacing": 20, "padding": { "top": 24, "bottom": 24, "leading": 20, "trailing": 20 }, "components": [
+          { "type": "text", "text_lid": "title", "font_size": "heading_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#41266aff" } } },
+          { "type": "countdown", "id": "countdown", "count_from": "minutes", "style": { "type": "date", "date": "2000-01-01T00:00:00Z" },
+            "countdown_stack": { "type": "stack", "spacing": 12, "shape": { "type": "rectangle", "corners": { "all": 22 } }, "padding": { "top": 22, "bottom": 22, "leading": 16, "trailing": 16 }, "background_color": { "light": { "type": "hex", "value": "#ffffffff" } }, "components": [
+              { "type": "text", "id": "countdown-title", "text_lid": "running_title", "font_size": "heading_s" },
+              { "type": "text", "id": "remaining", "text_lid": "remaining", "font_size": "heading_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#61378dff" } } }
+            ] },
+            "end_stack": { "type": "stack", "spacing": 12, "shape": { "type": "rectangle", "corners": { "all": 22 } }, "padding": { "top": 22, "bottom": 22, "leading": 16, "trailing": 16 }, "background_color": { "light": { "type": "hex", "value": "#e3d6f4ff" } }, "components": [
+              { "type": "text", "id": "expired-copy", "text_lid": "expired", "font_size": "heading_s", "font_weight": "bold" },
+              { "type": "text", "text_lid": "regular", "font_size": "body_m" }
+            ] } },
+          { "type": "text", "text_lid": "note", "font_size": "body_m" },
+          { "type": "package", "id": "monthly", "package_id": "$rc_monthly", "stack": { "type": "stack", "shape": { "type": "pill" }, "padding": { "top": 16, "bottom": 16, "leading": 12, "trailing": 12 }, "background_color": { "light": { "type": "hex", "value": "#ffffffff" } }, "components": [{ "type": "text", "text_lid": "plan" }] } }
+        ] },
+        "sticky_footer": { "type": "footer", "stack": { "type": "stack", "padding": { "top": 12, "bottom": 18, "leading": 20, "trailing": 20 }, "components": [
+          { "type": "purchase_button", "id": "purchase", "stack": { "type": "stack", "shape": { "type": "pill" }, "padding": { "top": 15, "bottom": 15, "leading": 16, "trailing": 16 }, "background_color": { "light": { "type": "hex", "value": "#61378dff" } }, "components": [
+            { "type": "text", "text_lid": "cta", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#ffffffff" } } }
+          ] } }
+        ] } }
+      } },
+      "components_localizations": { "en_US": {
+        "title": "A deadline with an ending", "running_title": "Preview ends soon", "remaining": "{{ seconds }} seconds",
+        "expired": "Offer ended", "regular": "The standard plan is still available.",
+        "note": "Each timed preset creates a new demo deadline. The purchase price and selected package do not change when it expires.",
+        "plan": "{{ product_name }} - {{ price }}", "cta": "Continue for {{ price }}"
+      } }
+    }
+  }]
+}
