@@ -1,0 +1,47 @@
+{
+  "state_declarations": {
+    "plan": { "type": "string", "default": "annual" }
+  },
+  "components_config": {
+    "base": {
+      "stack": {
+        "type": "stack",
+        "components": [
+          {
+            "type": "tabs",
+            "default_tab_id": "annual",
+            "tabs": [],
+            "state_updates": [{ "set": "plan", "to": "$value" }],
+            "overrides": [
+              {
+                "conditions": [
+                  {
+                    "type": "state_condition",
+                    "name": "plan",
+                    "operator": "=",
+                    "value": "annual"
+                  }
+                ],
+                "properties": { "visible": true }
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "text_lid": "intro",
+            "visible": false,
+            "overrides": [
+              {
+                "conditions": [
+                  { "type": "intro_offer_condition", "operator": "=", "value": true },
+                  { "type": "selected_package_condition", "operator": "in", "packages": ["annual"] }
+                ],
+                "properties": { "visible": true, "textLid": "intro_offer" }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

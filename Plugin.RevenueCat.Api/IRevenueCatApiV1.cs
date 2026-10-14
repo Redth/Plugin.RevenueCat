@@ -1,4 +1,5 @@
-﻿using Plugin.RevenueCat.Api.V1;
+using Plugin.RevenueCat.Api.V1;
+using Plugin.RevenueCat.Models;
 
 namespace Plugin.RevenueCat.Api;
 
@@ -23,6 +24,14 @@ public interface IRevenueCatApiV1
 	/// <param name="customer_id">The app user ID of the customer.</param>
 	/// <returns>The offerings response containing available offerings and the current offering ID.</returns>
 	Task<OfferingsResponse> GetOfferings(string customer_id);
+
+	/// <summary>
+	/// Gets the runtime offerings payload for a customer, including RevenueCat paywall component data when configured.
+	/// </summary>
+	/// <param name="customer_id">The app user ID of the customer.</param>
+	/// <param name="request">Optional SDK-like request headers such as platform and preferred locales.</param>
+	/// <returns>The full runtime offerings response with paywall components and UI config.</returns>
+	Task<PaywallOfferingsResponse> GetPaywallOfferings(string customer_id, PaywallOfferingsRequest? request = null);
 
 	/// <summary>
 	/// Gets the subscription management URL for a customer.

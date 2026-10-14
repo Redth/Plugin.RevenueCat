@@ -17,6 +17,7 @@ public interface IRevenueCatPlatformImplementation
 	Task<string?> LoginAsync(string userId);
 	Task<string?> LogOutAsync();
 
+
 	Task<string?> GetCustomerInfoAsync(bool force);
 	void InvalidateCustomerInfoCache();
 

@@ -131,6 +131,16 @@ enum RevenueCatBindingHelpers {
         return NSString(data: jsonData, encoding: String.Encoding.utf8.rawValue)
     }
 
+    static func introEligibilityStatusIdentifier(_ status: IntroEligibilityStatus) -> String {
+        switch status {
+        case .unknown: return "unknown"
+        case .ineligible: return "ineligible"
+        case .eligible: return "eligible"
+        case .noIntroOfferExists: return "no_intro_offer_exists"
+        @unknown default: return "unknown"
+        }
+    }
+
     static func packageTypeIdentifier(_ packageType: RevenueCat.PackageType) -> String {
         switch packageType {
         case .annual: return "annual"

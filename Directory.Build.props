@@ -2,6 +2,7 @@
 	<PropertyGroup>
 		<UseArtifactsOutput>true</UseArtifactsOutput>
 		<LangVersion>latest</LangVersion>
+		<MauiVersion>10.0.110</MauiVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true' Or '$(TF_BUILD)' == 'true'">

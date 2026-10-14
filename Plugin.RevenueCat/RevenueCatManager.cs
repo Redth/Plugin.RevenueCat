@@ -9,7 +9,7 @@ public class CustomerInfoUpdatedEventArgs(CustomerInfo customerInfoRequest) : Ev
 	public CustomerInfo CustomerInfoRequest => customerInfoRequest;
 }
 
-public class RevenueCatManager : IRevenueCatManager
+public class RevenueCatManager : IRevenueCatManager, IRevenueCatIntroEligibility
 {
 	public RevenueCatManager(RevenueCatOptions options, IRevenueCatPlatformImplementation platformImplementation, ILoggerFactory? loggerFactory = null)
 	{
@@ -78,6 +78,80 @@ public class RevenueCatManager : IRevenueCatManager
 
 	public Task<RevenueCatOperationResult<CustomerInfo>> LogOutWithResultAsync()
 		=> RequestResult<CustomerInfo>(nameof(LogOutAsync), PlatformImplementation.LogOutAsync);
+
+	public Task<string?> GetAppUserIdAsync()
+		=> Task.FromResult(AppUserId);
+
+	public async Task<RevenueCatOperationResult<IReadOnlyDictionary<string, IntroEligibilityStatus>>> CheckTrialOrIntroDiscountEligibilityWithResultAsync(
+		IEnumerable<string> productIdentifiers, CancellationToken cancellationToken = default)
+	{
+		ArgumentNullException.ThrowIfNull(productIdentifiers);
+		var ids = productIdentifiers.Where(id => !string.IsNullOrWhiteSpace(id)).Select(id => id.Trim())
+			.Where(id => !string.IsNullOrEmpty(id))
+			.Distinct(StringComparer.Ordinal)
+			.ToArray();
+		if (ids.Length == 0 || ids.Any(id => id.Contains(',')))
+			throw new ArgumentException("Provide at least one product identifier without commas.", nameof(productIdentifiers));
+
+		cancellationToken.ThrowIfCancellationRequested();
+		if (PlatformImplementation is not IRevenueCatIntroEligibilityPlatform eligibilityPlatform)
+			return EligibilityFailure("unsupported_platform", "Trial or introductory discount eligibility is only available on iOS and Mac Catalyst.");
+
+		var customerId = AppUserId;
+		if (string.IsNullOrEmpty(customerId))
+			return EligibilityFailure("not_initialized", "Initialize RevenueCat before checking introductory eligibility.");
+
+		var response = await RequestResult<Dictionary<string, string>>(
+			nameof(CheckTrialOrIntroDiscountEligibilityWithResultAsync),
+			() => eligibilityPlatform.CheckTrialOrIntroDiscountEligibilityAsync(string.Join(",", ids)))
+			.WaitAsync(cancellationToken).ConfigureAwait(false);
+		cancellationToken.ThrowIfCancellationRequested();
+
+		if (!string.Equals(customerId, AppUserId, StringComparison.Ordinal))
+			return EligibilityFailure("customer_changed", "The RevenueCat user changed while checking introductory eligibility. Retry for the current user.");
+
+		if (!response.IsSuccess)
+			return RevenueCatOperationResult<IReadOnlyDictionary<string, IntroEligibilityStatus>>.Failure(
+				response.Error ?? UnknownError(nameof(CheckTrialOrIntroDiscountEligibilityWithResultAsync)));
+
+		if (response.Value is not { Count: > 0 })
+			return EligibilityFailure("empty_eligibility_response", "The native SDK returned no introductory eligibility statuses.");
+
+		var result = new Dictionary<string, IntroEligibilityStatus>(StringComparer.Ordinal);
+		foreach (var id in ids)
+		{
+			var raw = response.Value.GetValueOrDefault(id);
+			if (raw is null)
+			{
+				result.Add(id, IntroEligibilityStatus.Unknown);
+				continue;
+			}
+			if (!TryParseEligibilityStatus(raw, out var status))
+				return EligibilityFailure("invalid_eligibility_status", $"The native SDK returned an unrecognized introductory eligibility status for '{id}'.");
+			result.Add(id, status);
+		}
+
+		return RevenueCatOperationResult<IReadOnlyDictionary<string, IntroEligibilityStatus>>.Success(result);
+	}
+
+	static bool TryParseEligibilityStatus(string value, out IntroEligibilityStatus status)
+	{
+		status = value switch
+		{
+			"eligible" => IntroEligibilityStatus.Eligible,
+			"ineligible" => IntroEligibilityStatus.Ineligible,
+			"no_intro_offer_exists" => IntroEligibilityStatus.NoIntroOfferExists,
+			_ => IntroEligibilityStatus.Unknown
+		};
+		return value is "eligible" or "ineligible" or "no_intro_offer_exists" or "unknown";
+	}
+
+	RevenueCatOperationResult<IReadOnlyDictionary<string, IntroEligibilityStatus>> EligibilityFailure(string code, string message)
+	{
+		Logger.LogWarning("RevenueCatManager->{Name}: {Code}: {Message}", nameof(CheckTrialOrIntroDiscountEligibilityWithResultAsync), code, message);
+		return RevenueCatOperationResult<IReadOnlyDictionary<string, IntroEligibilityStatus>>.Failure(
+			new RevenueCatError { Code = code, Message = message, Source = "dotnet" });
+	}
 
 	public Task<CustomerInfo?> GetCustomerInfoAsync(bool force)
 		=> GetValue(GetCustomerInfoWithResultAsync(force));
@@ -412,6 +486,10 @@ public class RevenueCatManager : IRevenueCatManager
 			else if (typeof(TObject) == typeof(List<StoreProduct>))
 			{
 				obj = (TObject)(object)JsonSerializer.Deserialize(json, ModelSerializerContext.Default.ListStoreProduct)!;
+			}
+			else if (typeof(TObject) == typeof(Dictionary<string, string>))
+			{
+				obj = (TObject)(object)JsonSerializer.Deserialize(json, ModelSerializerContext.Default.DictionaryStringString)!;
 			}
 			else if (typeof(TObject) == typeof(PurchaseResult))
 			{

@@ -11,11 +11,13 @@ namespace Plugin.RevenueCat.Api.V1;
     Converters = [
         typeof(IsoDateTimeOffsetConverter),
         typeof(DateOnlyConverter),
-        typeof(TimeOnlyConverter)
+        typeof(TimeOnlyConverter),
+        typeof(Plugin.RevenueCat.Models.PaywallComponentConverter)
     ])]
 [JsonSerializable(typeof(SubscriberResponse))]
 [JsonSerializable(typeof(SubscriberValueResponse))]
 [JsonSerializable(typeof(OfferingsResponse))]
+[JsonSerializable(typeof(Plugin.RevenueCat.Models.PaywallOfferingsResponse))]
 [JsonSerializable(typeof(Models.Subscriber))]
 [JsonSerializable(typeof(Models.Entitlement))]
 [JsonSerializable(typeof(Models.Subscription))]
@@ -30,4 +32,3 @@ namespace Plugin.RevenueCat.Api.V1;
 public partial class ApiV1SerializerContext : JsonSerializerContext
 {
 }
-

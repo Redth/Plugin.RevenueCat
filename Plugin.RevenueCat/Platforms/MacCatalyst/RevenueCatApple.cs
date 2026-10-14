@@ -8,7 +8,7 @@ using Plugin.RevenueCat.Models;
 namespace Plugin.RevenueCat;
 
 // All the code in this file is only included on iOS.
-public class RevenueCatApple : IRevenueCatPlatformImplementation
+public class RevenueCatApple : IRevenueCatPlatformImplementation, IRevenueCatIntroEligibilityPlatform
 {
 	readonly global::RevenueCat.RevenueCatManager revenueCatManager = new();
 
@@ -88,6 +88,9 @@ public class RevenueCatApple : IRevenueCatPlatformImplementation
 
     public Task<string?> GetProductsAsync(string productIdentifiersCsv, string? type)
         => RunStringAsync(() => revenueCatManager.GetProductsAsync(new NSString(productIdentifiersCsv), ToNSString(type)));
+
+    public Task<string?> CheckTrialOrIntroDiscountEligibilityAsync(string productIdentifiersCsv)
+        => RunStringAsync(() => revenueCatManager.CheckTrialOrIntroDiscountEligibilityAsync(new NSString(productIdentifiersCsv)));
 
     public Task<string?> GetCustomerInfoAsync(bool force)
         => RunStringAsync(() => revenueCatManager.GetCustomerInfoAsync(force));

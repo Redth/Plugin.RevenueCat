@@ -1,0 +1,115 @@
+{
+  "current_offering_id": "comparison",
+  "offerings": [
+    {
+      "identifier": "comparison",
+      "description": "Premium comparison example",
+      "packages": [
+        { "identifier": "$rc_monthly", "platform_product_identifier": "pro_monthly" },
+        { "identifier": "$rc_annual", "platform_product_identifier": "pro_annual" }
+      ],
+      "paywall_components": {
+        "id": "premium_comparison_fixture",
+        "template_name": "components",
+        "revision": 1,
+        "components_config": {
+          "base": {
+            "background": { "type": "color", "value": { "light": { "type": "hex", "value": "#111827ff" } } },
+            "stack": {
+              "type": "stack",
+              "spacing": 14,
+              "padding": { "top": 34, "bottom": 24, "leading": 18, "trailing": 18 },
+              "components": [
+                { "type": "text", "id": "title", "text_lid": "title", "font_size": "heading_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#ffffffff" } } },
+                { "type": "text", "id": "subtitle", "text_lid": "subtitle", "font_size": "body_m", "horizontal_alignment": "center", "color": { "light": { "type": "hex", "value": "#d1d5dbff" } } },
+                {
+                  "type": "package",
+                  "id": "monthly",
+                  "package_id": "$rc_monthly",
+                  "stack": {
+                    "type": "stack",
+                    "spacing": 5,
+                    "padding": { "top": 18, "bottom": 18, "leading": 18, "trailing": 18 },
+                    "shape": { "type": "rectangle", "corners": { "topLeading": 24, "topTrailing": 24, "bottomLeading": 24, "bottomTrailing": 24 } },
+                    "background_color": { "light": { "type": "hex", "value": "#1f2937ff" } },
+                    "border": { "color": { "light": { "type": "hex", "value": "#4b5563ff" } }, "width": 1 },
+                    "components": [
+                      { "type": "text", "id": "monthly-title", "text_lid": "monthly_title", "font_size": "body_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#ffffffff" } } },
+                      { "type": "text", "id": "monthly-copy", "text_lid": "monthly_copy", "font_size": "body_s", "color": { "light": { "type": "hex", "value": "#d1d5dbff" } } }
+                    ]
+                  }
+                },
+                {
+                  "type": "package",
+                  "id": "annual",
+                  "package_id": "$rc_annual",
+                  "is_selected_by_default": true,
+                  "stack": {
+                    "type": "stack",
+                    "spacing": 5,
+                    "padding": { "top": 24, "bottom": 18, "leading": 18, "trailing": 18 },
+                    "shape": { "type": "rectangle", "corners": { "topLeading": 28, "topTrailing": 28, "bottomLeading": 28, "bottomTrailing": 28 } },
+                    "background_color": { "light": { "type": "linear", "degrees": 135, "points": [ { "color": "#4338caff", "percent": 0 }, { "color": "#9333eaff", "percent": 100 } ] } },
+                    "badge": {
+                      "style": "overlay",
+                      "alignment": "top_trailing",
+                      "stack": {
+                        "type": "stack",
+                        "padding": { "top": 6, "bottom": 6, "leading": 12, "trailing": 12 },
+                        "shape": { "type": "pill" },
+                        "background_color": { "light": { "type": "hex", "value": "#facc15ff" } },
+                        "components": [
+                          { "type": "text", "id": "badge", "text_lid": "badge", "font_size": "body_s", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#713f12ff" } } }
+                        ]
+                      }
+                    },
+                    "components": [
+                      { "type": "text", "id": "annual-title", "text_lid": "annual_title", "font_size": "body_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#ffffffff" } } },
+                      { "type": "text", "id": "annual-copy", "text_lid": "annual_copy", "font_size": "body_s", "color": { "light": { "type": "hex", "value": "#ede9feff" } } }
+                    ]
+                  }
+                }
+              ]
+            },
+            "sticky_footer": {
+              "type": "footer",
+              "stack": {
+                "type": "stack",
+                "padding": { "top": 16, "bottom": 24, "leading": 24, "trailing": 24 },
+                "components": [
+                  {
+                    "type": "purchase_button",
+                    "id": "purchase",
+                    "stack": {
+                      "type": "stack",
+                      "padding": { "top": 15, "bottom": 15, "leading": 20, "trailing": 20 },
+                      "shape": { "type": "pill" },
+                      "background_color": { "light": { "type": "hex", "value": "#ffffffff" } },
+                      "components": [
+                        { "type": "text", "id": "cta", "text_lid": "cta", "font_size": "body_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#4338caff" } } }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "components_localizations": {
+          "en_US": {
+            "title": "Pick your premium path",
+            "subtitle": "Comparison templates often combine dark themes, badges, and selected plan emphasis.",
+            "monthly_title": "Monthly",
+            "monthly_copy": "{{ price }} per {{ sub_period }}. Cancel anytime.",
+            "annual_title": "Annual",
+            "annual_copy": "{{ price }} per {{ sub_period }}. Best for committed users.",
+            "badge": "POPULAR",
+            "cta": "Continue"
+          }
+        },
+        "default_locale": "en_US"
+      }
+    }
+  ],
+  "ui_config": { "app": { "colors": {}, "fonts": {} }, "localizations": {}, "variable_config": {}, "custom_variables": {} }
+}

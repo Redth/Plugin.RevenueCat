@@ -19,6 +19,7 @@ public interface IRevenueCatManager
 	Task<CustomerInfo?> LogOutAsync();
 	Task<RevenueCatOperationResult<CustomerInfo>> LogOutWithResultAsync();
 
+	Task<string?> GetAppUserIdAsync();
 	Task<CustomerInfo?> GetCustomerInfoAsync(bool force);
 	Task<RevenueCatOperationResult<CustomerInfo>> GetCustomerInfoWithResultAsync(bool force);
 	void InvalidateCustomerInfoCache();

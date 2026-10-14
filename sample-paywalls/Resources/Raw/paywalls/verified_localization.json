@@ -1,0 +1,58 @@
+{
+  "current_offering_id": "locale_lab",
+  "gallery": {
+    "sources": [
+      "https://github.com/RevenueCat/purchases-ios/blob/d654b8b85143c29e5bb73d0ff92f5f5766fbbedc/Tests/RevenueCatUITests/PaywallsV2/LocaleFinderTests.swift",
+      "https://github.com/RevenueCat/purchases-ios/blob/d654b8b85143c29e5bb73d0ff92f5f5766fbbedc/Sources/Paywalls/Components/PaywallButtonComponent.swift"
+    ],
+    "variants": [
+      { "name": "English (exact)", "locale": "en_US", "expected_outcome": "English text and https://example.com/en/terms in the host navigation event.",
+        "expected_text": { "localized-title": "Make room for more", "legal-copy": "Terms", "purchase-copy": "Continue for $6.99" }, "expected_purchase_package": "$rc_monthly" },
+      { "name": "Spanish Mexico (neutral fallback)", "locale": "es-MX", "expected_outcome": "Neutral Spanish text and /es/terms, not the Spain-only title.",
+        "expected_text": { "localized-title": "Haz espacio para más", "legal-copy": "Condiciones", "purchase-copy": "Continuar por $6.99" }, "expected_purchase_package": "$rc_monthly" },
+      { "name": "Spanish Spain (exact)", "locale": "es_ES", "expected_outcome": "Spain-specific title; missing individual keys fall back to neutral Spanish.",
+        "expected_text": { "localized-title": "Tu espacio, sin límites", "legal-copy": "Condiciones" }, "expected_purchase_package": "$rc_monthly" },
+      { "name": "German (long copy)", "locale": "de-DE", "expected_outcome": "Long German copy wraps; /de/terms is the navigation target.",
+        "expected_text": { "localized-title": "Mehr Möglichkeiten für deinen Alltag", "legal-copy": "Nutzungsbedingungen" }, "expected_purchase_package": "$rc_monthly" },
+      { "name": "Japanese (default fallback)", "locale": "ja-JP", "expected_outcome": "No Japanese fixture exists: use the default English copy and URL.",
+        "expected_text": { "localized-title": "Make room for more", "legal-copy": "Terms" }, "expected_purchase_package": "$rc_monthly" }
+    ]
+  },
+  "offerings": [{
+    "identifier": "locale_lab", "packages": [{ "identifier": "$rc_monthly", "platform_product_identifier": "gallery.monthly" }],
+    "paywall_components": {
+      "id": "verified-locale", "default_locale": "en_US",
+      "components_config": { "base": {
+        "background": { "light": { "type": "hex", "value": "#fff1f3ff" } },
+        "stack": { "type": "stack", "spacing": 20, "padding": { "top": 24, "bottom": 24, "leading": 20, "trailing": 20 }, "components": [
+          { "type": "text", "id": "localized-title", "text_lid": "title", "font_size": "heading_l", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#702b41ff" } } },
+          { "type": "text", "id": "localized-body", "text_lid": "body", "font_size": "body_l" },
+          { "type": "package", "id": "monthly", "package_id": "$rc_monthly", "stack": { "type": "stack", "shape": { "type": "rectangle", "corners": { "all": 22 } }, "padding": { "top": 20, "bottom": 20, "leading": 16, "trailing": 16 }, "background_color": { "light": { "type": "hex", "value": "#ffffffff" } }, "components": [{ "type": "text", "text_lid": "plan", "font_size": "body_l" }] } },
+          { "type": "button", "id": "terms", "action": { "type": "navigate_to", "destination": "url", "url": { "url_lid": "terms_url" } },
+            "stack": { "type": "stack", "padding": { "top": 12, "bottom": 12 }, "components": [{ "type": "text", "id": "legal-copy", "text_lid": "terms", "color": { "light": { "type": "hex", "value": "#702b41ff" } } }] } }
+        ] },
+        "sticky_footer": { "type": "footer", "stack": { "type": "stack", "padding": { "top": 12, "bottom": 18, "leading": 20, "trailing": 20 }, "components": [
+          { "type": "purchase_button", "id": "purchase", "stack": { "type": "stack", "shape": { "type": "pill" }, "padding": { "top": 15, "bottom": 15, "leading": 16, "trailing": 16 }, "background_color": { "light": { "type": "hex", "value": "#963d5aff" } }, "components": [
+            { "type": "text", "id": "purchase-copy", "text_lid": "cta", "font_weight": "bold", "color": { "light": { "type": "hex", "value": "#ffffffff" } } }
+          ] } }
+        ] } }
+      } },
+      "components_localizations": {
+        "en_US": {
+          "title": "Make room for more", "body": "One plan for every day. This fixture translates copy and links; mock USD store prices stay unchanged.",
+          "plan": "Monthly access - {{ price }}", "cta": "Continue for {{ price }}", "terms": "Terms", "terms_url": "https://example.com/en/terms"
+        },
+        "es": {
+          "title": "Haz espacio para más", "body": "Un plan para cada día. El precio de la tienda de prueba sigue en dólares.",
+          "plan": "Acceso mensual - {{ price }}", "cta": "Continuar por {{ price }}", "terms": "Condiciones", "terms_url": "https://example.com/es/terms"
+        },
+        "es_ES": { "title": "Tu espacio, sin límites" },
+        "de": {
+          "title": "Mehr Möglichkeiten für deinen Alltag",
+          "body": "Ein monatliches Abonnement für alle Funktionen, mit verständlichen Informationen und ausreichend Platz für längere Übersetzungen.",
+          "plan": "Monatlicher Zugang - {{ price }}", "cta": "Weiter für {{ price }}", "terms": "Nutzungsbedingungen", "terms_url": "https://example.com/de/terms"
+        }
+      }
+    }
+  }]
+}

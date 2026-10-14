@@ -193,6 +193,35 @@ public class RevenueCatManager : NSObject
             self.serializeJson(products.map { self.serializeStoreProduct($0) }, callback: callback)
         }
     }
+
+    @objc(checkTrialOrIntroDiscountEligibility:callback:)
+    public func checkTrialOrIntroDiscountEligibility(productIdentifiersCsv: NSString, callback: @escaping (NSString?, NSError?) -> Void) {
+        let productIds = (productIdentifiersCsv as String)
+            .split(separator: ",")
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+
+        guard !productIds.isEmpty else {
+            callback(nil, NSError(domain: RevenueCatBindingHelpers.errorDomain, code: 400,
+                                  userInfo: [NSLocalizedDescriptionKey: "At least one product identifier is required."]))
+            return
+        }
+
+        Purchases.shared.checkTrialOrIntroDiscountEligibility(productIdentifiers: productIds) { eligibility in
+            guard !eligibility.isEmpty else {
+                callback(nil, NSError(domain: RevenueCatBindingHelpers.errorDomain, code: 404,
+                                      userInfo: [NSLocalizedDescriptionKey: "No introductory eligibility statuses were returned."]))
+                return
+            }
+
+            var statuses = [String: String]()
+            for productId in productIds {
+                statuses[productId] = RevenueCatBindingHelpers.introEligibilityStatusIdentifier(
+                    eligibility[productId]?.status ?? .unknown)
+            }
+            self.serializeJson(statuses, callback: callback)
+        }
+    }
     
     @objc(purchase:packageIdentifier:callback:)
     public func purchase(offeringIdentifier: NSString, packageIdentifier: NSString, callback: @escaping (NSString?, NSError?) -> Void) {

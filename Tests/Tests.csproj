@@ -1,4 +1,4 @@
-﻿<Project Sdk="MSTest.Sdk/3.6.4">
+﻿<Project Sdk="MSTest.Sdk/4.4.1">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -14,22 +14,26 @@
     <PackageReference Include="DotNetEnv" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" />
-    <PackageReference Update="MSTest.TestFramework" VersionOverride="3.9.3" />
-    <PackageReference Update="MSTest.Analyzers" VersionOverride="3.9.3">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Update="Microsoft.NET.Test.Sdk" VersionOverride="17.14.1" />
-    <PackageReference Update="MSTest.TestAdapter" VersionOverride="3.9.3" />
+    <PackageReference Include="Microsoft.Maui.Controls" />
+    <PackageReference Include="SkiaSharp.Views.Maui.Controls" />
+    <PackageReference Include="Svg.Skia" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Plugin.RevenueCat.Api\Plugin.RevenueCat.Api.csproj" />
     <ProjectReference Include="..\Plugin.RevenueCat.Core\Plugin.RevenueCat.Core.csproj" />
     <ProjectReference Include="..\Plugin.RevenueCat\Plugin.RevenueCat.csproj" />
+    <ProjectReference Include="..\Plugin.RevenueCat.Paywalls\Plugin.RevenueCat.Paywalls.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Exercise the shipping renderer's managed view tree without native handlers. -->
+    <Compile Include="../Plugin.RevenueCat.Paywalls/Controls/**/*.cs" Link="Paywalls/Controls/%(Filename)%(Extension)" />
+    <Compile Include="../Plugin.RevenueCat.Paywalls/Rendering/Maui/**/*.cs" Link="Paywalls/Rendering/%(Filename)%(Extension)" />
+    <Compile Include="../sample-paywalls/PaywallGalleryCase.cs" Link="Gallery/PaywallGalleryCase.cs" />
+    <Compile Include="../sample-paywalls/PaywallExample.cs" Link="Gallery/PaywallExample.cs" />
+    <Compile Include="../sample-paywalls/PaywallExampleLoader.cs" Link="Gallery/PaywallExampleLoader.cs" />
+    <None Include="../sample-paywalls/Resources/Raw/paywalls/*.json" Link="paywalls/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
     <None Update="data\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

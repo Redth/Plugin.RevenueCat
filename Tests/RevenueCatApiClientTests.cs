@@ -72,7 +72,7 @@ public sealed class RevenueCatApiClientTests
 		var handler = new RecordingHttpMessageHandler(JsonResponse("{\"code\":\"not_found\"}", HttpStatusCode.NotFound));
 		var api = new RevenueCatApiV1(CreateHttpClient(handler, "https://api.revenuecat.com/v1/"));
 
-		var exception = await Assert.ThrowsExceptionAsync<HttpRequestException>(
+		var exception = await Assert.ThrowsExactlyAsync<HttpRequestException>(
 			async () => await api.GetOrCreateCustomer("missing-customer"));
 
 		Assert.AreEqual(HttpStatusCode.NotFound, exception.StatusCode);
@@ -230,7 +230,7 @@ public sealed class RevenueCatApiClientTests
 		var handler = new RecordingHttpMessageHandler(JsonResponse("{\"code\":\"forbidden\"}", HttpStatusCode.Forbidden));
 		var api = new RevenueCatApiV2(CreateHttpClient(handler, "https://api.revenuecat.com/v2/"));
 
-		var exception = await Assert.ThrowsExceptionAsync<HttpRequestException>(
+		var exception = await Assert.ThrowsExactlyAsync<HttpRequestException>(
 			async () => await api.GetCustomer("proj_123", "customer-123"));
 
 		Assert.AreEqual(HttpStatusCode.Forbidden, exception.StatusCode);

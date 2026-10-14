@@ -24,6 +24,38 @@ namespace Tests
         }
 
         [TestMethod]
+        public void Can_Deserialize_Single_Offering_With_Paywall_Fields()
+        {
+            const string json = """
+            {
+              "identifier": "default",
+              "metadata": { "campaign": "spring" },
+              "packages": [],
+              "web_checkout_url": "https://checkout.revenuecat.com/example",
+              "ui_config": { "app": { "colors": {}, "fonts": {} } },
+              "paywall_components": {
+                "id": "pw1",
+                "components_config": {
+                  "base": { "stack": { "type": "stack", "components": [] } }
+                },
+                "components_localizations": {},
+                "default_locale": "en_US"
+              },
+              "future_field": true
+            }
+            """;
+
+            var offering = json.ToOffering();
+
+            Assert.IsNotNull(offering);
+            Assert.AreEqual("spring", offering.Metadata["campaign"].GetString());
+            Assert.AreEqual("https://checkout.revenuecat.com/example", offering.WebCheckoutUrl);
+            Assert.IsNotNull(offering.UiConfig);
+            Assert.AreEqual("pw1", offering.PaywallComponents?.Id);
+            Assert.IsTrue(offering.ExtensionData!["future_field"].GetBoolean());
+        }
+
+        [TestMethod]
         [DataRow("type")]
         [DataRow("package_type")]
         public void Can_Deserialize_Package_Type_Aliases(string packageTypeProperty)

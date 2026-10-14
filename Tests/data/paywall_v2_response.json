@@ -1,0 +1,59 @@
+{
+  "object": "paywall",
+  "id": "pw123456789abcdef",
+  "name": "My Awesome Paywall",
+  "offering_id": "ofrng123456789a",
+  "created_at": 1658399423658,
+  "published_at": 1658399423958,
+  "components": {
+    "published": {
+      "revision": 3,
+      "components_config": {
+        "base": {
+          "stack": {
+            "type": "stack",
+            "id": "root",
+            "components": [
+              {
+                "type": "text",
+                "id": "title",
+                "text_lid": "title_lid",
+                "font_size": "heading_l",
+                "color": {
+                  "light": {
+                    "type": "hex",
+                    "value": "#000000ff"
+                  }
+                }
+              }
+            ]
+          },
+          "sticky_footer": {
+            "type": "footer",
+            "id": "sticky-footer",
+            "stack": {
+              "type": "stack",
+              "id": "sticky-footer-stack",
+              "components": []
+            }
+          }
+        }
+      },
+      "default_locale": "en_US",
+      "components_localizations": {
+        "en_US": {
+          "title_lid": "Go Pro"
+        }
+      },
+      "fonts": {
+        "BrandFont": {
+          "ios": {
+            "type": "name",
+            "value": "Avenir"
+          }
+        }
+      }
+    },
+    "draft": null
+  }
+}

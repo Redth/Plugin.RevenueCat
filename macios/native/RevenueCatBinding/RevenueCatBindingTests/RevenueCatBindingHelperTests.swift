@@ -103,6 +103,20 @@ final class RevenueCatBindingHelperTests: XCTestCase {
         XCTAssertEqual(RevenueCatBindingHelpers.subscriptionPeriodUnitIdentifier(.year), "year")
     }
 
+    func testIntroEligibilityStatusesRemainDistinct() throws {
+        let statuses: [String: String] = [
+            "unknown": RevenueCatBindingHelpers.introEligibilityStatusIdentifier(.unknown),
+            "ineligible": RevenueCatBindingHelpers.introEligibilityStatusIdentifier(.ineligible),
+            "eligible": RevenueCatBindingHelpers.introEligibilityStatusIdentifier(.eligible),
+            "without_offer": RevenueCatBindingHelpers.introEligibilityStatusIdentifier(.noIntroOfferExists)
+        ]
+        let payload = try decode(statuses)
+        XCTAssertEqual(payload["unknown"] as? String, "unknown")
+        XCTAssertEqual(payload["ineligible"] as? String, "ineligible")
+        XCTAssertEqual(payload["eligible"] as? String, "eligible")
+        XCTAssertEqual(payload["without_offer"] as? String, "no_intro_offer_exists")
+    }
+
     func testObjCSelectorAvailability() {
         let manager = RevenueCatManager()
         let selectorNames = [
@@ -111,6 +125,7 @@ final class RevenueCatBindingHelperTests: XCTestCase {
             "purchaseProduct:productType:purchaseOptionsJson:callback:",
             "getOfferingForPlacement:callback:",
             "getProducts:productType:callback:",
+            "checkTrialOrIntroDiscountEligibility:callback:",
             "redeemWebPurchase:callback:",
             "getVirtualCurrencies:",
             "invalidateVirtualCurrenciesCache"

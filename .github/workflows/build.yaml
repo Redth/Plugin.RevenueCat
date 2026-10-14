@@ -20,10 +20,12 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0 #Nerdbank needs full clone
-    - name: 🍎 Select Xcode 26.1
-      run: sudo xcode-select -s /Applications/Xcode_26.1.app/Contents/Developer
+    - name: 🍎 Select Xcode 26.6
+      run: sudo xcode-select -s /Applications/Xcode_26.6.app/Contents/Developer
     - name: 🥅 Setup .NET
       uses: actions/setup-dotnet@v5
+      with:
+        global-json-file: global.json
 
     - name: 🥅 .NET Workload Install
       run: dotnet workload install maui android ios maccatalyst
@@ -41,6 +43,12 @@ jobs:
         dotnet pack -m:1 -c Release -p:PublicRelease=${{ env.NBGV_PublicRelease }} -bl:${{ github.workspace}}/artifacts/Plugin.RevenueCat.Core.binlog ./Plugin.RevenueCat.Core/Plugin.RevenueCat.Core.csproj
         dotnet pack -m:1 -c Release -p:PublicRelease=${{ env.NBGV_PublicRelease }} -bl:${{ github.workspace}}/artifacts/Plugin.RevenueCat.Api.binlog ./Plugin.RevenueCat.Api/Plugin.RevenueCat.Api.csproj
         dotnet pack -m:1 -c Release -p:PublicRelease=${{ env.NBGV_PublicRelease }} -bl:${{ github.workspace}}/artifacts/Plugin.RevenueCat.binlog ./Plugin.RevenueCat/Plugin.RevenueCat.csproj
+        dotnet pack -m:1 -c Release -p:PublicRelease=${{ env.NBGV_PublicRelease }} -bl:${{ github.workspace}}/artifacts/Plugin.RevenueCat.Paywalls.binlog ./Plugin.RevenueCat.Paywalls/Plugin.RevenueCat.Paywalls.csproj
+
+    - name: Paywall gallery platform builds
+      run: |
+        dotnet build ./sample-paywalls/PaywallGallerySample.csproj -c Release -f net10.0-android -p:RuntimeIdentifier=android-arm64
+        dotnet build ./sample-paywalls/PaywallGallerySample.csproj -c Release -f net10.0-maccatalyst -p:RuntimeIdentifier=maccatalyst-arm64
 
     - name: 🤖 Android Native Unit Tests
       working-directory: ./android/native

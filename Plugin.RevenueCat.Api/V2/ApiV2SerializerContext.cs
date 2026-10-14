@@ -17,8 +17,12 @@ namespace Plugin.RevenueCat.Api.V2;
 [JsonSerializable(typeof(Offering))]
 [JsonSerializable(typeof(Package))]
 [JsonSerializable(typeof(Product))]
+[JsonSerializable(typeof(Paywall))]
+[JsonSerializable(typeof(PaywallComponents))]
+[JsonSerializable(typeof(PaywallComponentsVersion))]
 [JsonSerializable(typeof(Subscription))]
 [JsonSerializable(typeof(PagedList<Offering>))]
+[JsonSerializable(typeof(PagedList<Paywall>))]
 [JsonSerializable(typeof(PagedList<CustomerAttribute>))]
 [JsonSerializable(typeof(PagedList<Entitlement>))]
 [JsonSerializable(typeof(PagedList<Subscription>))]
@@ -27,4 +31,3 @@ namespace Plugin.RevenueCat.Api.V2;
 public partial class ApiV2SerializerContext : JsonSerializerContext
 {
 }
-
