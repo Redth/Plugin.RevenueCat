@@ -1,4 +1,5 @@
-﻿using Android.App;
+﻿using System.Diagnostics.CodeAnalysis;
+using Android.App;
 using Java.Interop;
 using Java.Util.Concurrent;
 using Java.Util.Functions;
@@ -276,7 +277,10 @@ public class RevenueCatAndroid : Java.Lang.Object, IRevenueCatPlatformImplementa
 
 internal static class CompletableFutureExtensions
 {
-	public static Task<TResult> AsTask<TResult>(this CompletableFuture completableFuture) where TResult : Java.Lang.Object
+	public static Task<TResult> AsTask<
+		[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)] TResult>(
+		this CompletableFuture completableFuture)
+		where TResult : Java.Lang.Object
 	{
 		var l = new CompletableFutureListener<TResult>();
 
@@ -286,7 +290,11 @@ internal static class CompletableFutureExtensions
 	}
 }
 
-internal class CompletableFutureListener<TResult> : Java.Lang.Object, IBiConsumer
+// TryJavaCast<T> may construct the managed peer for T, so T's constructors must be preserved
+// for trimming / NativeAOT (see https://github.com/Redth/Plugin.RevenueCat/issues/33).
+internal class CompletableFutureListener<
+	[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)] TResult>
+	: Java.Lang.Object, IBiConsumer
 	where TResult : Java.Lang.Object
 {
 	readonly TaskCompletionSource<TResult> _tcs = new();
