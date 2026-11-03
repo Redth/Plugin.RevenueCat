@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Android.App;
+﻿using Android.App;
 using Java.Interop;
 using Java.Util.Concurrent;
 using Java.Util.Functions;
@@ -83,20 +82,17 @@ public class RevenueCatAndroid : Java.Lang.Object, IRevenueCatPlatformImplementa
 	
 	public async Task<string?> LoginAsync(string userId)
 	{
-		var s = await global::RevenueCat.RevenueCatManager.Login(userId)!.AsTask<Java.Lang.String>();
-		return s?.ToString();
+		return await global::RevenueCat.RevenueCatManager.Login(userId)!.AsStringTask();
 	}
 
 	public async Task<string?> LogOutAsync()
 	{
-		var s = await global::RevenueCat.RevenueCatManager.Logout()!.AsTask<Java.Lang.String>();
-		return s?.ToString();
+		return await global::RevenueCat.RevenueCatManager.Logout()!.AsStringTask();
 	}
 
 	public async Task<string?> GetCustomerInfoAsync(bool force)
 	{
-		var s = await global::RevenueCat.RevenueCatManager.GetCustomerInfo(force)!.AsTask<Java.Lang.String>();
-		return s?.ToString();
+		return await global::RevenueCat.RevenueCatManager.GetCustomerInfo(force)!.AsStringTask();
 	}
 
 	public void InvalidateCustomerInfoCache()
@@ -106,84 +102,71 @@ public class RevenueCatAndroid : Java.Lang.Object, IRevenueCatPlatformImplementa
 
 	public async Task<string?> RestoreAsync()
 	{
-		var s = await global::RevenueCat.RevenueCatManager.Restore()!.AsTask<Java.Lang.String>();
-		return s?.ToString();
+		return await global::RevenueCat.RevenueCatManager.Restore()!.AsStringTask();
 	}
 	
 	public async Task<string?> SyncPurchasesAsync()
 	{
-		var s = await global::RevenueCat.RevenueCatManager.SyncPurchases()!.AsTask<Java.Lang.String>();
-		return s?.ToString();
+		return await global::RevenueCat.RevenueCatManager.SyncPurchases()!.AsStringTask();
 	}
 
 	public async Task<string?> PurchaseAsync(object? platformContext, string offeringIdentifier, string packageIdentifier)
 	{
-		var s = await global::RevenueCat.RevenueCatManager.Purchase(platformContext as Activity, offeringIdentifier, packageIdentifier)!.AsTask<Java.Lang.String>();
-		return s?.ToString();
+		return await global::RevenueCat.RevenueCatManager.Purchase(platformContext as Activity, offeringIdentifier, packageIdentifier)!.AsStringTask();
 	}
 
 	public async Task<string?> PurchaseWithResultAsync(object? platformContext, string offeringIdentifier, string packageIdentifier, string? purchaseOptionsJson)
 	{
-		var s = await global::RevenueCat.RevenueCatManager.PurchaseWithResult(platformContext as Activity, offeringIdentifier, packageIdentifier, purchaseOptionsJson)!.AsTask<Java.Lang.String>();
-		return s?.ToString();
+		return await global::RevenueCat.RevenueCatManager.PurchaseWithResult(platformContext as Activity, offeringIdentifier, packageIdentifier, purchaseOptionsJson)!.AsStringTask();
 	}
 
 	public async Task<string?> PurchaseProductAsync(object? platformContext, string productIdentifier, string? type, string? purchaseOptionsJson)
 	{
-		var s = await global::RevenueCat.RevenueCatManager.PurchaseProduct(platformContext as Activity, productIdentifier, type, purchaseOptionsJson)!.AsTask<Java.Lang.String>();
-		return s?.ToString();
+		return await global::RevenueCat.RevenueCatManager.PurchaseProduct(platformContext as Activity, productIdentifier, type, purchaseOptionsJson)!.AsStringTask();
 	}
 
 	public async Task<string?> PurchaseSubscriptionOptionAsync(object? platformContext, string productIdentifier, string subscriptionOptionIdentifier, string? type, string? purchaseOptionsJson)
 	{
-		var s = await global::RevenueCat.RevenueCatManager.PurchaseSubscriptionOption(platformContext as Activity, productIdentifier, subscriptionOptionIdentifier, type, purchaseOptionsJson)!.AsTask<Java.Lang.String>();
-		return s?.ToString();
+		return await global::RevenueCat.RevenueCatManager.PurchaseSubscriptionOption(platformContext as Activity, productIdentifier, subscriptionOptionIdentifier, type, purchaseOptionsJson)!.AsStringTask();
 	}
 
 	public async Task<string?> GetOfferingAsync(string offeringIdentifier)
 	{
-		var s = await global::RevenueCat.RevenueCatManager.GetOffering(offeringIdentifier)!.AsTask<Java.Lang.String>();
-		return s?.ToString();
+		return await global::RevenueCat.RevenueCatManager.GetOffering(offeringIdentifier)!.AsStringTask();
 	}
 
 	public async Task<string?> GetOfferingsAsync()
 	{
-		var s = await global::RevenueCat.RevenueCatManager.Offerings!.AsTask<Java.Lang.String>();
-		return s?.ToString();
+		return await global::RevenueCat.RevenueCatManager.Offerings!.AsStringTask();
 	}
 
 	public async Task<string?> GetOfferingForPlacementAsync(string placementIdentifier)
 	{
-		var s = await global::RevenueCat.RevenueCatManager.GetOfferingForPlacement(placementIdentifier)!.AsTask<Java.Lang.String>();
-		return s?.ToString();
+		return await global::RevenueCat.RevenueCatManager.GetOfferingForPlacement(placementIdentifier)!.AsStringTask();
 	}
 
 	public async Task<string?> GetProductsAsync(string productIdentifiersCsv, string? type)
 	{
-		var s = await global::RevenueCat.RevenueCatManager.GetProducts(productIdentifiersCsv, type)!.AsTask<Java.Lang.String>();
-		return s?.ToString();
+		return await global::RevenueCat.RevenueCatManager.GetProducts(productIdentifiersCsv, type)!.AsStringTask();
 	}
 	
 	public async Task SyncOfferingsAndAttributesIfNeeded()
-		=> await global::RevenueCat.RevenueCatManager.SyncAttributesAndOfferingsIfNeeded()!.AsTask<Java.Lang.Boolean>().ConfigureAwait(false);
+		=> await global::RevenueCat.RevenueCatManager.SyncAttributesAndOfferingsIfNeeded()!.AsBooleanTask().ConfigureAwait(false);
 
 	public async Task<bool> CanMakePaymentsAsync(object? platformContext)
 	{
 		var context = (platformContext as Activity) ?? global::Android.App.Application.Context;
-		var s = await global::RevenueCat.RevenueCatManager.CanMakePayments(context)!.AsTask<Java.Lang.Boolean>();
-		return s?.BooleanValue() ?? false;
+		return await global::RevenueCat.RevenueCatManager.CanMakePayments(context)!.AsBooleanTask();
 	}
 
 	public async Task<string?> GetStorefrontAsync()
 	{
-		var s = await global::RevenueCat.RevenueCatManager.Storefront!.AsTask<Java.Lang.String>();
-		return s?.ToString();
+		return await global::RevenueCat.RevenueCatManager.Storefront!.AsStringTask();
 	}
 
 	public async Task<string?> GetVirtualCurrenciesAsync()
 	{
-		var s = await global::RevenueCat.RevenueCatManager.VirtualCurrencies!.AsTask<Java.Lang.String>();
-		return s?.ToString();
+		return await global::RevenueCat.RevenueCatManager.VirtualCurrencies!.AsStringTask();
 	}
 
 	public void InvalidateVirtualCurrenciesCache()
@@ -191,14 +174,12 @@ public class RevenueCatAndroid : Java.Lang.Object, IRevenueCatPlatformImplementa
 
 	public async Task<string?> RedeemWebPurchaseAsync(string redemptionLink)
 	{
-		var s = await global::RevenueCat.RevenueCatManager.RedeemWebPurchase(redemptionLink)!.AsTask<Java.Lang.String>();
-		return s?.ToString();
+		return await global::RevenueCat.RevenueCatManager.RedeemWebPurchase(redemptionLink)!.AsStringTask();
 	}
 
 	public async Task<string?> GetAmazonLwaConsentStatusAsync()
 	{
-		var s = await global::RevenueCat.RevenueCatManager.AmazonLwaConsentStatus!.AsTask<Java.Lang.String>();
-		return s?.ToString();
+		return await global::RevenueCat.RevenueCatManager.AmazonLwaConsentStatus!.AsStringTask();
 	}
 
 	public void CollectDeviceIdentifiers()
@@ -275,51 +256,61 @@ public class RevenueCatAndroid : Java.Lang.Object, IRevenueCatPlatformImplementa
 	}
 }
 
+// Only a fixed set of result types come back from RevenueCatManager's CompletableFutures, so each
+// gets a concrete listener rather than a generic one. Calling TryJavaCast<T> with an open generic T
+// requires DynamicallyAccessedMembers annotations to be trim/NativeAOT safe (see issue #33).
 internal static class CompletableFutureExtensions
 {
-	public static Task<TResult> AsTask<
-		[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)] TResult>(
-		this CompletableFuture completableFuture)
-		where TResult : Java.Lang.Object
+	public static Task<string?> AsStringTask(this CompletableFuture completableFuture)
 	{
-		var l = new CompletableFutureListener<TResult>();
-
+		var l = new StringCompletableFutureListener();
 		completableFuture.WhenComplete(l);
-
 		return l.Task;
 	}
+
+	public static Task<bool> AsBooleanTask(this CompletableFuture completableFuture)
+	{
+		var l = new BooleanCompletableFutureListener();
+		completableFuture.WhenComplete(l);
+		return l.Task;
+	}
+
+	internal static Exception ToException(Java.Lang.Object? error)
+		=> error.TryJavaCast<Java.Lang.Throwable>(out var javaEx)
+			? javaEx
+			: new Exception(error?.ToString() ?? "CompletableFuture completed without a result.");
 }
 
-// TryJavaCast<T> may construct the managed peer for T, so T's constructors must be preserved
-// for trimming / NativeAOT (see https://github.com/Redth/Plugin.RevenueCat/issues/33).
-internal class CompletableFutureListener<
-	[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)] TResult>
-	: Java.Lang.Object, IBiConsumer
-	where TResult : Java.Lang.Object
+internal sealed class StringCompletableFutureListener : Java.Lang.Object, IBiConsumer
 {
-	readonly TaskCompletionSource<TResult> _tcs = new();
+	readonly TaskCompletionSource<string?> _tcs = new();
 
-	public Task<TResult> Task => _tcs.Task;
+	public Task<string?> Task => _tcs.Task;
 
 	public void Accept(Java.Lang.Object? t, Java.Lang.Object? error)
 	{
 		if (error is not null || t is null)
-		{
-			if (error.TryJavaCast<Java.Lang.Throwable>(out var javaEx))
-			{
-				_tcs.TrySetException(javaEx);
-			}
-			else
-			{
-				_tcs.TrySetException(new Exception(error?.ToString() ?? "CompletableFuture completed without a result."));
-			}
-		}
+			_tcs.TrySetException(CompletableFutureExtensions.ToException(error));
+		else if (t.TryJavaCast<Java.Lang.String>(out var result))
+			_tcs.TrySetResult(result.ToString());
 		else
-		{
-			if (t.TryJavaCast<TResult>(out var result))
-				_tcs.TrySetResult(result);
-			else
-				_tcs.TrySetException(new InvalidCastException(t.GetType().Name));
-		}
+			_tcs.TrySetException(new InvalidCastException(t.GetType().Name));
+	}
+}
+
+internal sealed class BooleanCompletableFutureListener : Java.Lang.Object, IBiConsumer
+{
+	readonly TaskCompletionSource<bool> _tcs = new();
+
+	public Task<bool> Task => _tcs.Task;
+
+	public void Accept(Java.Lang.Object? t, Java.Lang.Object? error)
+	{
+		if (error is not null || t is null)
+			_tcs.TrySetException(CompletableFutureExtensions.ToException(error));
+		else if (t.TryJavaCast<Java.Lang.Boolean>(out var result))
+			_tcs.TrySetResult(result.BooleanValue());
+		else
+			_tcs.TrySetException(new InvalidCastException(t.GetType().Name));
 	}
 }
