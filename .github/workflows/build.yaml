@@ -173,6 +173,9 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: startsWith(github.event.ref, 'refs/tags/v')
+    permissions:
+      contents: read
+      id-token: write # Required for NuGet trusted publishing (GitHub OIDC)
     steps:
       - name: ⬇️ Packages
         uses: actions/download-artifact@v5
@@ -180,6 +183,11 @@ jobs:
           name: Packages
       - name: 🥅 Setup .NET
         uses: actions/setup-dotnet@v5
+      - name: 🔑 NuGet Login (Trusted Publishing)
+        id: nuget-login
+        uses: NuGet/login@v1
+        with:
+          user: redth
       - name: 🚢 Push NuGet
         run: |
-          dotnet nuget push ./*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_ORG_API_KEY }} --skip-duplicate
+          dotnet nuget push ./*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --skip-duplicate
