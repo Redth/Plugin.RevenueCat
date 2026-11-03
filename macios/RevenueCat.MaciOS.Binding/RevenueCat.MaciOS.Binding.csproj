@@ -137,24 +137,27 @@
 		<Exec Command="unzip -q -o -d $(_RevenueCatDownloadPath) @(RevenueCatSdkArchives)" />
 		
 		
+		<!--
+			Only the iOS (device + simulator) and Mac Catalyst slices are used by this binding.
+			Strip every other platform slice by prefix so the package stays under nuget.org's
+			250 MB limit, regardless of how upstream names the slices
+			(e.g. tvos-arm64, macos-arm64_x86_64, watchos-arm64_x86_64-simulator, xros-arm64).
+		-->
 		<ItemGroup>
-			<_RevenueCatUnwantedPlatforms Include="xros-arm64" />
-			<_RevenueCatUnwantedPlatforms Include="xros-arm64_x86_64-simulator" />
-			<_RevenueCatUnwantedPlatforms Include="watchos-arm64_arm64_32_armv7k" />
-			<_RevenueCatUnwantedPlatforms Include="watchos-arm64_i386_x86_64-simulator" />
+			<_RevenueCatUnwantedPlatforms Include="tvos" />
+			<_RevenueCatUnwantedPlatforms Include="macos" />
+			<_RevenueCatUnwantedPlatforms Include="watchos" />
+			<_RevenueCatUnwantedPlatforms Include="xros" />
 		</ItemGroup>
-		
+
 		<Exec Command="codesign --deep --remove-signature $(_RevenueCatXcFrameworkPath)" />
-		
-		<!-- Remove vision and watchos to save space -->
-		<RemoveDir Directories="$(_RevenueCatXcFrameworkPath)/%(_RevenueCatUnwantedPlatforms.Identity)" />
-		
+
+		<Exec Command="rm -rf &quot;$(_RevenueCatXcFrameworkPath)&quot;/%(_RevenueCatUnwantedPlatforms.Identity)-*" />
+
 		<ItemGroup>
 			<_RevenueCatCodeSignatureDirs Include="$(_RevenueCatXcFrameworkPath)/_CodeSignature" />
 			<_RevenueCatCodeSignatureDirs
 				Include="$(_RevenueCatXcFrameworkPath)/ios-arm64_x86_64-simulator/RevenueCat.framework/_CodeSignature" />
-			<_RevenueCatCodeSignatureDirs
-				Include="$(_RevenueCatXcFrameworkPath)/tvos-arm64_x86_64-simulator/RevenueCat.framework/_CodeSignature" />
 		</ItemGroup>
 
 		<!-- Remove _CodeSignature directory -->
