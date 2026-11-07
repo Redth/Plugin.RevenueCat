@@ -39,7 +39,8 @@ public partial class Subscriber
 	[JsonPropertyName("non_subscriptions")]
 	public Dictionary<string, List<NonSubscription>> NonSubscriptions { get; set; } = new();
 
-	[JsonPropertyName("other_purchases")]
+	// Deprecated by RevenueCat; purchase history is in NonSubscriptions.
+	[JsonIgnore]
 	public Dictionary<string, List<NonSubscription>> OtherPurchases { get; set; } = new();
 
 	[JsonExtensionData]
