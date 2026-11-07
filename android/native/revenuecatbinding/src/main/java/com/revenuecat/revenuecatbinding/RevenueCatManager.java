@@ -7,6 +7,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.revenuecat.purchases.CacheFetchPolicy;
 import com.revenuecat.purchases.CustomerInfo;
 import com.revenuecat.purchases.EntitlementVerificationMode;
@@ -721,7 +723,7 @@ public class RevenueCatManager
                     CustomerInfo customerInfo = ((RedeemWebPurchaseListener.Result.Success) result).getCustomerInfo();
                     handleCustomerInfoUpdated(customerInfo);
                     resultInfo.put("status", "success");
-                    resultInfo.put("customer_info", new Gson().fromJson(customerInfo.getRawData().toString(), Object.class));
+                    resultInfo.put("customer_info", parseCustomerInfoJson(customerInfo.getRawData().toString()));
                     future.complete(new Gson().toJson(resultInfo));
                     return;
                 }
@@ -1141,10 +1143,14 @@ public class RevenueCatManager
         return priceInfo;
     }
 
+    static JsonElement parseCustomerInfoJson(String json) {
+        return JsonParser.parseString(json);
+    }
+
     static Map<String, Object> serializePurchaseResult(@Nullable StoreTransaction storeTransaction, @Nullable CustomerInfo customerInfo, boolean userCancelled) {
         Map<String, Object> purchaseResultInfo = new HashMap<>();
         purchaseResultInfo.put("user_cancelled", userCancelled);
-        purchaseResultInfo.put("customer_info", customerInfo == null ? null : new Gson().fromJson(customerInfo.getRawData().toString(), Object.class));
+        purchaseResultInfo.put("customer_info", customerInfo == null ? null : parseCustomerInfoJson(customerInfo.getRawData().toString()));
         purchaseResultInfo.put("store_transaction", storeTransaction == null ? null : serializeStoreTransaction(storeTransaction));
         return purchaseResultInfo;
     }
