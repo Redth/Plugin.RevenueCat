@@ -13,9 +13,23 @@ import com.revenuecat.purchases.models.StoreReplacementMode;
 
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class RevenueCatManagerTest {
+    @Test
+    public void purchaseCustomerInfoJson_preservesIntegerTokens() {
+        for (String timestamp : new String[] { "1793981463374", "9007199254740993", "9223372036854775807" }) {
+            String raw = "{\"request_date_ms\":" + timestamp + ",\"schema_version\":3,"
+                + "\"subscriber\":{\"entitlements\":{},\"non_subscriptions\":{}}}";
+            Map<String, Object> result = new HashMap<>();
+            result.put("customer_info", RevenueCatManager.parseCustomerInfoJson(raw));
+            String json = new Gson().toJson(result);
+
+            assertThat(json).isEqualTo("{\"customer_info\":" + raw + "}");
+        }
+    }
+
     @Test
     public void parsePurchaseOptions_preservesSupportedOptionKeys() {
         Map<String, Object> options = RevenueCatManager.parsePurchaseOptions("{"
