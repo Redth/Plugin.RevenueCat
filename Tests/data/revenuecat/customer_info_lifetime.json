@@ -1,0 +1,40 @@
+{
+  "request_date": "2026-11-06T17:20:31Z",
+  "request_date_ms": 1793985631597,
+  "schema_version": 3,
+  "subscriber": {
+    "original_app_user_id": "synthetic-lifetime-owner",
+    "entitlements": {
+      "premium": {
+        "product_identifier": "lifetime_access",
+        "expires_date": null,
+        "purchase_date": "2026-11-06T17:17:31Z"
+      }
+    },
+    "subscriptions": {},
+    "non_subscriptions": {
+      "lifetime_access": [
+        {
+          "id": "synthetic-lifetime-order",
+          "purchase_date": "2026-11-06T17:17:31Z",
+          "store": "play_store",
+          "is_sandbox": true,
+          "price": {
+            "amount": 59.99,
+            "currency": "USD"
+          }
+        }
+      ]
+    },
+    "other_purchases": {
+      "lifetime_access": {
+        "purchase_date": "2026-11-06T17:17:31Z",
+        "price": {
+          "amount": 59.99,
+          "currency": "USD"
+        },
+        "display_name": null
+      }
+    }
+  }
+}

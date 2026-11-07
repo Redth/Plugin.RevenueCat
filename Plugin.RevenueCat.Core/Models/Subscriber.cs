@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Plugin.RevenueCat.Core.Converters;
 
 public partial class Subscriber
 {
@@ -39,7 +40,9 @@ public partial class Subscriber
 	[JsonPropertyName("non_subscriptions")]
 	public Dictionary<string, List<NonSubscription>> NonSubscriptions { get; set; } = new();
 
+	/// <summary>Legacy purchase data. RevenueCat deprecates this field; use <see cref="NonSubscriptions"/> for purchase history.</summary>
 	[JsonPropertyName("other_purchases")]
+	[JsonConverter(typeof(OtherPurchasesJsonConverter))]
 	public Dictionary<string, List<NonSubscription>> OtherPurchases { get; set; } = new();
 
 	[JsonExtensionData]
