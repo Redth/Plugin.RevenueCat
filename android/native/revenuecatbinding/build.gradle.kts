@@ -31,8 +31,8 @@ dependencies {
     // Uncomment line below and replace {dependency.name.goes.here} with your dependency
     // implementation("{dependency.name.goes.here}")
 
-    implementation("com.revenuecat.purchases:purchases:10.23.2")
-    implementation("com.revenuecat.purchases:purchases-store-amazon:10.23.2")
+    implementation("com.revenuecat.purchases:purchases:11.4.3")
+    implementation("com.revenuecat.purchases:purchases-store-amazon:11.4.3")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.7.3")
 //    implementation("com.revenuecat.purchases:purchases-ui:8.16.0")
     implementation("com.google.code.gson:gson:2.12.1")

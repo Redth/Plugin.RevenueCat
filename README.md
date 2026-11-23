@@ -104,17 +104,19 @@ These commands only compile/package the sample; real purchase flows still requir
 
 ### Native SDK dependency validation
 
-The slim wrappers target RevenueCat iOS **5.91.0** and Android **10.23.2**. Recheck the full Android runtime graph after an SDK update with
+The slim wrappers target RevenueCat iOS **5.103.2** and Android **11.4.3**. Recheck the full Android runtime graph after an SDK update with
 `cd android/native && ./gradlew :revenuecatbinding:dependencies --configuration releaseRuntimeClasspath`.
-For 10.23.2, the direct runtime edges are Play Billing 8.3.0, Amazon Appstore 3.0.5,
+For 11.4.3, the direct runtime edges are Play Billing 9.1.0, Amazon Appstore 3.0.5,
 Tink Android 1.10.0, Google Play Services Ads Identifier 17.0.1 / Auth Blockstore
-16.4.0, Kotlin stdlib/Parcelize 2.0.21, coroutines 1.6.4, AndroidX Core Ktx 1.8.0,
-Lifecycle Process 2.5.0, serialization JSON 1.5.1, and Poko annotations 0.17.2.
+16.4.0, Kotlin stdlib/Parcelize 2.2.21, coroutines 1.9.0, AndroidX Core Ktx 1.15.0,
+Lifecycle Process 2.5.0 (resolved to 2.6.2), Startup Runtime 1.1.1, serialization JSON
+1.7.3, and Poko annotations 0.20.2.
 The wrapper additionally uses Gson 2.12.1 and resolves serialization JSON JVM
 1.7.3. The binding maps runtime artifacts to central NuGet packages (including
-BillingClient 8.3.0.2, Tink Android 1.10.0.2, GoogleGson 2.12.1, Kotlin stdlib
-2.3.10.1, coroutines 1.10.2.3, and AndroidX Lifecycle 2.10.0.2); the newer
-Kotlin/AndroidX NuGet versions satisfy other MAUI dependencies as well.
+BillingClient 9.1.0.2, Tink Android 1.10.0.2, GoogleGson 2.12.1, Kotlin stdlib /
+Parcelize 2.4.0.1, coroutines 1.11.0.1, AndroidX Core Ktx 1.19.1, and AndroidX
+Lifecycle 2.11.0.1); the newer Kotlin/AndroidX NuGet versions satisfy other MAUI
+dependencies as well.
 
 **Verifier limitation:** The .NET Android Java-dependency verifier currently fails
 with `XAJDV7004` when it reads the empty `PackageReference.Version` metadata left
