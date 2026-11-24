@@ -92,12 +92,13 @@ Configuration options are available through `RevenueCatOptionsBuilder` for expli
 
 ### Smoke validation
 
-The sample app can be smoke-built without live purchases to validate MAUI packaging and binding references:
+The sample app targets `.NET 11` and can be smoke-built from `sample/` without live purchases to validate MAUI packaging and binding references:
 
 ```bash
-dotnet build ./sample/MauiSample.csproj -f net10.0-android --no-restore
-dotnet build ./sample/MauiSample.csproj -f net10.0-ios --no-restore
-dotnet build ./sample/MauiSample.csproj -f net10.0-maccatalyst --no-restore
+cd sample
+dotnet build -f net11.0-android
+dotnet build -f net11.0-ios
+dotnet build -f net11.0-maccatalyst
 ```
 
 These commands only compile/package the sample; real purchase flows still require platform store configuration and test accounts.
