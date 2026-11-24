@@ -14,9 +14,38 @@ import com.revenuecat.purchases.models.StoreReplacementMode;
 
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class RevenueCatManagerTest {
+    @Test
+    public void purchaseCustomerInfoJson_preservesIntegerTokens() {
+        for (String timestamp : new String[] {
+            "0", "1793981463374", "9007199254740993", "9223372036854775807", "-9223372036854775808"
+        }) {
+            String raw = "{\"request_date_ms\":" + timestamp + ",\"schema_version\":3,"
+                + "\"subscriber\":{\"entitlements\":{},\"non_subscriptions\":{}}}";
+            Map<String, Object> result = new HashMap<>();
+            result.put("customer_info", RevenueCatManager.parseCustomerInfoJson(raw));
+            String json = new Gson().toJson(result);
+
+            assertThat(json).isEqualTo("{\"customer_info\":" + raw + "}");
+        }
+    }
+
+    @Test
+    public void purchaseCustomerInfoJson_preservesNestedNumbersAndValueTypes() {
+        String raw = "{\"schema_version\":3,\"subscriber\":{"
+            + "\"subscriptions\":{\"monthly\":{\"price\":{\"amount\":4.99,\"currency\":\"USD\"},\"is_sandbox\":true}},"
+            + "\"non_subscriptions\":{\"coins\":[{\"id\":\"9007199254740993\","
+            + "\"price\":{\"amount\":1.25e-3,\"currency\":\"USD\"},\"purchase_date_ms\":9007199254740993}]}},"
+            + "\"future_numbers\":[0,-1,-9223372036854775808,18446744073709551615,1e100]}";
+        Map<String, Object> result = new HashMap<>();
+        result.put("customer_info", RevenueCatManager.parseCustomerInfoJson(raw));
+
+        assertThat(new Gson().toJson(result)).isEqualTo("{\"customer_info\":" + raw + "}");
+    }
+
     @Test
     public void packageTypeIdentifier_matchesManagedEnumNames() {
         assertThat(RevenueCatManager.packageTypeIdentifier(PackageType.MONTHLY)).isEqualTo("monthly");
