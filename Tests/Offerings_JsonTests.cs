@@ -94,6 +94,30 @@ namespace Tests
         }
 
         [TestMethod]
+        [DataRow("unknown", PackageType.Unknown)]
+        [DataRow("custom", PackageType.Custom)]
+        [DataRow("lifetime", PackageType.Lifetime)]
+        [DataRow("annual", PackageType.Annual)]
+        [DataRow("six_month", PackageType.Six_Month)]
+        [DataRow("three_month", PackageType.Three_Month)]
+        [DataRow("two_month", PackageType.Two_Month)]
+        [DataRow("monthly", PackageType.Monthly)]
+        [DataRow("weekly", PackageType.Weekly)]
+        public void Can_Deserialize_Android_Package_Types(string type, PackageType expected)
+        {
+            foreach (var property in new[] { "package_type", "type" })
+            {
+                var identifier = type is "custom" or "unknown" ? "my-package" : "$rc_" + type;
+                var json = $$"""
+                {"identifier":"default","packages":[{"identifier":"{{identifier}}","{{property}}":"{{type}}"}]}
+                """;
+                var package = json.ToOffering()!.Packages[0];
+                Assert.AreEqual(expected, package.PackageType);
+                Assert.AreEqual(identifier, package.Identifier);
+            }
+        }
+
+        [TestMethod]
         public void Can_Deserialize_Offerings_Collection()
         {
             const string json = """

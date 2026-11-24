@@ -53,6 +53,7 @@ import com.revenuecat.purchases.AmazonLWAConsentStatus;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.HashMap;
@@ -998,6 +999,10 @@ public class RevenueCatManager
         return errorInfo;
     }
 
+    static String packageTypeIdentifier(PackageType packageType) {
+        return packageType.name().toLowerCase(Locale.ROOT);
+    }
+
     private static Map<String, Object> serializeOffering(Offering offering) {
         Map<String, Object> offeringInfo = new HashMap<>();
         offeringInfo.put("id", offering.getIdentifier());
@@ -1011,8 +1016,8 @@ public class RevenueCatManager
             Map<String, Object> packageInfo = new HashMap<>();
             packageInfo.put("id", pkg.getIdentifier());
             packageInfo.put("identifier", pkg.getIdentifier());
-            packageInfo.put("package_type", pkg.getPackageType().getIdentifier());
-            packageInfo.put("type", pkg.getPackageType().getIdentifier());
+            packageInfo.put("package_type", packageTypeIdentifier(pkg.getPackageType()));
+            packageInfo.put("type", packageTypeIdentifier(pkg.getPackageType()));
             packageInfo.put("store_product", serializeStoreProduct(pkg.getProduct()));
             packageInfos.add(packageInfo);
         }
