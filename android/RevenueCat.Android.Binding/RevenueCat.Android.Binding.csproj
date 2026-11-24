@@ -15,7 +15,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<RevenueCatSdkVersion>10.23.2</RevenueCatSdkVersion>
+		<RevenueCatSdkVersion>11.4.3</RevenueCatSdkVersion>
 		<RevenueCatSdkUrl>https://repo1.maven.org/maven2/com/revenuecat/purchases/purchases/$(RevenueCatSdkVersion)/purchases-$(RevenueCatSdkVersion).aar</RevenueCatSdkUrl>
 		<RevenueCatUISdkUrl>https://repo1.maven.org/maven2/com/revenuecat/purchases/purchases-ui/$(RevenueCatSdkVersion)/purchases-ui-$(RevenueCatSdkVersion).aar</RevenueCatUISdkUrl>
 	</PropertyGroup>
@@ -42,7 +42,7 @@
 		<AndroidMavenLibrary Include="com.amazon.device:amazon-appstore-sdk" Version="3.0.5" Bind="false" Pack="True" VerifyDependencies="False" />
 
 		<!-- Kotlin data class annotations -->
-		<AndroidMavenLibrary Include="dev.drewhamilton.poko:poko-annotations" Version="0.17.2" Bind="false" Pack="True" VerifyDependencies="False" />
+		<AndroidMavenLibrary Include="dev.drewhamilton.poko:poko-annotations" Version="0.20.2" Bind="false" Pack="True" VerifyDependencies="False" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -50,6 +50,7 @@
 		<PackageReference Include="Xamarin.GooglePlayServices.Auth.Blockstore" />
 		<PackageReference Include="Xamarin.KotlinX.Serialization.Json" />
 		<PackageReference Include="Xamarin.Android.Google.BillingClient" />
+		<PackageReference Include="Xamarin.AndroidX.Core.Core.Ktx" />
 		<PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" />
 		<PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData.Core" />
 		<PackageReference Include="Xamarin.Kotlin.Parcelize.Runtime" />
@@ -76,8 +77,7 @@
 		<AndroidIgnoredJavaDependency Include="androidx.annotation:annotation:1.6.0" />
 		<AndroidIgnoredJavaDependency Include="org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3" />
 		<AndroidIgnoredJavaDependency Include="org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.7.3" />
-		<AndroidIgnoredJavaDependency Include="org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.21" />
-		<AndroidIgnoredJavaDependency Include="androidx.core:core-ktx:1.8.0" />
+		<AndroidIgnoredJavaDependency Include="androidx.core:core-ktx:1.15.0" />
 	</ItemGroup>
 
 </Project>
