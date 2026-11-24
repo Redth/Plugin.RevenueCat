@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.revenuecat.purchases.EntitlementVerificationMode;
 import com.revenuecat.purchases.ProductType;
+import com.revenuecat.purchases.PackageType;
 import com.revenuecat.purchases.PurchasesAreCompletedBy;
 import com.revenuecat.purchases.Store;
 import com.revenuecat.purchases.models.StoreReplacementMode;
@@ -16,6 +17,19 @@ import org.junit.Test;
 import java.util.Map;
 
 public class RevenueCatManagerTest {
+    @Test
+    public void packageTypeIdentifier_matchesManagedEnumNames() {
+        assertThat(RevenueCatManager.packageTypeIdentifier(PackageType.MONTHLY)).isEqualTo("monthly");
+        assertThat(RevenueCatManager.packageTypeIdentifier(PackageType.UNKNOWN)).isEqualTo("unknown");
+        assertThat(RevenueCatManager.packageTypeIdentifier(PackageType.CUSTOM)).isEqualTo("custom");
+        assertThat(RevenueCatManager.packageTypeIdentifier(PackageType.LIFETIME)).isEqualTo("lifetime");
+        assertThat(RevenueCatManager.packageTypeIdentifier(PackageType.ANNUAL)).isEqualTo("annual");
+        assertThat(RevenueCatManager.packageTypeIdentifier(PackageType.SIX_MONTH)).isEqualTo("six_month");
+        assertThat(RevenueCatManager.packageTypeIdentifier(PackageType.THREE_MONTH)).isEqualTo("three_month");
+        assertThat(RevenueCatManager.packageTypeIdentifier(PackageType.TWO_MONTH)).isEqualTo("two_month");
+        assertThat(RevenueCatManager.packageTypeIdentifier(PackageType.WEEKLY)).isEqualTo("weekly");
+    }
+
     @Test
     public void parsePurchaseOptions_preservesSupportedOptionKeys() {
         Map<String, Object> options = RevenueCatManager.parsePurchaseOptions("{"
